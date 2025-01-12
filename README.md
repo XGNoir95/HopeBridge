@@ -1,16 +1,15 @@
 # HopeBridge
 
-
-![Logo](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTezaw0GCKPxw2IDDgfAG_sejfT-yvh8ZCEwQ&s)
+<img src="https://github.com/Adnan-Shahriar-1190/Todo-App/blob/main/logo2.png" alt="Image Description" width="500" height="200" />
 
 ## Team Members:
 
 | Name                | ID        |    Email     |  Role  |
 | :-------------------| :---------| :------------| :----- |
-| Surid Abrar |20220104028| shuhridabrar2016@gmail.com |Lead |
+| Shurid Abrar |20220104028| shuhridabrar2016@gmail.com |Lead |
 | Zubaer Mahmud Shihab|20220104030|zubaer.mahmud31@gmail.com|Backend |
 | Adnan Shahriar Bhuiyan|20220104036| sb.adnan2020@gmail.com |Backend |
-| Mahathir Rahman |20220104046| mahadirmrh04@gmail.com |Frontend |
+| Mahadir Rahman |20220104046| mahadirmrh04@gmail.com |Frontend |
 
 ## Project Overview:
 
@@ -35,18 +34,7 @@ DisasterConnect strives to unite donors, volunteers, medical professionals, and 
 - **Rendering Method :** Client Side Rendering
 ## User Interface:
 
-Demo Figma UI : [**Figma Link**](https://www.figma.com)
-
-#### Home Page
-
-![App Screenshot](https://m.media-amazon.com/images/S/pv-target-images/81ef275effa427553a847bc220bebe1dc314b2e79d00333f94a6bcadd7cce851.jpg)
-#### LogIn Page
-
-![App Screenshot](https://m.media-amazon.com/images/S/pv-target-images/81ef275effa427553a847bc220bebe1dc314b2e79d00333f94a6bcadd7cce851.jpg)
-#### Donation Form
-
-![App Screenshot](https://m.media-amazon.com/images/S/pv-target-images/81ef275effa427553a847bc220bebe1dc314b2e79d00333f94a6bcadd7cce851.jpg)
-
+Demo Figma UI : [**Figma Link**](https://www.figma.com/design/VGfJWjiebvbJB0Nst4b4ry/Untitled?node-id=0-1&p=f)
 
 ## Key Features:
 
@@ -89,13 +77,13 @@ Demo Figma UI : [**Figma Link**](https://www.figma.com)
 ## Checkpoint 1 : 
 - Project initialization with Laravel backend and React frontend.
 - User authentication implementation.
-- Database setup for donations, volunteers, and blood donors.
+- Database setup.
 ## Checkpoint 2 : 
-- Develop donor management features.
-- Implement medical volunteering functionality.
+- Implement safe guard feature.
+- Implement relief network feature.
 - Add CRUD operations for volunteers and donor management.
 ## Checkpoint 3 : 
-- Integrate blood donation platform.
+- Integrate disaster alert,disaster report feature.
+- Implement volunteer management, donation management feature.
 - Test all features thoroughly.
-- Deploy the application on a hosting platform.
 
