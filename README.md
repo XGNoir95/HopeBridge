@@ -77,6 +77,52 @@ Demo Figma UI: [**Figma Link**](https://www.figma.com/design/VGfJWjiebvbJB0Nst4b
 - Tracks contributions and provides transparency on how funds and resources are allocated.
 
 ---
+# API Endpoints
+
+### **1. User Management:**
+- **POST /register** - Register a new user (volunteer, donor, medical professional, etc.)  
+- **POST /login** - Login an existing user and return authentication token  
+- **GET /profile** - Get the profile of the logged-in user  
+- **PUT /profile** - Update user profile details (name, contact, preferences, etc.)  
+
+### **2. Donation Management:**
+- **GET /donations** - Get a list of all donations made  
+- **POST /donations** - Create a new donation (financial or goods)  
+- **GET /donor-history/{userId}** - Get a specific user's donation history  
+- **POST /donor-history** - Record and track donation history (financial or goods)  
+
+### **3. Volunteer Management:**
+- **GET /volunteers** - Get a list of all available volunteers  
+- **POST /volunteers** - Register a new volunteer  
+- **GET /medical-volunteers** - Get a list of all available medical volunteers  
+- **POST /medical-volunteers** - Register medical professionals for volunteering  
+
+### **4. Disaster Management:**
+- **POST /disasters** - Report a new disaster with location, severity, and impact details  
+- **GET /disasters** - Get a list of all reported disasters  
+- **GET /disasters/{id}** - Get details of a specific disaster  
+- **GET /alerts** - Get a list of all active disaster alerts  
+- **POST /alerts** - Create a new alert for urgent disaster response needs  
+
+### **5. Resource Management:**
+- **POST /resources** - Add new resources (blood donations, supplies) available for disaster relief  
+- **GET /resources** - Get a list of available resources (blood, food, medical supplies)  
+- **GET /resources/{type}** - Filter available resources by type (e.g., blood, food, water, medical)  
+
+### **6. Shelter Management:**
+- **POST /shelters** - Add a new shelter for disaster relief  
+- **GET /shelters/{id}** - Get details of a specific shelter  
+- **GET /shelter** - Get a list of all shelters available for disaster victims  
+
+### **7. Feedback and Support:**
+- **POST /feedback** - Submit feedback or suggestions regarding disaster relief operations  
+- **GET /feedback** - Get all user feedback and suggestions  
+
+### **8. Emergency and Contact Management:**
+- **POST /emergency-contact** - Create an emergency contact for volunteers or disaster relief workers  
+- **GET /emergency-contact** - Get emergency contact details for users  
+
+---
 
 ## Checkpoints:
 
