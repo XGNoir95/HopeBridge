@@ -5,13 +5,12 @@ import Hero from '../components/Hero';
 const Home = () => {
   return (
     <div className="flex-1">
-      {/* Hero Section with Placeholder Image */}
+
       <Hero />
 
-      {/* Action Cards */}
       <div className="container mx-auto py-16 px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {/* Report Card */}
+
           <div className="text-center p-6 bg-white rounded-lg shadow-lg">
             <div className="flex justify-center mb-4">
               <Megaphone size={60} className="text-[#311B08]" />
@@ -22,7 +21,6 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Donate Card */}
           <div className="text-center p-6 bg-[#E49854] text-[#311B08] rounded-lg shadow-lg">
             <div className="flex justify-center mb-4">
               <Heart size={60} />
@@ -33,7 +31,6 @@ const Home = () => {
             </p>
           </div>
 
-          {/* Join Card */}
           <div className="text-center p-6 bg-white rounded-lg shadow-lg">
             <div className="flex justify-center mb-4">
               <HandshakeIcon size={60} className="text-[#311B08]" />
@@ -46,7 +43,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Partner Organizations */}
       <div className="bg-gray-100 py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Our Partner Organizations:</h2>

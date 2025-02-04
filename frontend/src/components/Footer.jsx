@@ -6,13 +6,11 @@ const Footer = () => {
     <footer className="bg-[#3E2723] text-white mt-auto">
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col items-center text-center">
-          
-          {/* Logo and Tagline */}
+
           <div className="mb-4">
             <img src="FLogo.png" alt="Hope Bridge Logo" className="h-16 sm:h-20 object-contain mx-auto" />
           </div>
 
-          {/* Social Media Icons */}
           <div className="flex flex-wrap justify-center space-x-4 sm:space-x-6 mb-4">
             <a href="#" className="hover:text-blue-500 transition-colors">
               <Facebook size={24} />
@@ -28,7 +26,6 @@ const Footer = () => {
             </a>
           </div>
 
-          {/* Footer Links */}
           <div className="flex flex-wrap justify-center space-x-2 sm:space-x-4 text-sm mb-4">
             <a href="#" className="hover:text-orange-300 transition-colors">About</a>
             <span className="hidden sm:inline">|</span>
@@ -39,7 +36,6 @@ const Footer = () => {
             <a href="#" className="hover:text-orange-300 transition-colors">Contact Us</a>
           </div>
 
-          {/* Copyright */}
           <p className="text-sm mt-4">© 2024 All rights reserved by HopeBridge</p>
         </div>
       </div>
