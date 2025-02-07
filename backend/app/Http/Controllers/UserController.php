@@ -16,18 +16,24 @@ class UserController extends Controller
     }
     public function index()
     {
-        $users = User::all();
-        return $users;
+       return response()->json(User::all(), 200);
     }
+
     public function store(Request $request)
     {
         
     }
-    public function show($id)
-    {
-        $user = User::find($id);
-        return $user;
+  public function show($id)
+{
+    $user = User::find($id);
+    
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
     }
+
+    return response()->json($user, 200);
+}
+
     public function update(Request $request, $id)   
     {
         $user = User::find($id);
