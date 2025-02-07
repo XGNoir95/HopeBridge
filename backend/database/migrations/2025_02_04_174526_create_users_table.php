@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
+
 class CreateUsersTable extends Migration
 {
     /**
@@ -14,9 +14,9 @@ class CreateUsersTable extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->integer('user_id')->primary();
+            $table->increments('user_id');
             $table->string('userMail', 255)->unique();
-            $table->string('donor_id', 255)->unique();
+            $table->string('donor_id', 255)->nullable()->unique();
             $table->string('userPhone', 255);
             $table->string('userName', 255);
             $table->string('district', 255);
