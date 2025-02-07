@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\QueryException;
 
-class CreateShelterTable extends Migration
+class CreateVideosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,13 +14,11 @@ class CreateShelterTable extends Migration
      */
     public function up()
     {
-        Schema::create('shelters', function (Blueprint $table) {
-			$table->integer('shelter_id')->primary();
-			$table->string('shelterName',255);
-			$table->string('thana',255);
-			$table->string('District',255);
-			$table->integer('Capacity');
-			$table->string('shelterPhone',255);
+        Schema::create('videos', function (Blueprint $table) {
+			$table->integer('videos_id')->primary();
+			$table->string('videoDescription',255);
+			$table->string('videoDate',255);
+			$table->string('videoLink',255);
         });
     }
 
@@ -31,6 +29,6 @@ class CreateShelterTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shelters');
+        Schema::dropIfExists('videos');
     }
 }
