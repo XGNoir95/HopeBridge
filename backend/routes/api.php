@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\TestController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +12,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/test', [TestController::class, 'getTestHuman']);
+Route::get('/test', [TestController::class, 'getTestHuman'])->middleware('test.middleware');
 Route::get('/test/{id}', [TestController::class, 'getTestHumanWithId']);
 
-Route::get('/tests', function () {
-    return response()->json(['message' => 'Connect Hoise'], 200);
-});
+Route::get('users', 'App\Http\Controllers\UserController@index');
+Route::get('users/{id}', 'App\Http\Controllers\UserController@show');
+Route::post('users', 'App\Http\Controllers\UserController@store');
+Route::put('users/{id}', 'App\Http\Controllers\UserController@update');
+Route::delete('users/{id}', 'App\Http\Controllers\UserController@destroy');
