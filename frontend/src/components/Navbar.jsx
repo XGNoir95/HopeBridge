@@ -1,35 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, User, Shield, LifeBuoy } from 'lucide-react';
-import logo from '../assets/logo.png'; 
+import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
+  const logo = "/hblogo.png";
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <nav className="bg-[#3E2723] text-white p-4 shadow-lg">
+    // <nav className="bg-[url('navbar.png')] text-white p-4 shadow-lg">
+    <nav className="bg-[#311B08] text-white p-4 shadow-lg">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
+
         <Link to="/" className="flex items-center space-x-2">
-          <img src={logo} alt="Hope Bridge Logo" className="h-15" />
+          <img src={logo} alt="Hope Bridge Logo" className="w-auto h-14" />
           <span className="text-2xl font-bold"></span>
         </Link>
 
-        {/* Navigation Links */}
-        <div className="flex space-x-6">
-          <Link to="/" className="flex items-center space-x-1 hover:text-orange-300 transition-colors">
-            <Home size={18} />
-            <span>Home</span>
+        <div className="md:hidden">
+          <button onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X size={32} /> : <Menu size={32} />}
+          </button>
+        </div>
+
+        <div className={`absolute md:static top-16 right-4 bg-[#311B08] w-48 md:w-auto rounded-lg md:flex md:space-x-10 p-4 md:p-0 shadow-lg md:shadow-none transition-all duration-300 ease-in-out ${isOpen ? 'block' : 'hidden'}`}>
+          <Link to="/" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+            Home
           </Link>
-          <Link to="/relief" className="flex items-center space-x-1 hover:text-orange-300 transition-colors">
-            <LifeBuoy size={18} />
-            <span>Relief</span>
+          <Link to="/" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+            Alerts
           </Link>
-          <Link to="/safeguard" className="flex items-center space-x-1 hover:text-orange-300 transition-colors">
-            <Shield size={18} />
-            <span>Safeguard</span>
+          <Link to="/relief" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+            Relief
           </Link>
-          <Link to="/profile" className="flex items-center space-x-1 hover:text-orange-300 transition-colors">
-            <User size={18} />
-            <span>Profile</span>
+          <Link to="/safeguard" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+            Safeguard
+          </Link>
+          <Link to="/login" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+            Profile
           </Link>
         </div>
       </div>

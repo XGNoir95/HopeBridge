@@ -1,7 +1,10 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Activity } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 
-const UserProfile = () => {
+
+export default function UserProfile() {
+  const navigate = useNavigate();
   const user = {
     name: 'John Doe',
     address: 'San Francisco, CA',
@@ -27,10 +30,12 @@ const UserProfile = () => {
               <h2 className="text-2xl font-bold mb-2">{user.name}</h2>
               <p className="text-gray-600 mb-4">{user.address}</p>
               <div className="space-y-2">
-                <button className="w-full bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                <button className="w-full hover:bg-[#EBB380] hover:text-[#311B08] bg-[#311B08] text-[#EBB380] px-4 py-2 rounded">
                   Edit Profile
                 </button>
-                <button className="w-full border border-orange-500 text-orange-500 px-4 py-2 rounded hover:bg-orange-50">
+                <button 
+                  onClick={() => navigate("/")}
+                  className="w-full border border-[#EBB380] text-[#311B08] px-4 py-2 rounded hover:bg-orange-50">
                   Log Out
                 </button>
               </div>
@@ -86,5 +91,3 @@ const UserProfile = () => {
     </div>
   );
 }
-
-export default UserProfile;
