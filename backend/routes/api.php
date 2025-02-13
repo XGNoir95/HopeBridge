@@ -34,7 +34,7 @@ Route::put('/disaster-posts/{post_id}', [DisasterPostController::class, 'update'
 Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
 
 Route::get('/shelters', [ShelterController::class, 'index']);
-
+Route::get('/shelters/{id}', [ShelterController::class, 'show']);
 
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/{id}', [UserController::class, 'show']);
