@@ -15,11 +15,10 @@ class AuthController extends Controller
             'userName' => 'required|string|max:255',
             'userMail' => 'required|email|unique:users,userMail',
             'userPhone' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:4',
             'blood_group' => 'required|string|max:255',
             'district' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'donor_id' => 'nullable|string|unique:users,donor_id', // Optional if nullable
         ]);
 
         if ($validator->fails()) {
@@ -34,7 +33,6 @@ class AuthController extends Controller
             'blood_group' => $request->blood_group,
             'district' => $request->district,
             'city' => $request->city,
-            'donor_id' => $request->donor_id, // Optional if nullable
         ]);
 
         return response()->json([

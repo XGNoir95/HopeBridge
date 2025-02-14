@@ -16,13 +16,13 @@ class User extends Model
 
     protected $fillable = [
         'userMail',
-        'donor_id',
         'userPhone',
         'userName',
         'district',
         'city',
         'password',
         'blood_group',
+        'profile_picture',
     ];
 
     protected $hidden = [
