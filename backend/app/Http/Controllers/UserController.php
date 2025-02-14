@@ -23,9 +23,10 @@ class UserController extends Controller
     {
         
     }
-  public function show($id)
+    public function show(Request $request)
 {
-    $user = User::find($id);
+    $userId = $request->get('user_id');
+    $user = User::find($userId);
     
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
@@ -33,6 +34,8 @@ class UserController extends Controller
 
     return response()->json($user, 200);
 }
+
+    
 
     public function update(Request $request, $id)   
     {
