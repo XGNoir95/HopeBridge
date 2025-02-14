@@ -1,6 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ShelterController;
+use App\Http\Controllers\DisasterPostController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +22,9 @@ use App\Http\Controllers\TestController;
 Route::get('/test', [TestController::class, 'getTestHuman'])->middleware('test.middleware');
 Route::get('/test/{id}', [TestController::class, 'getTestHumanWithId']);
 
-Route::get('users', 'App\Http\Controllers\UserController@index');
-Route::get('users/{id}', 'App\Http\Controllers\UserController@show');
-Route::post('users', 'App\Http\Controllers\UserController@store');
-Route::put('users/{id}', 'App\Http\Controllers\UserController@update');
-Route::delete('users/{id}', 'App\Http\Controllers\UserController@destroy');
+//Auth
+Route::post('/register', [UserController::class, 'register']);
+Route::post('/login', [UserController::class, 'login']);
+
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/users/{id}', [UserController::class, 'show']);

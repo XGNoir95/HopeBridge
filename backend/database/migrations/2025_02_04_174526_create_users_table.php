@@ -16,7 +16,6 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('user_id'); // Auto-incrementing primary key
             $table->string('userMail', 255)->unique();
-            $table->integer('donor_id');
             $table->string('userPhone', 255);
             $table->string('userName', 255);
             $table->string('district', 255);
