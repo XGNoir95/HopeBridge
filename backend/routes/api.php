@@ -8,7 +8,6 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\DisasterPostController;
 
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,16 +24,18 @@ Route::get('/test/{id}', [TestController::class, 'getTestHumanWithId']);
 //Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+//Route::get('/vt', [AuthController::class, 'validateToken']);
 
 //Post
 Route::post('/image', [ImageController::class, 'store']);
-Route::post('/create-post', [DisasterPostController::class, 'store']);
-Route::get('/disaster-posts', [DisasterPostController::class, 'index']);
+Route::post('/create-post', [DisasterPostController::class, 'store'])->middleware('jwt');
+Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middleware('jwt');
 Route::put('/disaster-posts/{post_id}', [DisasterPostController::class, 'update']);
 Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
 
 Route::get('/shelters', [ShelterController::class, 'index']);
 Route::get('/shelters/{id}', [ShelterController::class, 'show']);
 
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/{id}', [UserController::class, 'show']);
+//Route::get('/users', [UserController::class, 'index']);
+Route::get('/user', [UserController::class, 'show'])->middleware('jwt');
+//Route::get('/users/{id}', [UserController::class, 'show'])->middleware('jwt');

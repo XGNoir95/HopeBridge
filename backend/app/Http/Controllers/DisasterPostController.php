@@ -9,8 +9,6 @@ class DisasterPostController extends Controller
     public function store(Request $request)
 {
     $validatedData = $request->validate([
-        'user_id' => 'required|exists:users,user_id',  // Validate that the user_id exists in the users table
-        // 'user_id' => auth()->id(),  // after login can get authenticated user ID
         'title' => 'required|string|max:255',
         'description' => 'required|string',
         'files' => 'nullable|array',
@@ -20,6 +18,9 @@ class DisasterPostController extends Controller
         'disaster_type' => 'required|string|max:255',
         'status' => 'nullable|string|in:pending,approved,rejected',
     ]);
+
+    // Get the authenticated user's ID
+    $userId = $request->attributes->get('user_id'); // This comes from JwtMiddleware
 
     $files = $request->file('files');
     $urls = [];
@@ -31,7 +32,7 @@ class DisasterPostController extends Controller
     }
 
     $disasterPost = DisasterPost::create([
-        'user_id' => $validatedData['user_id'],
+        'user_id' => $userId,  // Use the authenticated user's ID
         'title' => $validatedData['title'],
         'description' => $validatedData['description'],
         'files' => json_encode($urls),
