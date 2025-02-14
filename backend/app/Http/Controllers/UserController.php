@@ -20,7 +20,18 @@ class UserController extends Controller
         $users = $this->userService->getUserList();
         return response()->json($users);
     }
+    public function register(Request $request) {
+        $result = $this->userService->createUser($request->all());
 
+        if (!$result['success']) {
+            return response()->json(['errors' => $result['errors']], 422);
+        }
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'user' => $result['user'],
+        ], 201);
+    }
     public function store(Request $request)
     {
         $userData = $request->all();

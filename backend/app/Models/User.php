@@ -10,12 +10,13 @@ class User extends Model
 
     protected $primaryKey = 'user_id';
 
-
     protected $fillable = [
-        'userMail', 'donor_id', 'userPhone', 'userName', 
+        'userMail', 'userPhone', 'userName', 
         'district', 'city', 'password', 'blood_group'
     ];
-
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
     public $incrementing = true;
     protected $keyType = 'integer';
 
