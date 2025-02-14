@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    
     //Register a new user.
     public function register(Request $request)
     {
@@ -43,7 +42,6 @@ class AuthController extends Controller
             'user' => $user->makeHidden(['password']), // Exclude sensitive fields
         ], 201);
     }
-
     // User Login
     
     // public function login(Request $request)
