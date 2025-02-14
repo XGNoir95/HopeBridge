@@ -50,6 +50,10 @@ class UserService{
         $user = User::find($id);
         return $user;
     }
+    public function getUserByMail($mail){
+        $user = User::find($mail);
+        return $user;
+    }
     public function deleteUser(User $user){
         // Delete the user
         $user->delete();
