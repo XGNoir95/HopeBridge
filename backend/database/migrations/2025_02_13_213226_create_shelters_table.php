@@ -3,9 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
 
-class CreateShelterTable extends Migration
+class CreateSheltersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,12 +14,11 @@ class CreateShelterTable extends Migration
     public function up()
     {
         Schema::create('shelters', function (Blueprint $table) {
-			$table->integer('shelter_id')->primary();
-			$table->string('shelterName',255);
-			$table->string('thana',255);
-			$table->string('District',255);
-			$table->integer('Capacity');
-			$table->string('shelterPhone',255);
+            $table->id();
+            $table->string('name');
+            $table->decimal('latitude', 10, 8);
+            $table->decimal('longitude', 11, 8);
+            $table->timestamps();
         });
     }
 

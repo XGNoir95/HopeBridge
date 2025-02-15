@@ -1,6 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ShelterController;
+use App\Http\Controllers\DisasterPostController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +21,22 @@ use App\Http\Controllers\TestController;
 Route::get('/test', [TestController::class, 'getTestHuman'])->middleware('test.middleware');
 Route::get('/test/{id}', [TestController::class, 'getTestHumanWithId']);
 
-Route::get('users', 'App\Http\Controllers\UserController@index');
-Route::get('users/{id}', 'App\Http\Controllers\UserController@show');
-Route::post('users', 'App\Http\Controllers\UserController@store');
-Route::put('users/{id}', 'App\Http\Controllers\UserController@update');
-Route::delete('users/{id}', 'App\Http\Controllers\UserController@destroy');
+//Auth
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+//Route::get('/vt', [AuthController::class, 'validateToken']);
+
+//Post
+Route::post('/image', [ImageController::class, 'store']);
+Route::post('/create-post', [DisasterPostController::class, 'store'])->middleware('jwt');
+Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middleware('jwt');
+Route::put('/disaster-posts/{post_id}', [DisasterPostController::class, 'update']);
+Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
+
+Route::get('/shelters', [ShelterController::class, 'index']);
+Route::get('/shelters/{id}', [ShelterController::class, 'show']);
+
+Route::get('/users', [UserController::class, 'index']);
+Route::get('/user', [UserController::class, 'show'])->middleware('jwt');
+Route::put('/updateUser', [UserController::class, 'updateUser'])->middleware('jwt');
+//Route::get('/users/{id}', [UserController::class, 'show'])->middleware('jwt');

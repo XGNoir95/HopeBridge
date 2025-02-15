@@ -5,11 +5,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import UserProfile from "./pages/UserProfile";
 import Login from "./pages/Login";
-import Register from "./pages/Register";  
-import Relief from "./pages/Relief";
-import Safeguard from "./pages/Safeguard";
-import Alerts from "./pages/Alerts";
-import Report from "./pages/Report";
+import Register from "./pages/Register";
 
 function App() {
   return (
@@ -20,11 +16,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<UserProfile />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} /> 
-          <Route path="/relief" element={<Relief />} />
-          <Route path="/safeguard" element={<Safeguard />} />
-          <Route path="/alerts" element={<Alerts />} />
-          <Route path="/report" element={<Report />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
         <Footer />
       </div>
