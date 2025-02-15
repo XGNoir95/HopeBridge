@@ -41,7 +41,8 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        $user = $this->userService->getUserById($request->get);
+        $user = $this->userService->getUserById($request);
+
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
