@@ -51,7 +51,7 @@ export default function RegisterForm() {
 
         <div className="mt-8 flex flex-col gap-y-4">
           <button 
-            onClick={() => navigate("/profile")}  // Navigate to dashboard page upon successful registration
+            onClick={() => navigate("/profile")} 
             className="bg-[#EBB380] text-[#311B08] hover:bg-[#311B08] hover:text-[#EBB380] text-lg font-bold py-3 rounded-xl transition-all">
             Sign Up
           </button>
