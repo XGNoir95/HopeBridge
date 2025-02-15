@@ -12,7 +12,7 @@ export default function Form() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setToken(null); // Reset token on new login attempt
+    setToken(null);
 
     try {
       const response = await axios.post("http://localhost:8000/api/login", {
@@ -25,7 +25,11 @@ export default function Form() {
       if (receivedToken) {
         localStorage.setItem("token", receivedToken);
         setToken(receivedToken);
-        navigate("/profile"); // Redirect after successful login
+
+        // Dispatch a storage event to notify other components
+        window.dispatchEvent(new Event("storage"));
+
+        navigate("/profile");
       } else {
         setError("No token received from the server.");
       }
@@ -60,17 +64,6 @@ export default function Form() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <div className="mt-8 flex justify-between items-center">
-          <div>
-            <input type="checkbox" id="remember" />
-            <label className="ml-2 font-medium text-gray-700" htmlFor="remember">
-              Remember me
-            </label>
-          </div>
-          <button className="font-medium text-[#311B08] hover:underline">
-            Forgot Password
-          </button>
         </div>
         <div className="mt-8 flex flex-col gap-y-4">
           <button
