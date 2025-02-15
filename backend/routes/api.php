@@ -36,6 +36,7 @@ Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'dest
 Route::get('/shelters', [ShelterController::class, 'index']);
 Route::get('/shelters/{id}', [ShelterController::class, 'show']);
 
-//Route::get('/users', [UserController::class, 'index']);
+Route::get('/users', [UserController::class, 'index']);
 Route::get('/user', [UserController::class, 'show'])->middleware('jwt');
+Route::put('/updateUser', [UserController::class, 'updateUser'])->middleware('jwt');
 //Route::get('/users/{id}', [UserController::class, 'show'])->middleware('jwt');

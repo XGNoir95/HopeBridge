@@ -11,11 +11,16 @@ use Illuminate\Support\Facades\Hash;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Illuminate\Support\Facades\Validator;
+use App\Services\UserService;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 
 class AuthController extends Controller
 {
     //Register a new user.
+    protected $UserService;
+    public function __construct(UserService $UserService){
+        $this->UserService = $UserService;
+    }
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -56,7 +61,8 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
     
-        $user = User::where('userMail', $data['userMail'])->first(); // Update query to use 'userMail'
+        // $user= User::where('userMail', $data['userMail'])->first();
+        $user= $this->UserService->getUserByMail($data['userMail']);
     
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
