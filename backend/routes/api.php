@@ -41,7 +41,9 @@ Route::get('/shelters/{id}', [ShelterController::class, 'show']);
 
 Route::get('/users', [UserController::class, 'index']);
 Route::get('/user', [UserController::class, 'show'])->middleware('jwt');
-Route::put('/updateUser', [UserController::class, 'updateUser'])->middleware('jwt');
+
+//need to use post insted of put to update mixed files
+Route::post('/user/update-user', [UserController::class, 'updateUser'])->middleware('jwt');
 //Route::get('/users/{id}', [UserController::class, 'show'])->middleware('jwt');
 
 Route::get('/user/posts', [DisasterPostController::class, 'userPosts'])->middleware('jwt');
