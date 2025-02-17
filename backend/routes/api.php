@@ -42,3 +42,4 @@ Route::put('/updateUser', [UserController::class, 'updateUser'])->middleware('jw
 //Route::get('/users/{id}', [UserController::class, 'show'])->middleware('jwt');
 
 Route::get('/user/posts', [DisasterPostController::class, 'userPosts'])->middleware('jwt');
+Route::get('/user/posts/{post_id}', [DisasterPostController::class, 'FindPostById'])->middleware('jwt');

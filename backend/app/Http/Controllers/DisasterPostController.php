@@ -126,6 +126,8 @@ class DisasterPostController extends Controller
             'message' => 'Disaster post deleted successfully',
         ]);
     }
+
+    //Show all posts of a user
     public function userPosts(Request $request)
     {
         $userId = $request->get('user_id');
@@ -147,5 +149,25 @@ class DisasterPostController extends Controller
             'user_posts' => $userPosts,
         ]);
     }
-        
+
+    //Show a Selected post of the user
+    public function FindPostById(Request $request, $post_id)
+{
+    $userId = $request->get('user_id');
+
+    $userPost = DisasterPost::find($post_id);
+
+    if (!$userPost || $userPost->user_id !== $userId) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Post not found',
+        ], 404);
+    }
+    return response()->json([
+        'success' => true,
+        'user_post' => $userPost,
+    ]);
+}
+
+
 }
