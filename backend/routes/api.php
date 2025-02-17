@@ -30,7 +30,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/image', [ImageController::class, 'store']);
 Route::post('/create-post', [DisasterPostController::class, 'store'])->middleware('jwt');
 Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middleware('jwt');
-Route::put('/disaster-posts/{post_id}', [DisasterPostController::class, 'update']);
+
+//need to use post insted of put to update mixed files
+Route::post('/disaster-posts/{post_id}/update', [DisasterPostController::class, 'update'])->middleware('jwt');
+
 Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
 
 Route::get('/shelters', [ShelterController::class, 'index']);

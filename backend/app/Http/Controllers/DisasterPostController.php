@@ -49,7 +49,7 @@ class DisasterPostController extends Controller
     ]);
 }
 
-    // Display all of the disaster posts
+    // Display all the  posts of all users
     public function index()
     {
         $disasterPosts = DisasterPost::orderBy('created_at', 'desc')->get();
@@ -74,14 +74,14 @@ class DisasterPostController extends Controller
         $disasterPost = DisasterPost::findOrFail($post_id);
 
         $validatedData = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
+            'title' => 'string|max:255',
+            'description' => 'string',
             'files' => 'nullable|array',
             'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'city' => 'sometimes|required|string|max:255',
-            'district' => 'sometimes|required|string|max:255',
-            'disaster_type' => 'sometimes|required|string|max:255',
-            'status' => 'nullable|string|in:pending,approved,rejected',
+            'division' => 'string|max:255',
+            'district' => 'string|max:255',
+            'event_date' => 'nullable|date',
+            'event_time' => 'nullable|date_format:H:i:s',
         ]);
     
         $files = $request->file('files');
@@ -92,30 +92,24 @@ class DisasterPostController extends Controller
                 $urls[] = $result->getSecurePath(); 
             }
         }
-    
-        //merge New data with unchanged data
-        $existingFiles = json_decode($disasterPost->files, true) ?? [];
-        $updatedFiles = array_merge($existingFiles, $urls);
-    
+        $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
         // Update the disaster post
         $disasterPost->update([
             'title' => $validatedData['title'] ?? $disasterPost->title,
             'description' => $validatedData['description'] ?? $disasterPost->description,
             'files' => json_encode($updatedFiles),
-            'city' => $validatedData['city'] ?? $disasterPost->city,
+            'division' => $validatedData['division'] ?? $disasterPost->division,
             'district' => $validatedData['district'] ?? $disasterPost->district,
-            'disaster_type' => $validatedData['disaster_type'] ?? $disasterPost->disaster_type,
-            'status' => $validatedData['status'] ?? $disasterPost->status,
+            'event_date' => $validatedData['event_date'] ?? $disasterPost->event_date,
+            'event_time' => $validatedData['event_time'] ?? $disasterPost->event_time,
         ]);
         return response()->json([
             'success' => true,
-            'message' => 'Disaster post updated successfully',
+            'message' => 'Disaster post updated',
             'disaster_post' => $disasterPost,
         ]);
-    }
-
-
-
+    } 
+    
     // Delete post by id
     public function destroy($post_id)
     {
@@ -151,13 +145,11 @@ class DisasterPostController extends Controller
     }
 
     //Show a Selected post of the user
-    public function FindPostById(Request $request, $post_id)
+    public function FindPostById($post_id)
 {
-    $userId = $request->get('user_id');
-
     $userPost = DisasterPost::find($post_id);
 
-    if (!$userPost || $userPost->user_id !== $userId) {
+    if (!$userPost) {
         return response()->json([
             'success' => false,
             'message' => 'Post not found',
