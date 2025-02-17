@@ -15,13 +15,12 @@ class DisasterPost extends Model
         'title',
         'description',
         'files',
-        'city',
+        'division',
         'district',
-        'disaster_type',
-        'status',
+        'event_date',
+        'event_time',
     ];
 
-    //relationship with the User model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');

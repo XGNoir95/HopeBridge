@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\DisasterPost;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class DisasterPostController extends Controller
 {
@@ -13,14 +14,14 @@ class DisasterPostController extends Controller
         'description' => 'required|string',
         'files' => 'nullable|array',
         'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'city' => 'required|string|max:255',
+        'division' => 'required|string|max:255',
         'district' => 'required|string|max:255',
-        'disaster_type' => 'required|string|max:255',
-        'status' => 'nullable|string|in:pending,approved,rejected',
+        'event_date' => 'nullable|date',
+        'event_time' => 'nullable|date_format:H:i:s',
     ]);
 
     // Get the authenticated user's ID
-    $userId = $request->attributes->get('user_id'); // This comes from JwtMiddleware
+    $userId = $request->attributes->get('user_id');
 
     $files = $request->file('files');
     $urls = [];
@@ -32,14 +33,14 @@ class DisasterPostController extends Controller
     }
 
     $disasterPost = DisasterPost::create([
-        'user_id' => $userId,  // Use the authenticated user's ID
+        'user_id' => $userId,
         'title' => $validatedData['title'],
         'description' => $validatedData['description'],
         'files' => json_encode($urls),
-        'city' => $validatedData['city'],
+        'division' => $validatedData['division'],
         'district' => $validatedData['district'],
-        'disaster_type' => $validatedData['disaster_type'],
-        'status' => $validatedData['status'] ?? 'pending',
+        'event_date' => $validatedData['event_date'] ??  now()->toDateString(),
+        'event_time' => $validatedData['event_time'] ?? now()->toTimeString(),
     ]);
 
     return response()->json([
@@ -114,6 +115,7 @@ class DisasterPostController extends Controller
     }
 
 
+
     // Delete post by id
     public function destroy($post_id)
     {
@@ -124,4 +126,26 @@ class DisasterPostController extends Controller
             'message' => 'Disaster post deleted successfully',
         ]);
     }
+    public function userPosts(Request $request)
+    {
+        $userId = $request->get('user_id');
+        $user = User::find($userId);
+    
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+    
+        $userPosts = DisasterPost::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return response()->json([
+            'success' => true,
+            'user_posts' => $userPosts,
+        ]);
+    }
+        
 }
