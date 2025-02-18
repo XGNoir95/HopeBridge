@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\DisasterPost;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class DisasterPostController extends Controller
 {
@@ -13,14 +14,14 @@ class DisasterPostController extends Controller
         'description' => 'required|string',
         'files' => 'nullable|array',
         'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'city' => 'required|string|max:255',
+        'division' => 'required|string|max:255',
         'district' => 'required|string|max:255',
-        'disaster_type' => 'required|string|max:255',
-        'status' => 'nullable|string|in:pending,approved,rejected',
+        'event_date' => 'nullable|date',
+        'event_time' => 'nullable|date_format:H:i:s',
     ]);
 
     // Get the authenticated user's ID
-    $userId = $request->attributes->get('user_id'); // This comes from JwtMiddleware
+    $userId = $request->attributes->get('user_id');
 
     $files = $request->file('files');
     $urls = [];
@@ -32,14 +33,14 @@ class DisasterPostController extends Controller
     }
 
     $disasterPost = DisasterPost::create([
-        'user_id' => $userId,  // Use the authenticated user's ID
+        'user_id' => $userId,
         'title' => $validatedData['title'],
         'description' => $validatedData['description'],
         'files' => json_encode($urls),
-        'city' => $validatedData['city'],
+        'division' => $validatedData['division'],
         'district' => $validatedData['district'],
-        'disaster_type' => $validatedData['disaster_type'],
-        'status' => $validatedData['status'] ?? 'pending',
+        'event_date' => $validatedData['event_date'] ??  now()->toDateString(),
+        'event_time' => $validatedData['event_time'] ?? now()->toTimeString(),
     ]);
 
     return response()->json([
@@ -48,7 +49,7 @@ class DisasterPostController extends Controller
     ]);
 }
 
-    // Display all of the disaster posts
+    // Display all the  posts of all users
     public function index()
     {
         $disasterPosts = DisasterPost::orderBy('created_at', 'desc')->get();
@@ -73,14 +74,14 @@ class DisasterPostController extends Controller
         $disasterPost = DisasterPost::findOrFail($post_id);
 
         $validatedData = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
+            'title' => 'string|max:255',
+            'description' => 'string',
             'files' => 'nullable|array',
             'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'city' => 'sometimes|required|string|max:255',
-            'district' => 'sometimes|required|string|max:255',
-            'disaster_type' => 'sometimes|required|string|max:255',
-            'status' => 'nullable|string|in:pending,approved,rejected',
+            'division' => 'string|max:255',
+            'district' => 'string|max:255',
+            'event_date' => 'nullable|date',
+            'event_time' => 'nullable|date_format:H:i:s',
         ]);
     
         $files = $request->file('files');
@@ -91,29 +92,24 @@ class DisasterPostController extends Controller
                 $urls[] = $result->getSecurePath(); 
             }
         }
-    
-        //merge New data with unchanged data
-        $existingFiles = json_decode($disasterPost->files, true) ?? [];
-        $updatedFiles = array_merge($existingFiles, $urls);
-    
+        $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
         // Update the disaster post
         $disasterPost->update([
             'title' => $validatedData['title'] ?? $disasterPost->title,
             'description' => $validatedData['description'] ?? $disasterPost->description,
             'files' => json_encode($updatedFiles),
-            'city' => $validatedData['city'] ?? $disasterPost->city,
+            'division' => $validatedData['division'] ?? $disasterPost->division,
             'district' => $validatedData['district'] ?? $disasterPost->district,
-            'disaster_type' => $validatedData['disaster_type'] ?? $disasterPost->disaster_type,
-            'status' => $validatedData['status'] ?? $disasterPost->status,
+            'event_date' => $validatedData['event_date'] ?? $disasterPost->event_date,
+            'event_time' => $validatedData['event_time'] ?? $disasterPost->event_time,
         ]);
         return response()->json([
             'success' => true,
-            'message' => 'Disaster post updated successfully',
+            'message' => 'Disaster post updated',
             'disaster_post' => $disasterPost,
         ]);
-    }
-
-
+    } 
+    
     // Delete post by id
     public function destroy($post_id)
     {
@@ -124,4 +120,46 @@ class DisasterPostController extends Controller
             'message' => 'Disaster post deleted successfully',
         ]);
     }
+
+    //Show all posts of a user
+    public function userPosts(Request $request)
+    {
+        $userId = $request->get('user_id');
+        $user = User::find($userId);
+    
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+    
+        $userPosts = DisasterPost::where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return response()->json([
+            'success' => true,
+            'user_posts' => $userPosts,
+        ]);
+    }
+
+    //Show a Selected post of the user
+    public function FindPostById($post_id)
+{
+    $userPost = DisasterPost::find($post_id);
+
+    if (!$userPost) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Post not found',
+        ], 404);
+    }
+    return response()->json([
+        'success' => true,
+        'user_post' => $userPost,
+    ]);
+}
+
+
 }

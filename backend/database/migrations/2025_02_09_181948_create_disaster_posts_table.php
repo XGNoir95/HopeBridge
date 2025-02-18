@@ -19,13 +19,12 @@ class CreateDisasterPostsTable extends Migration
         $table->string('title');
         $table->text('description');
         $table->json('files')->nullable();
-        $table->string('city');
+        $table->string('division');
         $table->string('district');
-        $table->string('disaster_type');
-        $table->string('status')->default('pending');
+        $table->date('event_date')->nullable(); 
+        $table->time('event_time')->nullable();         
         $table->timestamps();
 
-        // Add foreign key constraint for user_id
         $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
     });
 }

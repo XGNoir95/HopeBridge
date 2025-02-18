@@ -22,7 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('city', 255);
             $table->string('password', 255);
             $table->string('blood_group', 255);
-            $table->string('profile_picture', 255)->default('https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid');
+            $table->json('profile_picture')->nullable();
         });
     }
 
