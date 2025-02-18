@@ -4,50 +4,61 @@ namespace App\Http\Controllers;
 use App\Models\DisasterPost;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class DisasterPostController extends Controller
 {
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'title' => 'required|string|max:255',
-        'description' => 'required|string',
-        'files' => 'nullable|array',
-        'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        'division' => 'required|string|max:255',
-        'district' => 'required|string|max:255',
-        'event_date' => 'nullable|date',
-        'event_time' => 'nullable|date_format:H:i:s',
-    ]);
-
-    // Get the authenticated user's ID
-    $userId = $request->attributes->get('user_id');
-
-    $files = $request->file('files');
-    $urls = [];
-    if ($files && is_array($files)) {
-        foreach ($files as $file) {
-            $result = $file->storeOnCloudinary();
-            $urls[] = $result->getSecurePath();
+    {
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'files' => 'nullable|array',
+            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'division' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'event_date' => 'nullable|date',
+            'event_time' => 'nullable|date_format:H:i:s',
+        ]);
+    
+        // Get the authenticated user's ID
+        $userId = $request->attributes->get('user_id');
+    
+        $files = $request->file('files');
+        $urls = [];
+        if ($files && is_array($files)) {
+            foreach ($files as $file) {
+                $result = $file->storeOnCloudinary();
+                $urls[] = $result->getSecurePath();
+            }
         }
+    
+        $disasterPost = DisasterPost::create([
+            'user_id' => $userId,
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'files' => json_encode($urls),
+            'division' => $validatedData['division'],
+            'district' => $validatedData['district'],
+            'event_date' => $validatedData['event_date'] ?? now()->toDateString(),
+            'event_time' => $validatedData['event_time'] ?? now()->toTimeString(),
+        ]);
+    
+        // Log the post creation
+        Log::info('New disaster post created', [
+            'user_id' => $userId,
+            'title' => $validatedData['title'],
+            'division' => $validatedData['division'],
+            'district' => $validatedData['district'],
+            'event_date' => $disasterPost->event_date,
+            'event_time' => $disasterPost->event_time,
+        ]);
+    
+        return response()->json([
+            'success' => true,
+            'disaster_post' => $disasterPost,
+        ]);
     }
-
-    $disasterPost = DisasterPost::create([
-        'user_id' => $userId,
-        'title' => $validatedData['title'],
-        'description' => $validatedData['description'],
-        'files' => json_encode($urls),
-        'division' => $validatedData['division'],
-        'district' => $validatedData['district'],
-        'event_date' => $validatedData['event_date'] ??  now()->toDateString(),
-        'event_time' => $validatedData['event_time'] ?? now()->toTimeString(),
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'disaster_post' => $disasterPost,
-    ]);
-}
 
     // Display all the  posts of all users
     public function index()
