@@ -62,37 +62,41 @@ class UserController extends Controller
     }
 
     public function updateUser(Request $request)
-    {
-        $user = $this->userService->getUserById($request);
+{
+    $user = $this->userService->getUserById($request);
 
-        $validatedData = $request->validate([
-            'userMail' => 'string|email|max:255|unique:users,userMail,' . $user->user_id . ',user_id',
-            'userPhone' => 'string|max:255',
-            'userName' => 'string|max:255',
-            'district' => 'string|max:255',
-            'city' => 'string|max:255',
-            'blood_group' => 'string|max:255',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Handle profile picture upload
-        ]);
-    
-        if ($request->hasFile('profile_picture')) {
-            $file = $request->file('profile_picture');
-            $result = $file->storeOnCloudinary();
-            $validatedData['profile_picture'] = json_encode([$result->getSecurePath()]);
-        } elseif ($request->input('profile_picture') === null) {
-            $validatedData['profile_picture'] = null;
-        } else {
-            $validatedData['profile_picture'] = $user->profile_picture;
-        }
-    
-        $updatedUser = $this->userService->updateUser($user, $validatedData);
-    
-        return response()->json([
-            'success' => true,
-            'message' => 'User updated',
-            'user' => $updatedUser,
-        ]);
+    $validatedData = $request->validate([
+        'userMail' => 'string|email|max:255|unique:users,userMail,' . $user->user_id . ',user_id',
+        'userPhone' => 'string|max:255',
+        'userName' => 'string|max:255',
+        'district' => 'string|max:255',
+        'city' => 'string|max:255',
+        'blood_group' => 'string|max:255',
+        'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Handle profile picture upload
+    ]);
+
+    \Log::info('Validated Data:', $validatedData); // Debugging: Log validated data
+
+    if ($request->hasFile('profile_picture')) {
+        $file = $request->file('profile_picture');
+        $result = $file->storeOnCloudinary(); // Upload to Cloudinary
+        $validatedData['profile_picture'] = json_encode([$result->getSecurePath()]); // Save the URL
+    } elseif ($request->input('profile_picture') === null) {
+        $validatedData['profile_picture'] = null;
+    } else {
+        $validatedData['profile_picture'] = $user->profile_picture; // Keep the existing picture
     }
+
+    $updatedUser = $this->userService->updateUser($user, $validatedData);
+
+    \Log::info('Updated User:', $updatedUser->toArray()); // Debugging: Log updated user data
+
+    return response()->json([
+        'success' => true,
+        'message' => 'User updated',
+        'user' => $updatedUser,
+    ]);
+}
 
     public function destroy($id)
     {
