@@ -10,6 +10,7 @@ import Alerts from "./pages/Alerts";
 import Relief from "./pages/Relief";
 import Safeguard from "./pages/Safeguard";
 import Report from "./pages/Report";
+import DonationPage from "./pages/DonationPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/relief" element={<Relief />} />
           <Route path="/safeguard" element={<Safeguard />} />
           <Route path="/report" element={<Report />} />
+          <Route path="/donate" element={<DonationPage />} />
         </Routes>
         <Footer />
       </div>
