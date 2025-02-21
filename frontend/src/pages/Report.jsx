@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const ReportIncident = () => {
@@ -15,9 +15,34 @@ const ReportIncident = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  // Division & District State
+  const [divisions, setDivisions] = useState([]);
+  const [districts, setDistricts] = useState([]);
+
+  useEffect(() => {
+    // Fetch divisions on mount
+    axios.get("https://bdapis.com/api/v1.2/divisions")
+      .then((response) => setDivisions(response.data.data))
+      .catch((error) => console.error("Error fetching divisions:", error));
+  }, []);
+
+  const fetchDistricts = (division) => {
+    axios.get(`https://bdapis.com/api/v1.2/division/${division}`)
+      .then((response) => {
+        const districtNames = response.data.data.map((item) => item.district);
+        setDistricts(districtNames);
+      })
+      .catch((error) => console.error("Error fetching districts:", error));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "division") {
+      setFormData({ ...formData, division: value, district: "" }); // Reset district
+      fetchDistricts(value);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -28,25 +53,28 @@ const ReportIncident = () => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
-
+  
     const token = localStorage.getItem("token");
     if (!token) {
       setMessage("Authentication required!");
       setLoading(false);
       return;
     }
-
+  
+    // Convert time to `HH:mm:ss` format if it's not empty
+    const formattedTime = formData.event_time ? `${formData.event_time}:00` : "";
+  
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
       if (key === "files") {
-        formData.files.forEach((file) => {
-          data.append("files[]", file);
-        });
+        formData.files.forEach((file) => data.append("files[]", file));
+      } else if (key === "event_time") {
+        data.append("event_time", formattedTime); // Ensure correct time format
       } else {
         data.append(key, formData[key]);
       }
     });
-
+  
     try {
       await axios.post("http://localhost:8000/api/create-post", data, {
         headers: {
@@ -70,6 +98,7 @@ const ReportIncident = () => {
     }
     setLoading(false);
   };
+  
 
   return (
     <div className="relative flex size-full min-h-screen flex-col overflow-x-hidden">
@@ -89,8 +118,25 @@ const ReportIncident = () => {
 
               <label className="text-lg font-bold px-4 pb-2 mt-4">Location</label>
               <div className="flex gap-4">
-                <input type="text" name="division" className="form-input flex-1 rounded-xl bg-gray-100 h-14 p-[15px] text-base" placeholder="Division" value={formData.division} onChange={handleChange} required />
-                <input type="text" name="district" className="form-input flex-1 rounded-xl bg-gray-100 h-14 p-[15px] text-base" placeholder="District" value={formData.district} onChange={handleChange} required />
+                {/* Division Dropdown */}
+                <select name="division" className="w-full rounded-xl bg-gray-100 h-14 p-[15px] text-base" value={formData.division} onChange={handleChange} required>
+                  <option value="" disabled>Select Division</option>
+                  {divisions.map((division, index) => (
+                    <option key={index} value={division.division}>
+                      {division.division}
+                    </option>
+                  ))}
+                </select>
+
+                {/* District Dropdown */}
+                <select name="district" className="w-full rounded-xl bg-gray-100 h-14 p-[15px] text-base disabled:bg-gray-300" value={formData.district} onChange={handleChange} required disabled={!formData.division}>
+                  <option value="" disabled>Select District</option>
+                  {districts.map((district, index) => (
+                    <option key={index} value={district}>
+                      {district}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <label className="text-lg font-bold px-4 pb-2 mt-4">Date and Time</label>
