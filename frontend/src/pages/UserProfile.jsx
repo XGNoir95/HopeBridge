@@ -311,7 +311,7 @@ const Profile = () => {
                                         )}
                                         <label
                                             htmlFor="profile-picture-upload"
-                                            className="cursor-pointer bg-[#311B08] text-[#EBB380] px-4 py-2 rounded-lg hover:bg-amber-600 hover:text-[#311B08] font-semibold"
+                                            className="cursor-pointer bg-[#311B08] text-[#EBB380] px-4 py-2 rounded-lg hover:bg-amber-600 hover:text-white border border-[#311B08] font-semibold"
                                         >
                                             Upload Photo
                                         </label>
@@ -365,7 +365,7 @@ const Profile = () => {
 
                             {/* Save Changes Button */}
                             <button
-                                className="h-13 w-full bg-[#311B08] text-[#EBB380] font-semibold text-lg px-4 py-2 rounded-lg hover:bg-amber-600 hover:text-[#311B08]"
+                                className="h-13 w-full bg-[#311B08] text-[#EBB380] font-semibold text-lg px-4 py-2 rounded-lg hover:bg-amber-600 hover:text-white border border-[#311B08]"
                                 onClick={async () => {
                                     try {
                                         const token = localStorage.getItem('token');

@@ -20,26 +20,31 @@ const DonationPage = () => {
       <main className="container mx-auto py-16 px-4">
         <h2 className="text-2xl font-semibold text-center mb-8">How you can help:</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div className="bg-[#EBB380] p-6 rounded-lg shadow-lg hover:shadow-2xl transition">
-            <DollarSign size={48} className="mx-auto text-[#311B08] mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Donate Money</h3>
-            <p>Support relief efforts by donating funds to help communities rebuild.</p>
-          </div>
+          <Link to="/donate-money">
+            <div className="bg-[#EBB380] p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer">
+              <DollarSign size={48} className="mx-auto text-[#311B08] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Donate Money</h3>
+              <p>Support relief efforts by donating funds to help communities rebuild.</p>
+            </div>
+          </Link>
 
-          <div className="bg-[#EBB380] p-6 rounded-lg shadow-lg hover:shadow-2xl transition">
-            <Droplet size={48} className="mx-auto text-[#311B08] mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Donate Blood</h3>
-            <p>Help save lives by donating blood for emergency medical needs.</p>
-          </div>
+          <Link to="/donate-blood">
+            <div className="bg-[#EBB380] p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer">
+              <Droplet size={48} className="mx-auto text-[#311B08] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Donate Blood</h3>
+              <p>Help save lives by donating blood for emergency medical needs.</p>
+            </div>
+          </Link>
 
-          <div className="bg-[#EBB380] p-6 rounded-lg shadow-lg hover:shadow-2xl transition">
-            <Gift size={48} className="mx-auto text-[#311B08] mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Donate Goods</h3>
-            <p>Provide essential items such as food, clothing, and supplies to those affected.</p>
-          </div>
+          <Link to="/donate-goods">
+            <div className="bg-[#EBB380] p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer">
+              <Gift size={48} className="mx-auto text-[#311B08] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Donate Goods</h3>
+              <p>Provide essential items such as food, clothing, and supplies to those affected.</p>
+            </div>
+          </Link>
         </div>
       </main>
-
     </div>
   );
 };

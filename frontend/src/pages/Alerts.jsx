@@ -79,7 +79,7 @@ function Alerts() {
           placeholder="Search by title or description..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
       </div>
 
@@ -88,7 +88,7 @@ function Alerts() {
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700">Division</label>
           <select
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             value={selectedDivision}
             onChange={(e) => {
               setSelectedDivision(e.target.value);
@@ -107,7 +107,7 @@ function Alerts() {
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700">District</label>
           <select
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
             value={selectedDistrict}
             onChange={(e) => setSelectedDistrict(e.target.value)}
             disabled={!selectedDivision}
