@@ -11,6 +11,9 @@ import Relief from "./pages/Relief";
 import Safeguard from "./pages/Safeguard";
 import Report from "./pages/Report";
 import DonationPage from "./pages/DonationPage";
+import DonateMoney from "./pages/DonateMoney";
+import DonateBlood from "./pages/DonateBlood";
+import DonateGoods from "./pages/DonateGoods";
 
 function App() {
   return (
@@ -27,6 +30,9 @@ function App() {
           <Route path="/safeguard" element={<Safeguard />} />
           <Route path="/report" element={<Report />} />
           <Route path="/donate" element={<DonationPage />} />
+          <Route path="/donate-money" element={<DonateMoney />} />
+          <Route path="/donate-blood" element={<DonateBlood />} />
+          <Route path="/donate-goods" element={<DonateGoods />} />
         </Routes>
         <Footer />
       </div>
