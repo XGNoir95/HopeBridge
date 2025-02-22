@@ -32,6 +32,7 @@ Route::post('/create-post', [DisasterPostController::class, 'store'])->middlewar
 Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middleware('jwt');
 
 //need to use post insted of put to update mixed files
+//admin korbe eta
 Route::post('/disaster-posts/{post_id}/update', [DisasterPostController::class, 'update'])->middleware('jwt');
 
 Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
