@@ -51,6 +51,17 @@ class UserService{
 
         return $user;
     }
+
+
+    public function authenticate($email, $password)
+    {
+        $user = $this->getUserByMail($email);
+
+        if ($user && Hash::check($password, $user->password)) {
+            return $user;
+        }
+        return null;
+    }
     public function getUserList(){
         $user = User::all();
         return $user->toArray();

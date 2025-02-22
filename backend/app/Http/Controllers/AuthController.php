@@ -5,21 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use DateTimeImmutable;
 use Illuminate\Http\Request;
+use App\Services\UserService;
+use App\Services\AdminService;
 use Lcobucci\JWT\Configuration;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Illuminate\Support\Facades\Validator;
-use App\Services\UserService;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 
 class AuthController extends Controller
 {
     //Register a new user.
     protected $UserService;
-    public function __construct(UserService $UserService){
+    protected $AdminService;
+    public function __construct(UserService $UserService,AdminService $AdminService){
         $this->UserService = $UserService;
+        $this->AdminService = $AdminService;
+        
     }
     public function register(Request $request)
     {
@@ -49,7 +53,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User created successfully',
-            'user' => $user->makeHidden(['password']), // Exclude sensitive fields
+            'user' => $user->makeHidden(['password']),
         ], 201);
     }
 
@@ -57,28 +61,38 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $data = $request->validate([
-            'userMail' => 'required|string|email',  // Change to 'userMail' instead of 'email'
+            'userMail' => 'required|string|email',
             'password' => 'required|string',
         ]);
     
-        // $user= User::where('userMail', $data['userMail'])->first();
-        $user= $this->UserService->getUserByMail($data['userMail']);
+        $admin = $this->AdminService->authenticate($data['userMail'], $data['password']);
+        $role=null;
     
-        if (!$user || !Hash::check($data['password'], $user->password)) {
+        if ($admin) {
+            $role = 'admin';
+        }
+        else {
+            $user = $this->UserService->authenticate($data['userMail'], $data['password']);
+            if ($user) {
+                $role = 'user';
+            }
+        }
+
+        if (!$admin && !$user) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
-    
-        $token = $this->issueJwtToken($user->user_id);
-        Log::info('User logged in successfully', [
-            'userMail' => $data['userMail'],
-            'user_id' => $user->user_id,
-            'timestamp' => now(),
+
+        $token = $this->issueJwtToken($user->user_id ?? $admin->admin_id, $role);
+
+        return response()->json([
+            'token' => $token,
+            'role' => $role,
         ]);
-        return response()->json(['token' => $token]);
     }
+    
 
     //Token Issue
-    protected function issueJwtToken($userId)
+    protected function issueJwtToken($userId,$role)
     {
         $config = Configuration::forSymmetricSigner(
             new Sha256(),
@@ -90,7 +104,8 @@ class AuthController extends Controller
             ->issuedBy(config('app.url'))  // Issuer (optional)
             ->issuedAt($now)
             ->expiresAt($now->modify('+1 hour'))
-            ->withClaim('uid', $userId) // Add user ID as a claim
+            ->withClaim('uid', $userId)
+            ->withClaim('role', $role)
             ->getToken($config->signer(), $config->signingKey());
 
         return $token->toString();

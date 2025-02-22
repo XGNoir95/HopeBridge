@@ -14,8 +14,7 @@ class JwtMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        $jwt = $request->bearerToken(); // Extract token from Authorization header
-
+        $jwt = $request->bearerToken();
         if (!$jwt) {
             return response()->json(['message' => 'No token provided'], 401);
         }
@@ -27,7 +26,7 @@ class JwtMiddleware
                 InMemory::plainText(config('app.jwt_secret'))
             );
 
-            // Parse the JWT token
+            // Parse JWT token
             $token = $config->parser()->parse($jwt);
 
             // Validate signature
@@ -40,21 +39,21 @@ class JwtMiddleware
                 return response()->json(['message' => 'Invalid token'], 401);
             }
 
-            // Retrieve claims
             $claims = $token->claims()->all();
 
-            // Debugging log to check the claims content
             Log::info('JWT Token Claims:', ['claims' => $claims]);
 
-            // Extract user ID safely
             $userId = $claims['uid'] ?? null;
+            $userRole = $claims['role']?? null;
 
             if (!$userId) {
                 return response()->json(['message' => 'User ID not found in token'], 401);
             }
-
-            // Attach user ID to the request object for later use
-            $request->attributes->add(['user_id' => $userId]);
+            
+            $request->attributes->add([
+                'user_id' => $userId,
+                'user_role' => $userRole,
+            ]);
         } catch (\Exception $e) {
             Log::error('JWT Validation Failed', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Invalid or expired token'], 401);
