@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
@@ -40,7 +41,7 @@ Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'dest
 Route::get('/shelters', [ShelterController::class, 'index']);
 Route::get('/shelters/{id}', [ShelterController::class, 'show']);
 
-Route::get('/users', [UserController::class, 'index']);
+Route::get('/users', [UserController::class, 'index'])->middleware('jwt','admin');
 Route::get('/user', [UserController::class, 'show'])->middleware('jwt');
 
 //need to use post insted of put to update mixed files
@@ -49,3 +50,8 @@ Route::post('/user/update-user', [UserController::class, 'updateUser'])->middlew
 
 Route::get('/user/posts', [DisasterPostController::class, 'userPosts'])->middleware('jwt');
 Route::get('/user/posts/{post_id}', [DisasterPostController::class, 'FindPostById'])->middleware('jwt');
+
+//admin
+Route::post('/register/admin', [AdminController::class, 'createAdmin'])->middleware('jwt','admin');
+Route::get('/admin', [AdminController::class, 'showAdmin'])->middleware('jwt','admin');
+Route::get('/admins', [AdminController::class, 'showAllAdmins'])->middleware('jwt','admin');
