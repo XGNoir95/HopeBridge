@@ -21,7 +21,7 @@ class UserService{
             'userName' => 'required|string|max:255',
             'userMail' => 'required|email|unique:users,userMail',
             'userPhone' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:4',
             'blood_group' => 'required|string|max:255',
             'district' => 'required|string|max:255',
             'city' => 'required|string|max:255',

@@ -39,22 +39,21 @@ class AuthController extends Controller
     // User Login
     public function login(Request $request)
     {
-        
         $admin = $this->AdminService->loginGo($request);
         $user = $this->UserService->loginGo($request);
         $role=null;
     
         if ($admin) {
-            $role = 'admin';   
+            $role = 'admin';
+            $token =$this->UserService->getToken($admin->admin_id,$role);
         }
         else if($user){
             $role = 'user';
+            $token =$this->UserService->getToken($user->user_id,$role);
         }
         else {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
-
-        $token = $this->UserService->getToken($user->user_id ?? $admin->admin_id, $role);
 
         return response()->json([
             'token' => $token,

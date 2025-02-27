@@ -60,14 +60,14 @@ class AdminController extends Controller
             : ['https://cdn.vectorstock.com/i/500p/52/38/avatar-icon-vector-11835238.jpg'];
     
         return response()->json([
-            'admin_id' => $admin->admin_id,
-            'adminMail' => $admin->adminMail,
-            'adminPhone' => $admin->adminPhone,
-            'adminName' => $admin->adminName,
+            'user_id' => $admin->admin_id,
+            'email' => $admin->adminMail,
+            'phone' => $admin->adminPhone,
+            'userName' => $admin->adminName,
             'district' => $admin->district,
             'city' => $admin->city,
             'blood_group' => $admin->blood_group,
-            'profile_picture' => $profilePicture,
+            'profilePic' => $profilePicture,
         ], 200);
     }
     // show all admins
