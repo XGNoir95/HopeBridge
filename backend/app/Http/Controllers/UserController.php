@@ -24,19 +24,15 @@ class UserController extends Controller
         $result = $this->userService->createUser($request->all());
 
         if (!$result['success']) {
-            return response()->json(['errors' => $result['errors']], 422);
+            return response()->json([
+                'message' => 'Registrain failed'
+            ], 400);
         }
 
         return response()->json([
             'message' => 'User created successfully',
             'user' => $result['user'],
         ], 201);
-    }
-    public function store(Request $request)
-    {
-        $userData = $request->all();
-        $user = $this->userService->createUser($userData);
-        return response()->json($user, 201);
     }
 
     public function show(Request $request)
@@ -100,11 +96,19 @@ class UserController extends Controller
 
     public function destroy($id)
     {
+        /*
         $user = $this->userService->getUserById($id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
         $this->userService->deleteUser($user);
-        return response()->json(['message' => 'User deleted successfully'],200);
+        return response()->json(['message' => 'User deleted successfully'],200);*/
+        $result =$this->userService->deleteUser($id);
+        if($result){
+            return response()->json(['message' => 'User deleted successfully'],200);
+        }
+        else{
+            return response()->json(['message' => 'User not found'], 404);
+        }
     }
 }

@@ -3,9 +3,14 @@
 namespace App\Services;
 
 use App\Models\User;
+use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
+use Lcobucci\JWT\Configuration;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use Request;
 
 class UserService{
@@ -52,6 +57,17 @@ class UserService{
 
         return $user;
     }
+    public function loginGo($request){
+        $data = $request->validate([
+            'userMail' => 'required|string|email',  // Change to 'userMail' instead of 'email'
+            'password' => 'required|string',
+        ]);
+        $user = $this->getUserByMail($data['userMail']);
+        if (!$user || !Hash::check($data['password'], $user->password)) {
+            return false;
+        }
+        return $user;
+    }
     public function getUserList(){
         // $user = User::all();
         $user =DB::table('users')->get();
@@ -67,11 +83,35 @@ class UserService{
         $user = DB::table('users')->where('userMail',$mail)->first();
         return $user;
     }
-    public function deleteUser(User $user){
+    public function deleteUser($id){
         // Delete the user
         // $user->delete();
-        DB::table('users')->where('user_id',$user->id)->delete();
+        $user =$this->getUserByid($id);
+        if(!$user)
+            return false;
+        DB::table('users')->where('user_id',$id)->delete();
 
         return true;
+    }
+    protected function issueJwtToken($userId)
+    {
+        $config = Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::plainText(config('app.jwt_secret'))
+        );
+
+        $now = new DateTimeImmutable();
+        $token = $config->builder()
+            ->issuedBy(config('app.url'))  // Issuer (optional)
+            ->issuedAt($now)
+            ->expiresAt($now->modify('+1 hour'))
+            ->withClaim('uid', $userId) // Add user ID as a claim
+            ->getToken($config->signer(), $config->signingKey());
+
+        return $token->toString();
+    }
+    public function getToken($id){
+        $token = $this->issueJwtToken($id);
+        return $token;
     }
 }
