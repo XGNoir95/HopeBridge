@@ -1,0 +1,60 @@
+CREATE TABLE users (
+    user_id INT IDENTITY(1,1) PRIMARY KEY,
+    userMail VARCHAR(255) UNIQUE NOT NULL,
+    userPhone VARCHAR(255) NOT NULL,
+    userName VARCHAR(255) NOT NULL,
+    district VARCHAR(255) NOT NULL,
+    city VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    blood_group VARCHAR(255) NOT NULL,
+    profile_picture VARCHAR(MAX) NULL
+);
+DROP TABLE users;
+SELECT * FROM users;
+INSERT INTO users VALUES();
+ALTER TABLE users DROP COLUMN ...
+
+
+
+
+CREATE TABLE admins (
+    admin_id INT PRIMARY KEY,
+    adminMail VARCHAR(255) UNIQUE NOT NULL,
+    adminPhone VARCHAR(255) NOT NULL,
+    adminName VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+DROP TABLE admins
+SELECT * FROM admins;
+ALTER TABLE admins DROP COLUMN ...
+
+
+
+CREATE TABLE shelters (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    latitude DECIMAL(10, 8) NOT NULL,
+    longitude DECIMAL(11, 8) NOT NULL,
+    created_at DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+DROP TABLE shelters
+SELECT * FROM shelters;
+INSERT INTO shelters VALUES();
+ALTER TABLE shelters DROP COLUMN ...
+
+
+CREATE TABLE disaster_posts (
+    post_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description VARCHAR(MAX) NOT NULL,
+    files VARCHAR(MAX) NULL,
+    division VARCHAR(255) NOT NULL,
+    district VARCHAR(255) NOT NULL,
+    event_date DATE NULL,
+    event_time TIME NULL,
+    created_at DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT FK_User FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);

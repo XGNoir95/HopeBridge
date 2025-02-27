@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Request;
@@ -52,21 +53,24 @@ class UserService{
         return $user;
     }
     public function getUserList(){
-        $user = User::all();
+        // $user = User::all();
+        $user =DB::table('users')->get();
         return $user->toArray();
     }
     public function getUserById($request){
         $userId = $request->get('user_id');
-        $user = User::find($userId);
+        $user = DB::table('users')->where('user_id',$userId)->first();
         return $user;
     }
     public function getUserByMail($mail) {
-        $user = User::where('userMail', $mail)->first();
+        // $user = User::where('userMail', $mail)->first();
+        $user = DB::table('users')->where('userMail',$mail)->first();
         return $user;
     }
     public function deleteUser(User $user){
         // Delete the user
-        $user->delete();
+        // $user->delete();
+        DB::table('users')->where('user_id',$user->id)->delete();
 
         return true;
     }
