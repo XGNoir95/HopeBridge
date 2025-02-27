@@ -3,8 +3,15 @@
 namespace App\Services;
 
 use App\Models\User;
+use DateTimeImmutable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
+
 use Request;
 
 class UserService{
@@ -41,7 +48,7 @@ class UserService{
             'userName' => 'required|string|max:255',
             'userMail' => 'required|email|unique:users,userMail',
             'userPhone' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:4',
             'blood_group' => 'required|string|max:255',
             'district' => 'required|string|max:255',
             'city' => 'required|string|max:255',
@@ -62,17 +69,30 @@ class UserService{
         }
         return null;
     }
+    public function loginGo($request){
+        $data = $request->validate([
+            'userMail' => 'required|string|email',  // Change to 'userMail' instead of 'email'
+            'password' => 'required|string',
+        ]);
+        $user = $this->getUserByMail($data['userMail']);
+        if (!$user || !Hash::check($data['password'], $user->password)) {
+            return null;
+        }
+        return $user;
+    }
     public function getUserList(){
-        $user = User::all();
+        // $user = User::all();
+        $user =DB::table('users')->get();
         return $user->toArray();
     }
     public function getUserById($request){
         $userId = $request->get('user_id');
-        $user = User::find($userId);
+        $user = DB::table('users')->where('user_id',$userId)->first();
         return $user;
     }
     public function getUserByMail($mail) {
-        $user = User::where('userMail', $mail)->first();
+        // $user = User::where('userMail', $mail)->first();
+        $user = DB::table('users')->where('userMail',$mail)->first();
         return $user;
     }
     public function deleteUser(User $user){
@@ -80,5 +100,27 @@ class UserService{
         $user->delete();
 
         return true;
+    }
+    protected function issueJwtToken($userId,$role)
+    {
+        $config = Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::plainText(config('app.jwt_secret'))
+        );
+
+        $now = new DateTimeImmutable();
+        $token = $config->builder()
+            ->issuedBy(config('app.url'))  // Issuer (optional)
+            ->issuedAt($now)
+            ->expiresAt($now->modify('+1 hour'))
+            ->withClaim('uid', $userId)
+            ->withClaim('role', $role)
+            ->getToken($config->signer(), $config->signingKey());
+
+        return $token->toString();
+    }
+    public function getToken($id,$role){
+        $token = $this->issueJwtToken($id,$role);
+        return $token;
     }
 }

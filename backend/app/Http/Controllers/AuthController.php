@@ -22,155 +22,43 @@ class AuthController extends Controller
     protected $AdminService;
     public function __construct(UserService $UserService,AdminService $AdminService){
         $this->UserService = $UserService;
-        $this->AdminService = $AdminService;
-        
+        $this->AdminService = $AdminService;   
     }
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'userName' => 'required|string|max:255',
-            'userMail' => 'required|email|unique:users,userMail',
-            'userPhone' => 'required|string|max:255',
-            'password' => 'required|string|min:4',
-            'blood_group' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        $user=$this->UserService->createUser($request->all());
+        if(!$user){
+            return response()->json(["message"=> "Registration Failed"]  ,400);
         }
-
-        $user = User::create([
-            'userName' => $request->userName,
-            'userMail' => $request->userMail,
-            'userPhone' => $request->userPhone,
-            'password' => Hash::make($request->password),
-            'blood_group' => $request->blood_group,
-            'district' => $request->district,
-            'city' => $request->city,
-        ]);
-
         return response()->json([
             'message' => 'User created successfully',
-            'user' => $user->makeHidden(['password']),
+            'user' => $user->makeHidden(['password']), // Exclude sensitive fields
         ], 201);
     }
 
     // User Login
     public function login(Request $request)
     {
-        $data = $request->validate([
-            'userMail' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-    
-        $admin = $this->AdminService->authenticate($data['userMail'], $data['password']);
+        
+        $admin = $this->AdminService->loginGo($request);
+        $user = $this->UserService->loginGo($request);
         $role=null;
     
         if ($admin) {
-            $role = 'admin';
+            $role = 'admin';   
+        }
+        else if($user){
+            $role = 'user';
         }
         else {
-            $user = $this->UserService->authenticate($data['userMail'], $data['password']);
-            if ($user) {
-                $role = 'user';
-            }
-        }
-
-        if (!$admin && !$user) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = $this->issueJwtToken($user->user_id ?? $admin->admin_id, $role);
+        $token = $this->UserService->getToken($user->user_id ?? $admin->admin_id, $role);
 
         return response()->json([
             'token' => $token,
             'role' => $role,
         ]);
     }
-    
-
-    //Token Issue
-    protected function issueJwtToken($userId,$role)
-    {
-        $config = Configuration::forSymmetricSigner(
-            new Sha256(),
-            InMemory::plainText(config('app.jwt_secret'))
-        );
-
-        $now = new DateTimeImmutable();
-        $token = $config->builder()
-            ->issuedBy(config('app.url'))  // Issuer (optional)
-            ->issuedAt($now)
-            ->expiresAt($now->modify('+1 hour'))
-            ->withClaim('uid', $userId)
-            ->withClaim('role', $role)
-            ->getToken($config->signer(), $config->signingKey());
-
-        return $token->toString();
-    }
-    
-    //Parse Jwt
-    // protected function parseJwtToken(string $jwt)
-    // {
-    //     $config = Configuration::forSymmetricSigner(
-    //         new Sha256(),
-    //         InMemory::plainText(config('app.jwt_secret'))
-    //     );
-
-    //     try {
-    //         $token = $config->parser()->parse($jwt);
-
-    //         // Extract claims (fixing the issue)
-    //         $claims = $token->claims()->all();  
-
-    //         return $claims;
-    //     } catch (\Exception $e) {
-    //         return null;
-    //     }
-    // }
-
-
-    // Validate JWT
-    // protected function validateJwtToken(string $jwt)
-    // {
-    //     if (!$jwt) {
-    //         return false;
-    //     }
-    //     $config = Configuration::forSymmetricSigner(
-    //         new Sha256(),
-    //         InMemory::plainText(config('app.jwt_secret'))
-    //     );
-    //     try {
-    //         $token = $config->parser()->parse($jwt);
-
-    //         // Validate the token signature
-    //         $isValid = $config->validator()->validate($token, new SignedWith(
-    //             $config->signer(),
-    //             $config->signingKey()
-    //         ));
-
-    //         return $isValid; // Return true if validation passes
-    //     } catch (\Exception $e) {
-    //         return false; // Return false if validation fails
-    //     }
-    // }
-
-    //Validate Token
-    // public function validateToken(Request $request)
-    // {
-    //     $jwt = $request->bearerToken();
-
-    //     if (!$jwt) {
-    //         return response()->json(['message' => 'No token provided'], 401);
-    //     }
-
-    //     if ($this->validateJwtToken($jwt)) {
-    //         return response()->json(['message' => 'Token is valid']);
-    //     }
-
-    //     return response()->json(['message' => 'Invalid or expired token'], 401);
-    // }
-   
 }

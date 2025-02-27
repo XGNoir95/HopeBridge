@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class AdminService
 {
@@ -16,15 +17,27 @@ class AdminService
         }
         return null;
     }
-
+    public function loginGo($request){
+        $data = $request->validate([
+            'userMail' => 'required|string|email',  // Change to 'userMail' instead of 'email'
+            'password' => 'required|string',
+        ]);
+        $admin=$this->getAdminByMail($data['adminMail']);
+        if(!$admin||!Hash::check($data['password'], $admin->password)){
+            return null;
+        }
+        return $admin;
+    }
     public function getAdminByMail($email) {
-        $admin = Admin::where('adminMail', $email)->first();
+        // $admin = Admin::where('adminMail', $email)->first();
+        $admin =DB::table('admin')->where('email', $email)->first();    
         return $admin;
     }
     
     public function getAdminById($request){
         $adminId = $request->get('user_id');
-        $admin = Admin::find($adminId);
+        // $admin = Admin::find($adminId);
+        $admin = DB::table('admin')->where('id', $adminId)->first();
         return $admin;
     }
 }
