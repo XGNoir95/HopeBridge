@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -32,12 +33,6 @@ class UserController extends Controller
             'user' => $result['user'],
         ], 201);
     }
-    public function store(Request $request)
-    {
-        $userData = $request->all();
-        $user = $this->userService->createUser($userData);
-        return response()->json($user, 201);
-    }
 
     public function show(Request $request)
     {
@@ -62,49 +57,26 @@ class UserController extends Controller
     }
 
     public function updateUser(Request $request)
-{
-    $user = $this->userService->getUserById($request);
-
-    $validatedData = $request->validate([
-        'userMail' => 'string|email|max:255|unique:users,userMail,' . $user->user_id . ',user_id',
-        'userPhone' => 'string|max:255',
-        'userName' => 'string|max:255',
-        'district' => 'string|max:255',
-        'city' => 'string|max:255',
-        'blood_group' => 'string|max:255',
-        'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Handle profile picture upload
-    ]);
-
-    \Log::info('Validated Data:', $validatedData); // Debugging: Log validated data
-
-    if ($request->hasFile('profile_picture')) {
-        $file = $request->file('profile_picture');
-        $result = $file->storeOnCloudinary(); // Upload to Cloudinary
-        $validatedData['profile_picture'] = json_encode([$result->getSecurePath()]); // Save the URL
-    } elseif ($request->input('profile_picture') === null) {
-        $validatedData['profile_picture'] = null;
-    } else {
-        $validatedData['profile_picture'] = $user->profile_picture; // Keep the existing picture
+    {
+        $updatedUser = $this->userService->updateUser($request);
+        if(!$updatedUser){
+            return response()->json(['message'=> 'Update Failed'], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated',
+            'user' => $updatedUser,
+        ]);
     }
-
-    $updatedUser = $this->userService->updateUser($user, $validatedData);
-
-    \Log::info('Updated User:', $updatedUser->toArray()); // Debugging: Log updated user data
-
-    return response()->json([
-        'success' => true,
-        'message' => 'User updated',
-        'user' => $updatedUser,
-    ]);
-}
 
     public function destroy($id)
     {
-        $user = $this->userService->getUserById($id);
-        if (!$user) {
+        $result =$this->userService->deleteUser($id);
+        if($result){
+            return response()->json(['message' => 'User deleted successfully'],200);
+        }
+        else{
             return response()->json(['message' => 'User not found'], 404);
         }
-        $this->userService->deleteUser($user);
-        return response()->json(['message' => 'User deleted successfully'],200);
     }
 }
