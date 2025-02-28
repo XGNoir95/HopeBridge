@@ -84,8 +84,7 @@ class DisasterPostService{
         return $disasterPost;
     }
     // delete a post
-    public function deletePost($request){
-        $post_id=$request->attributes->get('post_id');
+    public function deletePost($post_id){
         $result = $this->getPost($post_id);
         if ($result) {
             DB::table('disaster_posts')->where('post_id', $post_id)->delete();
