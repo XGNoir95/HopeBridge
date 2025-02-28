@@ -20,9 +20,4 @@ class DisasterPost extends Model
         'event_date',
         'event_time',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
-    }
 }

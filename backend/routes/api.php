@@ -19,8 +19,6 @@ use App\Http\Controllers\DisasterPostController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::get('/test', [TestController::class, 'getTestHuman'])->middleware('test.middleware');
-Route::get('/test/{id}', [TestController::class, 'getTestHumanWithId']);
 
 //Auth
 Route::post('/register', [AuthController::class, 'register']);

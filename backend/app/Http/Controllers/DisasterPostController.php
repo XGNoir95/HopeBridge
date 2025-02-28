@@ -43,7 +43,7 @@ class DisasterPostController extends Controller
     public function show($post_id)
     {
         // Find post by post_id and eager load user
-        $disasterPost = DisasterPost::with('user')->findOrFail($post_id);
+        $disasterPost = $this->disasterPostService->getPost($post_id);
         return response()->json([
             'success' => true,
             'disaster_post' => $disasterPost,
@@ -52,9 +52,8 @@ class DisasterPostController extends Controller
 
     public function update(Request $request, $post_id)
     {
-        $disasterPost = DisasterPost::findOrFail($post_id);
         // Update the disaster post
-        
+        $disasterPost = $this->disasterPostService->updatePost($request, $post_id);
         return response()->json([
             'success' => true,
             'message' => 'Disaster post updated',
