@@ -71,11 +71,12 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = $this->userService->getUserById($id);
-        if (!$user) {
+        $result =$this->userService->deleteUser($id);
+        if($result){
+            return response()->json(['message' => 'User deleted successfully'],200);
+        }
+        else{
             return response()->json(['message' => 'User not found'], 404);
         }
-        $this->userService->deleteUser($user);
-        return response()->json(['message' => 'User deleted successfully'],200);
     }
 }

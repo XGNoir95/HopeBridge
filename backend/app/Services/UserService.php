@@ -44,7 +44,7 @@ class UserService{
     }
     public function updateUser($request){
         // Update user attributes
-        $user = $this->getUserById($request);
+        $user = User::find($request->get('user_id'));
 
         $validatedData = $request->validate([
             'userMail' => 'string|email|max:255|unique:users,userMail,' . $user->user_id . ',user_id',
@@ -64,9 +64,7 @@ class UserService{
         } else {
             $validatedData['profile_picture'] = $user->profile_picture;
         }
-        $user->fill($validatedData);
-        $user->save();
-
+        $user->update($validatedData);
         return $user;
     }
 
@@ -89,18 +87,18 @@ class UserService{
     }
     public function getUserById($request){
         $userId = $request->get('user_id');
-        // $user = DB::table('users')->where('user_id',$userId)->first();
-        $user=User::find($userId);
+        $user = DB::table('users')->where('user_id',$userId)->first();
         return $user;
     }
     public function getUserByMail($mail) {
-        // $user = User::where('userMail', $mail)->first();
         $user = DB::table('users')->where('userMail',$mail)->first();
         return $user;
     }
-    public function deleteUser(User $user){
-        // Delete the user
-        $user->delete();
+    public function deleteUser($id){
+        $user =$this->getUserByid($id);
+        if(!$user)
+            return false;
+        DB::table('users')->where('user_id',$id)->delete();
 
         return true;
     }

@@ -53,37 +53,8 @@ class DisasterPostController extends Controller
     public function update(Request $request, $post_id)
     {
         $disasterPost = DisasterPost::findOrFail($post_id);
-
-        $validatedData = $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'string',
-            'files' => 'nullable|array',
-            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'division' => 'string|max:255',
-            'district' => 'string|max:255',
-            'event_date' => 'nullable|date',
-            'event_time' => 'nullable|date_format:H:i:s',
-        ]);
-    
-        $files = $request->file('files');
-        $urls = [];
-        if ($files && is_array($files)) {
-            foreach ($files as $file) {
-                $result = $file->storeOnCloudinary();
-                $urls[] = $result->getSecurePath(); 
-            }
-        }
-        $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
         // Update the disaster post
-        $disasterPost->update([
-            'title' => $validatedData['title'] ?? $disasterPost->title,
-            'description' => $validatedData['description'] ?? $disasterPost->description,
-            'files' => json_encode($updatedFiles),
-            'division' => $validatedData['division'] ?? $disasterPost->division,
-            'district' => $validatedData['district'] ?? $disasterPost->district,
-            'event_date' => $validatedData['event_date'] ?? $disasterPost->event_date,
-            'event_time' => $validatedData['event_time'] ?? $disasterPost->event_time,
-        ]);
+        
         return response()->json([
             'success' => true,
             'message' => 'Disaster post updated',
@@ -94,12 +65,19 @@ class DisasterPostController extends Controller
     // Delete post by id
     public function destroy($post_id)
     {
-        $disasterPost = DisasterPost::findOrFail($post_id);
-        $disasterPost->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Disaster post deleted successfully',
-        ]);
+        $result =$this->disasterPostService->deletePost($post_id);
+        if($result){
+            return response()->json([
+                'success' => true,
+                'message' => 'Disaster post deleted successfully',
+            ],201);
+        }
+        else{
+            return response()->json([
+                'success'=> false,
+                'message'=> 'Post not found'
+            ],400);
+        }
     }
 
     //Show all posts of a user
@@ -110,10 +88,9 @@ class DisasterPostController extends Controller
         if (!$result) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found',
+                'message' => 'No Post Found',
             ], 404);
         }
-    
         return response()->json([
             'success' => true,
             'user_posts' => $result,
@@ -122,20 +99,17 @@ class DisasterPostController extends Controller
 
     //Show a Selected post of the user
     public function FindPostById($post_id)
-{
-    $userPost = DisasterPost::find($post_id);
-
-    if (!$userPost) {
+    {
+        $userPost = $this->disasterPostService->getPost($post_id);
+        if (!$userPost) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Post not found',
+            ], 404);
+        }
         return response()->json([
-            'success' => false,
-            'message' => 'Post not found',
-        ], 404);
+            'success' => true,
+            'user_post' => $userPost,
+        ]);
     }
-    return response()->json([
-        'success' => true,
-        'user_post' => $userPost,
-    ]);
-}
-
-
 }
