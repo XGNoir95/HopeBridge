@@ -42,33 +42,35 @@ class UserService{
         ]);
         return $user;
     }
-    public function updateUser(User $user,$data){
+    public function updateUser($request){
         // Update user attributes
-        $validator = Validator::make($data, [
-            'userName' => 'required|string|max:255',
-            'userMail' => 'required|email|unique:users,userMail',
-            'userPhone' => 'required|string|max:255',
-            'password' => 'required|string|min:4',
-            'blood_group' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
+        $user = $this->getUserById($request);
+
+        $validatedData = $request->validate([
+            'userMail' => 'string|email|max:255|unique:users,userMail,' . $user->user_id . ',user_id',
+            'userPhone' => 'string|max:255',
+            'userName' => 'string|max:255',
+            'district' => 'string|max:255',
+            'city' => 'string|max:255',
+            'blood_group' => 'string|max:255',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Handle profile picture upload
         ]);
-        $user->fill($data);
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $result = $file->storeOnCloudinary();
+            $validatedData['profile_picture'] = json_encode([$result->getSecurePath()]);
+        } elseif ($request->input('profile_picture') === null) {
+            $validatedData['profile_picture'] = null;
+        } else {
+            $validatedData['profile_picture'] = $user->profile_picture;
+        }
+        $user->fill($validatedData);
         $user->save();
 
         return $user;
     }
 
 
-    public function authenticate($email, $password)
-    {
-        $user = $this->getUserByMail($email);
-
-        if ($user && Hash::check($password, $user->password)) {
-            return $user;
-        }
-        return null;
-    }
     public function loginGo($request){
         $data = $request->validate([
             'userMail' => 'required|string|email',  // Change to 'userMail' instead of 'email'
@@ -87,7 +89,8 @@ class UserService{
     }
     public function getUserById($request){
         $userId = $request->get('user_id');
-        $user = DB::table('users')->where('user_id',$userId)->first();
+        // $user = DB::table('users')->where('user_id',$userId)->first();
+        $user=User::find($userId);
         return $user;
     }
     public function getUserByMail($mail) {

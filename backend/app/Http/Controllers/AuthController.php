@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\AdminService;
 use Lcobucci\JWT\Configuration;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
