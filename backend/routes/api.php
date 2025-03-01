@@ -35,6 +35,7 @@ Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middlew
 Route::post('/disaster-posts/{post_id}/update', [DisasterPostController::class, 'update'])->middleware('jwt');
 
 Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
+Route::get('/disaster-posts/RedZone', [DisasterPostController::class,'heatMapData']);
 
 Route::get('/shelters', [ShelterController::class, 'index']);
 Route::get('/shelters/{id}', [ShelterController::class, 'show']);

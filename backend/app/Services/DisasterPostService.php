@@ -78,4 +78,38 @@ class DisasterPostService{
 
         return $results;
     }
+    public function heatMapArray(){
+        $posts=$this->getAllPost();
+        $city=[
+            'Dhaka'=>0,
+            'Chittagong'=> 0,
+            'Rajshahi'=>0,
+            'Khulna'=>0,
+            'Barisal'=>0,
+            'Sylhet'=>0,
+            'Rangpur'=>0,
+            'Mymensingh'=>0
+        ];
+        foreach ($posts as $indv) {
+            $div = $indv['division'];
+            foreach ($city as $key => &$val) { // Using reference to modify the value
+                if ($key == $div) {
+                    $val++;
+                    break;
+                }
+            }
+        }
+        $result=json_encode($city,JSON_PRETTY_PRINT);
+        return $result;
+    }
 }
+/*
+for(auto indv:posts){
+    string div=indv.division;
+    for(auto val:city){
+        if(val.first==div){
+            val.second++;
+        }
+    }
+}
+*/
