@@ -29,7 +29,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
 //Post
 Route::post('/create-post', [DisasterPostController::class, 'store'])->middleware('jwt');
-Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middleware('jwt');
+Route::get('/disaster-posts', [DisasterPostController::class, 'index']);
 
 //need to use post insted of put to update mixed files
 //admin korbe eta
@@ -51,7 +51,7 @@ Route::get('/user/posts', [DisasterPostController::class, 'userPosts'])->middlew
 Route::get('/user/posts/{post_id}', [DisasterPostController::class, 'FindPostById'])->middleware('jwt');
 
 //admin
-Route::post('/register/admin', [AdminController::class, 'createAdmin']);
+Route::post('/register/admin', [AdminController::class, 'createAdmin'])->middleware('jwt','admin');
 Route::get('/admin', [AdminController::class, 'showAdmin'])->middleware('jwt','admin');
 Route::get('/admins', [AdminController::class, 'showAllAdmins'])->middleware('jwt','admin');
 

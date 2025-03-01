@@ -70,10 +70,26 @@ class SafeguardController extends Controller
     }
 
     public function createVideo(Request $request)
-    {
-        $video = $this->videoService->createVideo($request);
-        return response()->json(['success' => true, 'video' => $video], 201);
+{
+    try {
+        $video = $this->videoService->createVideo($request->all());
+        return response()->json([
+            'success' => true,
+            'video' => $video,
+        ], 201);
+    } catch (\InvalidArgumentException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 400);
+    } catch (\Exception $e) {
+        Log::error('Error creating video: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to create video. Please try again later.',
+        ], 500);
     }
+}
 
     public function showVideo($id)
     {

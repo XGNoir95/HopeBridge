@@ -43,7 +43,7 @@ function App() {
           <Route path="/donate-money" element={<DonateMoney />} />
           <Route path="/donate-blood" element={<DonateBlood />} />
           <Route path="/donate-goods" element={<DonateGoods />} />
-          <Route path="/disaster-posts/:id" element={<DisasterPostDetail />} />
+          <Route path="/disaster-posts/:post_id" element={<DisasterPostDetail />} />
           <Route path="edit-profile" element={<EditProfile />} />
           <Route path="my-reports" element={<MyReports />} />
           <Route path="profile-info" element={<ProfileInfo />} />

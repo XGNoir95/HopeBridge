@@ -3,30 +3,44 @@
 namespace App\Services;
 
 use App\Models\Video;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class VideoService
 {
-    public function createVideo(Request $request)
+    public function createVideo(array $data)
     {
-        $validated = $request->validate([
+        // Validate the input data
+        $validator = Validator::make($data, [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'video_link' => 'required|string',
+            'video_link' => 'required|string|url', // Ensure the video link is a valid URL
         ]);
 
+        if ($validator->fails()) {
+            throw new \InvalidArgumentException($validator->errors()->first());
+        }
+
+        $validatedData = $validator->validated();
+
+        // Create the video
         $video = Video::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'video_link' => $validated['video_link'],
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'video_link' => $validatedData['video_link'],
         ]);
+
+        Log::info('New Video created', [
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+        ]);
+
         return $video;
     }
 
     public function getVideo($id)
     {
-        $result =Video::find($id);
-        return $result;
+        return Video::find($id);
     }
 
     public function deleteVideo($id)
