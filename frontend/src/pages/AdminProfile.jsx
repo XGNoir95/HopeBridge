@@ -35,7 +35,7 @@ const AdminProfile = () => {
                     adminName: data.adminName,
                     adminMail: data.adminMail,
                     adminPhone: data.adminPhone || "Not Available",
-                    profilePic: data.profile_picture,
+                    profilePic: data.profilePic ,
                     city: data.city || "Not Available",
                     district: data.district || "Not Available",
                     blood_group: data.blood_group || "Not Available",
