@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\DisasterPostController;
 
@@ -52,3 +53,8 @@ Route::get('/user/posts/{post_id}', [DisasterPostController::class, 'FindPostByI
 Route::post('/register/admin', [AdminController::class, 'createAdmin']);
 Route::get('/admin', [AdminController::class, 'showAdmin'])->middleware('jwt','admin');
 Route::get('/admins', [AdminController::class, 'showAllAdmins'])->middleware('jwt','admin');
+
+Route::post('/create-videos', [VideoController::class, 'create']);
+Route::get('/videos/{id}', [VideoController::class, 'show']);
+Route::delete('/videos/{id}', [VideoController::class, 'delete']);
+Route::get('/show-videos', [VideoController::class, 'showAll']);  // Show all videos
