@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
 
 class CreateNewsArticleTable extends Migration
 {
@@ -14,11 +13,11 @@ class CreateNewsArticleTable extends Migration
      */
     public function up()
     {
-        Schema::create('newsArticle', function (Blueprint $table) {
-			$table->integer('videoId')->primary();
-			$table->string('articleDescription',255);
-			$table->string('articleDate',255);
-			$table->string('articleImageLink',255);
+        Schema::create('news_article', function (Blueprint $table) {
+            $table->increments('articleId');
+            $table->string('title');
+            $table->string('articleDescription');
+            $table->json('files')->nullable();
         });
     }
 
@@ -29,6 +28,6 @@ class CreateNewsArticleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('newsArticle');
+        Schema::dropIfExists('news_article');
     }
 }
