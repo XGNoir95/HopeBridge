@@ -23,7 +23,7 @@ const Map = () => {
             { division: "Chittagong", lat: 22.3569, lng: 91.7832, impact: postCounts["Chittagong"]*10 || 0 },
             { division: "Rajshahi", lat: 24.3636, lng: 88.6241, impact: postCounts["Rajshahi"]*10 || 0 },
             { division: "Khulna", lat: 22.8456, lng: 89.5403, impact: postCounts["Khulna"]*10 || 0 },
-            { division: "Barisal", lat: 22.701, lng: 90.3535, impact: postCounts["Barisal"]*10 || 0 },
+            { division: "Barishal", lat: 22.701, lng: 90.3535, impact: postCounts["Barishal"]*10 || 0 },
             { division: "Sylhet", lat: 24.8949, lng: 91.8687, impact: postCounts["Sylhet"]*10 || 0 },
             { division: "Rangpur", lat: 25.7439, lng: 89.2752, impact: postCounts["Rangpur"]*10 || 0 },
             { division: "Mymensingh", lat: 24.7471, lng: 90.4203, impact: postCounts["Mymensingh"]*10 || 0 },

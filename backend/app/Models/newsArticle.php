@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class newsArticle extends Model
 {
     use HasFactory;
-    protected $table="newsarticle";
+    protected $table="news_article";
     protected $fillable = [
         "title",
         "articleDescription",
@@ -16,5 +16,4 @@ class newsArticle extends Model
     ];
     protected $primaryKey ="articleId";
     public $incrementing =true;
-    public $timestamps = true;
 }

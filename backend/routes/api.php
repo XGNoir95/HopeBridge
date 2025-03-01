@@ -59,3 +59,9 @@ Route::post('/create-video', [SafeguardController::class, 'createVideo'])->middl
 Route::delete('/videos/{id}', [SafeguardController::class, 'deleteVideo'])->middleware('jwt','admin');
 Route::get('/show-videos', [SafeguardController::class, 'showAllVideos']);
 Route::get('/videos/{id}', [SafeguardController::class, 'showVideo']);
+
+// Article Routes
+Route::post('/create-article', [SafeguardController::class, 'createArticle'])->middleware('jwt', 'admin');
+Route::delete('/articles/{id}', [SafeguardController::class, 'deleteArticle'])->middleware('jwt', 'admin');
+Route::get('/articles', [SafeguardController::class, 'articleIndex']);
+Route::get('/articles/{id}', [SafeguardController::class, 'showArticle']);

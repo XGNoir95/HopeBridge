@@ -2,51 +2,82 @@
 
 namespace App\Http\Controllers;
 use App\Services\NewsArticleService;
+use App\Services\VideoService;
 use Illuminate\Http\Request;
-use App\Models\Video;
 
 class SafeguardController extends Controller
 {
     protected $newsArticleService;
-    public function __construct(NewsArticleService $newsArticleService){
+    protected $videoService;
+    
+    public function __construct(NewsArticleService $newsArticleService, VideoService $videoService){
         $this->newsArticleService = $newsArticleService;
+        $this->videoService = $videoService;
     }
+
     public function articleIndex(){
-
+        $article= $this->newsArticleService->getAllArticle();
+        if($article){
+            return response()->json([
+                'success'=>true,
+                'newsArticle'=>$article
+            ]);
+        }
+        return response()->json(['success'=>false]);
     }
+
     public function createArticle(Request $request){
-
+        $article= $this->newsArticleService->createArticle($request->all());
+        if($article){
+            return response()->json([
+                'success'=>true,
+                'newsArticle'=> $article
+            ]);
+        }
+        return response()->json(['success'=>false]); 
     }
+
     public function updateArticle(Request $request){
-
+        
     }
-    public function deleteArticle(Request $request){
 
+    public function deleteArticle($article_id){
+        $result =$this->newsArticleService->deleteArticle($article_id);
+        if($result){
+            return response()->json([
+                'success'=>true,
+                'message'=>'Article deleted Successfully'
+            ]);
+        }
+        return response()->json([
+            'success'=>false,
+            'message'=> 'Article Not Found'
+        ]);
     }
-    public function showArticle(Request $request){
-
+  
+    public function showArticle($article_id){
+        $article= $this->newsArticleService->getArticle($article_id);
+        if($article){
+            return response()->json([
+                'success'=>true,
+                'newsArticle'=>$article
+            ]);
+        }
+        return response()->json([
+            'success'=>false,
+            'message'=>'Article Not Found'
+        ]);
     }
 
     public function createVideo(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'video_link' => 'required|string',
-        ]);
-    
-        $video = Video::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'video_link' => $validated['video_link'],
-        ]);
+        $video = $this->videoService->createVideo($request);
         return response()->json(['success' => true, 'video' => $video], 201);
     }
 
     public function showVideo($id)
     {
-        $video = Video::find($id);
-
+        $video = $this->videoService->getVideo($id);
         if (!$video) {
             return response()->json(['message' => 'Video not found'], 404);
         }
@@ -55,22 +86,20 @@ class SafeguardController extends Controller
 
     public function deleteVideo($id)
     {
-        $video = Video::find($id);
-
-        if (!$video) {
+        $deleted = $this->videoService->deleteVideo($id);
+        if (!$deleted) {
             return response()->json(['message' => 'Video not found'], 404);
         }
-        $video->delete();
         return response()->json(['message' => 'Video deleted successfully'], 200);
     }
 
     public function showAllVideos()
     {
-        $videos = Video::all();
+        $videos = $this->videoService->showAllVideos();
         if ($videos->isEmpty()) {
             return response()->json(['message' => 'No videos found'], 404);
         }
         return response()->json($videos, 200);
     }
-
+    
 }
