@@ -57,7 +57,7 @@ function Alerts() {
 
   const filteredPosts = disasterPosts.filter((post) => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          post.description.toLowerCase().includes(searchQuery.toLowerCase());
+      post.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDivision = selectedDivision ? post.division === selectedDivision : true;
     const matchesDistrict = selectedDistrict ? post.district === selectedDistrict : true;
     return matchesSearch && matchesDivision && matchesDistrict;
@@ -74,7 +74,7 @@ function Alerts() {
           Disaster Alerts & Updates
         </h1>
         <p className="text-xl max-w-3xl mx-auto">
-          Stay informed about recent disasters and emergencies. Check alerts, provide assistance, 
+          Stay informed about recent disasters and emergencies. Check alerts, provide assistance,
           and help affected communities recover. Together, we can make a difference.
         </p>
       </header>
@@ -129,9 +129,11 @@ function Alerts() {
             filteredPosts.map((post) => (
               <Link
                 key={post.id}
-                to={`/disaster-posts/${post.post_id}`}
-                className="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:-translate-y-2 hover:shadow-2xl flex flex-col justify-between border-2 border-gray-200" // Added border here
+                to={`/disaster-posts/${post.post_id}`} // URL with post_id
+                state={{ post }} // Pass the entire post object as state
+                className="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:-translate-y-2 hover:shadow-2xl flex flex-col justify-between border-2 border-gray-200"
               >
+
                 <h2 className="text-2xl font-bold text-amber-900 text-center">{post.title}</h2>
                 <p className="text-lg text-gray-600 mt-2 line-clamp-3">
                   <strong>Description: </strong>
