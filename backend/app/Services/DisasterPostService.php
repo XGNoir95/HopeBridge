@@ -85,7 +85,7 @@ class DisasterPostService{
             'Chittagong' => 0,
             'Rajshahi' => 0,
             'Khulna' => 0,
-            'Barisal' => 0,
+            'Barishal' => 0,
             'Sylhet' => 0,
             'Rangpur' => 0,
             'Mymensingh' => 0
