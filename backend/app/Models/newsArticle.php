@@ -16,5 +16,4 @@ class newsArticle extends Model
     ];
     protected $primaryKey ="articleId";
     public $incrementing =true;
-    public $timestamps = true;
 }

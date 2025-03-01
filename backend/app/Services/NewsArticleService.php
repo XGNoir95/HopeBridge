@@ -22,7 +22,7 @@ class NewsArticleService{
                 $result = $file->storeOnCloudinary();
                 $urls[] = $result->getSecurePath();
             }
-        }      
+        }
         $article = newsArticle::create([
             'title'=> $validatedData['title'],
             'articleDescription'=> $validatedData['description'],
@@ -38,7 +38,7 @@ class NewsArticleService{
 
     }
     public function getAllArticle(){
-        $articles = DB::table('newsarticle')->get();
+        $articles = DB::table('news_article')->get();
         return $articles;
     }
     public function getArticle($articleId){
@@ -46,11 +46,14 @@ class NewsArticleService{
         return $result;
     }
     public function deleteArticle($articleId){
-        $result=$this->getArticle( $articleId );
-        if($result){
-            DB::table('newarticle')->where('articleId',$articleId);
+        $result = $this->getArticle($articleId);
+        if ($result) {
+            DB::table('news_article')->where('articleId', $articleId)->delete();
             return true;
         }
         return false;
     }
+    
+
+    
 }

@@ -18,6 +18,7 @@ class CreateNewsArticleTable extends Migration
             $table->string('title');
             $table->string('articleDescription');
             $table->json('files')->nullable();
+            $table->timestamps();
         });
     }
 

@@ -1,13 +1,15 @@
 <?php
 
-use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\DisasterPostController;
+use App\Http\Controllers\SafeguardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,3 +54,14 @@ Route::get('/user/posts/{post_id}', [DisasterPostController::class, 'FindPostByI
 Route::post('/register/admin', [AdminController::class, 'createAdmin']);
 Route::get('/admin', [AdminController::class, 'showAdmin'])->middleware('jwt','admin');
 Route::get('/admins', [AdminController::class, 'showAllAdmins'])->middleware('jwt','admin');
+
+Route::post('/create-video', [SafeguardController::class, 'createVideo'])->middleware('jwt','admin');
+Route::delete('/videos/{id}', [SafeguardController::class, 'deleteVideo'])->middleware('jwt','admin');
+Route::get('/show-videos', [SafeguardController::class, 'showAllVideos']);
+Route::get('/videos/{id}', [SafeguardController::class, 'showVideo']);
+
+// Article Routes
+Route::post('/create-article', [SafeguardController::class, 'createArticle'])->middleware('jwt', 'admin');
+Route::delete('/articles/{id}', [SafeguardController::class, 'deleteArticle'])->middleware('jwt', 'admin');
+Route::get('/articles', [SafeguardController::class, 'articleIndex']);
+Route::get('/articles/{id}', [SafeguardController::class, 'showArticle']);
