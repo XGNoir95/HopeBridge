@@ -52,8 +52,8 @@ class DisasterPostController extends Controller
 
     public function update(Request $request, $post_id)
     {
-        // Update the disaster post
-        $disasterPost = $this->getPost($post_id);
+        $disasterPost = DisasterPost::findOrFail($post_id);
+
         $validatedData = $request->validate([
             'title' => 'string|max:255',
             'description' => 'string',
@@ -64,6 +64,7 @@ class DisasterPostController extends Controller
             'event_date' => 'nullable|date',
             'event_time' => 'nullable|date_format:H:i:s',
         ]);
+    
         $files = $request->file('files');
         $urls = [];
         if ($files && is_array($files)) {
@@ -73,7 +74,16 @@ class DisasterPostController extends Controller
             }
         }
         $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
-        $disasterPost->update($updatedFiles);
+        // Update the disaster post
+        $disasterPost->update([
+            'title' => $validatedData['title'] ?? $disasterPost->title,
+            'description' => $validatedData['description'] ?? $disasterPost->description,
+            'files' => json_encode($updatedFiles),
+            'division' => $validatedData['division'] ?? $disasterPost->division,
+            'district' => $validatedData['district'] ?? $disasterPost->district,
+            'event_date' => $validatedData['event_date'] ?? $disasterPost->event_date,
+            'event_time' => $validatedData['event_time'] ?? $disasterPost->event_time,
+        ]);
         return response()->json([
             'success' => true,
             'message' => 'Disaster post updated',
