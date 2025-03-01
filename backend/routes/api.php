@@ -26,7 +26,6 @@ Route::post('/login', [AuthController::class, 'login']);
 //Route::get('/vt', [AuthController::class, 'validateToken']);
 
 //Post
-Route::post('/image', [ImageController::class, 'store']);
 Route::post('/create-post', [DisasterPostController::class, 'store'])->middleware('jwt');
 Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middleware('jwt');
 
@@ -34,6 +33,7 @@ Route::get('/disaster-posts', [DisasterPostController::class, 'index'])->middlew
 //admin korbe eta
 Route::post('/disaster-posts/{post_id}/update', [DisasterPostController::class, 'update'])->middleware('jwt');
 Route::delete('/disaster-posts/{post_id}', [DisasterPostController::class, 'destroy']);
+Route::get('/disaster-posts/RedZone', [DisasterPostController::class,'heatMapData']);
 
 Route::get('/shelters', [ShelterController::class, 'index']);
 Route::get('/shelters/{id}', [ShelterController::class, 'show']);

@@ -141,4 +141,17 @@ class DisasterPostController extends Controller
             'user_post' => $userPost,
         ]);
     }
+    public function heatMapData(){
+        $result =$this->disasterPostService->heatMapArray();
+        if(!$result){
+            return response()->json([
+                'success'=> true,
+                'message'=> 'Data not Found',
+            ],404);
+        }
+        return response()->json([
+            'success'=> true,
+            'disasterData'=> $result,
+        ]);
+    }
 }

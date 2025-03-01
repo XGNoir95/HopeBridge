@@ -1,27 +1,56 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
 
 const Map = () => {
+  const [disasterData, setDisasterData] = useState([]);
+
   useEffect(() => {
-    const disasterData = [
-      { division: "Dhaka", lat: 23.8103, lng: 90.4125, type: "Flood", impact: 120 },
-      { division: "Chittagong", lat: 22.3569, lng: 91.7832, type: "Cyclone", impact: 90 },
-      { division: "Rajshahi", lat: 24.3636, lng: 88.6241, type: "Drought", impact: 50 },
-      { division: "Khulna", lat: 22.8456, lng: 89.5403, type: "Cyclone", impact: 70 },
-      { division: "Barisal", lat: 22.701, lng: 90.3535, type: "Flood", impact: 80 },
-      { division: "Sylhet", lat: 24.8949, lng: 91.8687, type: "Landslide", impact: 60 },
-      { division: "Rangpur", lat: 25.7439, lng: 89.2752, type: "Earthquake", impact: 30 },
-      { division: "Mymensingh", lat: 24.7471, lng: 90.4203, type: "Flood", impact: 40 },
-    ];
+    const fetchDisasterData = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/disaster-posts/RedZone');
+        const data = await response.json();
+
+        console.log("Received API Response:", data);
+
+        if (data.success && data.disasterData) {
+          const postCounts = JSON.parse(data.disasterData);
+          console.log("Parsed Post Counts:", postCounts);
+
+          const updatedDisasterData = [
+            { division: "Dhaka", lat: 23.8103, lng: 90.4125, impact: postCounts["Dhaka"]*10 || 0 },
+            { division: "Chittagong", lat: 22.3569, lng: 91.7832, impact: postCounts["Chittagong"]*10 || 0 },
+            { division: "Rajshahi", lat: 24.3636, lng: 88.6241, impact: postCounts["Rajshahi"]*10 || 0 },
+            { division: "Khulna", lat: 22.8456, lng: 89.5403, impact: postCounts["Khulna"]*10 || 0 },
+            { division: "Barisal", lat: 22.701, lng: 90.3535, impact: postCounts["Barisal"]*10 || 0 },
+            { division: "Sylhet", lat: 24.8949, lng: 91.8687, impact: postCounts["Sylhet"]*10 || 0 },
+            { division: "Rangpur", lat: 25.7439, lng: 89.2752, impact: postCounts["Rangpur"]*10 || 0 },
+            { division: "Mymensingh", lat: 24.7471, lng: 90.4203, impact: postCounts["Mymensingh"]*10 || 0 },
+          ];
+
+          console.log("Updated Disaster Data:", updatedDisasterData);
+          setDisasterData(updatedDisasterData);
+        } else {
+          console.error("Invalid API response format", data);
+        }
+      } catch (error) {
+        console.error("Error fetching disaster data:", error);
+      }
+    };
+
+    fetchDisasterData();
+  }, []);
+
+  useEffect(() => {
+    if (disasterData.length === 0) return;
 
     // Initialize the map
     const map = L.map('map').setView([23.685, 90.3563], 7); // Center on Bangladesh
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+      attribution: '© Adnan Shahriar',
     }).addTo(map);
 
     // Prepare heatmap data
@@ -36,6 +65,7 @@ const Map = () => {
       radius: 70,
       blur: 30,
       maxZoom: 13,
+     // minOpacity: 0.1,
     }).addTo(map);
 
     // Add markers for each division
@@ -49,7 +79,7 @@ const Map = () => {
     return () => {
       map.remove();
     };
-  }, []);
+  }, [disasterData]);
 
   return (
     <div className="flex justify-center items-center flex-col">
@@ -57,7 +87,7 @@ const Map = () => {
       <p className="text-gray-600 mb-8 text-xl">
         Visualizing disaster data across different divisions in Bangladesh.
       </p>
-      <div id="map" style={{ height: '700px', width: '100%', maxWidth: '1200px' }}></div>
+      <div id="map" style={{ height: '700px', width: '100%', maxWidth: '1200px', borderRadius: '10px', overflow: 'hidden' }}></div>
     </div>
   );
 };
