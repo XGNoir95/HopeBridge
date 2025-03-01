@@ -9,6 +9,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\DisasterPostController;
+use App\Http\Controllers\SafeguardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +55,7 @@ Route::post('/register/admin', [AdminController::class, 'createAdmin']);
 Route::get('/admin', [AdminController::class, 'showAdmin'])->middleware('jwt','admin');
 Route::get('/admins', [AdminController::class, 'showAllAdmins'])->middleware('jwt','admin');
 
-Route::post('/create-videos', [VideoController::class, 'create']);
-Route::get('/videos/{id}', [VideoController::class, 'show']);
-Route::delete('/videos/{id}', [VideoController::class, 'delete']);
-Route::get('/show-videos', [VideoController::class, 'showAll']);  // Show all videos
+Route::post('/create-video', [SafeguardController::class, 'createVideo'])->middleware('jwt','admin');
+Route::delete('/videos/{id}', [SafeguardController::class, 'deleteVideo'])->middleware('jwt','admin');
+Route::get('/show-videos', [SafeguardController::class, 'showAllVideos']);
+Route::get('/videos/{id}', [SafeguardController::class, 'showVideo']);
