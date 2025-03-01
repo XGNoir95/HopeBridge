@@ -1,7 +1,9 @@
-// MyReports.js
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const MyReports = ({ userPosts, navigate, setUserPosts }) => {
+const MyReports = ({ userPosts, setUserPosts }) => {
+    const navigate = useNavigate();
+
     const handleDeletePost = async (postId) => {
         try {
             const token = localStorage.getItem('token');
@@ -39,7 +41,9 @@ const MyReports = ({ userPosts, navigate, setUserPosts }) => {
                             <div className="flex gap-4 mt-4">
                                 <button
                                     className="w-30 bg-[#311B08] text-[#EBB380] px-4 py-2 rounded-lg hover:bg-amber-600 hover:text-white font-semibold"
-                                    onClick={() => navigate(`/disaster-posts/${post.post_id}`)}
+                                    onClick={() =>
+                                        navigate(`/disaster-posts/${post.post_id}`, { state: { post } })
+                                    }
                                 >
                                     View
                                 </button>
