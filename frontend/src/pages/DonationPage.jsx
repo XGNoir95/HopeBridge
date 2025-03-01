@@ -17,11 +17,11 @@ const DonationPage = () => {
         </p>
       </header>
 
-      <main className="container mx-auto py-16 px-4">
-        <h2 className="text-3xl font-bold text-center mb-8">How you can help:</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <main className="container mx-auto py-25 px-4">
+        <h2 className="text-4xl font-bold text-center mb-12">How you can help:</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center items-stretch">
           <Link to="/donate-money">
-            <div className="bg-[url('/money.png')] p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer">
+            <div className="bg-[url('/money.png')] bg-cover bg-center p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer h-full flex flex-col justify-between">
               <DollarSign size={48} className="mx-auto text-green-500 mb-4" />
               <h3 className="text-2xl font-bold mb-2 text-white">Donate Money</h3>
               <p className="text-lg text-white">Support relief efforts by donating funds to help communities rebuild.</p>
@@ -29,7 +29,7 @@ const DonationPage = () => {
           </Link>
 
           <Link to="/donate-blood">
-            <div className="bg-[url('/blood.png')] p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer">
+            <div className="bg-[url('/blood.png')] bg-cover bg-center p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer h-full flex flex-col justify-between">
               <Droplet size={48} className="mx-auto text-red-500 mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Donate Blood</h3>
               <p className="text-lg text-white">Help save lives by donating blood for emergency medical needs.</p>
@@ -37,13 +37,14 @@ const DonationPage = () => {
           </Link>
 
           <Link to="/donate-goods">
-            <div className="bg-[url('/goods.png')] p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer">
+            <div className="bg-[url('/goods.png')] bg-cover bg-center p-6 rounded-lg shadow-lg hover:shadow-2xl transition cursor-pointer h-full flex flex-col justify-between">
               <Gift size={48} className="mx-auto text-amber-600 mb-4" />
               <h3 className="text-xl font-bold mb-2 text-white">Donate Goods</h3>
               <p className="text-lg text-white">Provide essential items such as food, clothing, and supplies to those affected.</p>
             </div>
           </Link>
         </div>
+
       </main>
     </div>
   );
