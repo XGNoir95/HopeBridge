@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\DisasterPost;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Validate;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use App\Services\DisasterPostService;
@@ -53,7 +53,27 @@ class DisasterPostController extends Controller
     public function update(Request $request, $post_id)
     {
         // Update the disaster post
-        $disasterPost = $this->disasterPostService->updatePost($request, $post_id);
+        $disasterPost = $this->getPost($post_id);
+        $validatedData = $request->validate([
+            'title' => 'string|max:255',
+            'description' => 'string',
+            'files' => 'nullable|array',
+            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'division' => 'string|max:255',
+            'district' => 'string|max:255',
+            'event_date' => 'nullable|date',
+            'event_time' => 'nullable|date_format:H:i:s',
+        ]);
+        $files = $request->file('files');
+        $urls = [];
+        if ($files && is_array($files)) {
+            foreach ($files as $file) {
+                $result = $file->storeOnCloudinary();
+                $urls[] = $result->getSecurePath(); 
+            }
+        }
+        $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
+        $disasterPost->update($updatedFiles);
         return response()->json([
             'success' => true,
             'message' => 'Disaster post updated',

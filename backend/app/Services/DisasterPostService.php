@@ -56,32 +56,11 @@ class DisasterPostService{
     }
     //find a post by the ID
     public function getPost($post_id){
-        $result = DB::table('disaster_posts')->where('post_id', $post_id);
+        $result = DisasterPost::findOrFail($post_id);
         return $result;
     }
     public function updatePost($request,$post_id){
-        $disasterPost = $this->getPost($post_id);
-        $validatedData = $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'string',
-            'files' => 'nullable|array',
-            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'division' => 'string|max:255',
-            'district' => 'string|max:255',
-            'event_date' => 'nullable|date',
-            'event_time' => 'nullable|date_format:H:i:s',
-        ]);
-        $files = $request->file('files');
-        $urls = [];
-        if ($files && is_array($files)) {
-            foreach ($files as $file) {
-                $result = $file->storeOnCloudinary();
-                $urls[] = $result->getSecurePath(); 
-            }
-        }
-        $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
-        $disasterPost->update($updatedFiles);
-        return $disasterPost;
+        
     }
     // delete a post
     public function deletePost($post_id){
