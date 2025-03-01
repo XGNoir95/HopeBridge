@@ -7,12 +7,14 @@ export default function Form() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [token, setToken] = useState(null);
+  const [role, setRole] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setToken(null);
+    setRole(null);
 
     try {
       const response = await axios.post("http://localhost:8000/api/login", {
@@ -20,18 +22,20 @@ export default function Form() {
         password: password,
       });
 
-      const receivedToken = response.data.token;
-      
-      if (receivedToken) {
+      const { token: receivedToken, role: userRole } = response.data;
+
+      if (receivedToken && userRole) {
         localStorage.setItem("token", receivedToken);
+        localStorage.setItem("role", userRole);
         setToken(receivedToken);
+        setRole(userRole);
 
         // Dispatch a storage event to notify other components
         window.dispatchEvent(new Event("storage"));
 
-        navigate("/profile");
+        navigate(userRole === "admin" ? "/admin-dashboard" : "/profile");
       } else {
-        setError("No token received from the server.");
+        setError("Invalid response from the server.");
       }
     } catch (err) {
       setError("Invalid credentials. Please try again.");
@@ -81,6 +85,7 @@ export default function Form() {
         {token && (
           <div className="text-green-600 text-center mt-4 break-all">
             <p>Token: {token}</p>
+            <p>Role: {role}</p>
           </div>
         )}
         <div className="mt-8 flex justify-center items-center">

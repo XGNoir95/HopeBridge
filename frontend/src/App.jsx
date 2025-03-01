@@ -2,9 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import ScrollToTop from "./components/ScrollToTop"; // Import this
+import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/Home";
-import UserProfile from "./pages/UserProfile";
+import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Alerts from "./pages/Alerts";
@@ -16,6 +16,13 @@ import DonateMoney from "./pages/DonateMoney";
 import DonateBlood from "./pages/DonateBlood";
 import DonateGoods from "./pages/DonateGoods";
 import DisasterPostDetail from "./pages/DisasterPostDetail";
+import ProfileInfo from "./components/ProfileInfo";
+import MyReports from "./components/MyReports";
+import EditProfile from "./components/EditProfile";
+import AdminProfile from "./pages/AdminProfile";
+import AdminInfo from "./components/AdminInfo";
+import AllReports from "./components/AllReports";
+import UploadVlogs from "./components/UploadVlogs";
 
 function App() {
   return (
@@ -25,7 +32,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/alerts" element={<Alerts />} />
@@ -37,6 +44,13 @@ function App() {
           <Route path="/donate-blood" element={<DonateBlood />} />
           <Route path="/donate-goods" element={<DonateGoods />} />
           <Route path="/disaster-posts/:id" element={<DisasterPostDetail />} />
+          <Route path="edit-profile" element={<EditProfile />} />
+          <Route path="my-reports" element={<MyReports />} />
+          <Route path="profile-info" element={<ProfileInfo />} />
+          <Route path="/admin-dashboard" element={<AdminProfile />} />
+          <Route path="/admin-info" element={<AdminInfo />} />
+          <Route path="/all-reports" element={<AllReports />} />
+          <Route path="/upload-vlogs" element={<UploadVlogs />} />
         </Routes>
         <Footer />
       </div>

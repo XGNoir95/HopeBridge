@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const logo = "/hblogo.png";
   const [isOpen, setIsOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateAuthState = () => {
-      setIsAuthenticated(!!localStorage.getItem("token"));
+      const token = localStorage.getItem("token");
+      const userRole = localStorage.getItem("role");
+      setIsAuthenticated(!!token);
+      setRole(userRole);
     };
 
     // Listen for storage events
@@ -21,6 +26,15 @@ const Navbar = () => {
     // Cleanup
     return () => window.removeEventListener("storage", updateAuthState);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    setIsAuthenticated(false);
+    setRole(null);
+    window.dispatchEvent(new Event("storage"));
+    navigate("/");
+  };
 
   return (
     <nav className="bg-[#311B08] text-white p-4 shadow-lg">
@@ -53,9 +67,23 @@ const Navbar = () => {
           </Link>
 
           {isAuthenticated ? (
-            <Link to="/profile" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
-              Profile
-            </Link>
+            <>
+              {role === "admin" ? (
+                <Link to="/admin-dashboard" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+                  Admin Panel
+                </Link>
+              ) : (
+                <Link to="/profile" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+                  Profile
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Link to="/login" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
