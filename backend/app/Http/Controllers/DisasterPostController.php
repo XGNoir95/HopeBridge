@@ -51,45 +51,50 @@ class DisasterPostController extends Controller
     }
 
     public function update(Request $request, $post_id)
-    {
-        $disasterPost = DisasterPost::findOrFail($post_id);
+{
+    $disasterPost = DisasterPost::findOrFail($post_id);
 
-        $validatedData = $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'string',
-            'files' => 'nullable|array',
-            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'division' => 'string|max:255',
-            'district' => 'string|max:255',
-            'event_date' => 'nullable|date',
-            'event_time' => 'nullable|date_format:H:i:s',
-        ]);
-    
-        $files = $request->file('files');
-        $urls = [];
-        if ($files && is_array($files)) {
-            foreach ($files as $file) {
-                $result = $file->storeOnCloudinary();
-                $urls[] = $result->getSecurePath(); 
-            }
+    $validatedData = $request->validate([
+        'title' => 'string|max:255',
+        'description' => 'string',
+        'files' => 'nullable|array',
+        'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'division' => 'string|max:255',
+        'district' => 'string|max:255',
+        'event_date' => 'nullable|date',
+        'event_time' => 'nullable|date_format:H:i:s',
+    ]);
+
+    $files = $request->file('files');
+    $urls = [];
+    if ($files && is_array($files)) {
+        foreach ($files as $file) {
+            $result = $file->storeOnCloudinary();
+            $urls[] = $result->getSecurePath();
         }
-        $updatedFiles = !empty($urls) ? $urls : json_decode($disasterPost->files, true) ?? [];
-        // Update the disaster post
-        $disasterPost->update([
-            'title' => $validatedData['title'] ?? $disasterPost->title,
-            'description' => $validatedData['description'] ?? $disasterPost->description,
-            'files' => json_encode($updatedFiles),
-            'division' => $validatedData['division'] ?? $disasterPost->division,
-            'district' => $validatedData['district'] ?? $disasterPost->district,
-            'event_date' => $validatedData['event_date'] ?? $disasterPost->event_date,
-            'event_time' => $validatedData['event_time'] ?? $disasterPost->event_time,
-        ]);
-        return response()->json([
-            'success' => true,
-            'message' => 'Disaster post updated',
-            'disaster_post' => $disasterPost,
-        ]);
-    } 
+    }
+
+    $existingFiles = json_decode($disasterPost->files, true) ?? [];
+    $updatedFiles = array_merge($existingFiles, $urls);
+
+    // Update the disaster post
+    $disasterPost->update([
+        'title' => $validatedData['title'] ?? $disasterPost->title,
+        'description' => $validatedData['description'] ?? $disasterPost->description,
+        'files' => json_encode($updatedFiles),
+        'division' => $validatedData['division'] ?? $disasterPost->division,
+        'district' => $validatedData['district'] ?? $disasterPost->district,
+        'event_date' => $validatedData['event_date'] ?? $disasterPost->event_date,
+        'event_time' => $validatedData['event_time'] ?? $disasterPost->event_time,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Disaster post updated',
+        'disaster_post' => $disasterPost,
+    ]);
+}
+ 
     
     // Delete post by id
     public function destroy($post_id)
