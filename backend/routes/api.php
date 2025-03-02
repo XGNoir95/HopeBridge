@@ -62,3 +62,5 @@ Route::post('/create-article', [SafeguardController::class, 'createArticle'])->m
 Route::delete('/articles/{id}', [SafeguardController::class, 'deleteArticle'])->middleware('jwt', 'admin');
 Route::get('/articles', [SafeguardController::class, 'articleIndex']);
 Route::get('/articles/{id}', [SafeguardController::class, 'showArticle']);
+Route::post('articles/{id}/update',[SafeguardController::class,'updateArticle']);
+Route::post('videos/{id}/update',[SafeguardController::class,'updateVideo']);

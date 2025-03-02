@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\newsArticle;
+use App\Models\Video;
 use App\Services\NewsArticleService;
 use App\Services\VideoService;
 use Illuminate\Http\Request;
@@ -38,8 +40,40 @@ class SafeguardController extends Controller
         return response()->json(['success'=>false]); 
     }
 
-    public function updateArticle(Request $request){
-        
+    public function updateArticle(Request $request,$post_id){
+        $article = newsArticle::findOrFail($post_id);
+
+        $validatedData = $request->validate([
+            'title' => 'string|max:255',
+            'description' => 'string',
+            'files' => 'nullable|array',
+            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        ]);
+
+        $files = $request->file('files');
+        $urls = [];
+        if ($files && is_array($files)) {
+            foreach ($files as $file) {
+                $result = $file->storeOnCloudinary();
+                $urls[] = $result->getSecurePath();
+            }
+        }
+
+        $existingFiles = json_decode($article->files, true) ?? [];
+        $updatedFiles = array_merge($existingFiles, $urls);
+
+        // Update the news article
+        $article->update([
+            'title' => $validatedData['title'] ?? $article->title,
+            'articleDescription' => $validatedData['description'] ?? $article->description,
+            'files' => json_encode($updatedFiles)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'News article updated',
+            'news_article' => $article,
+        ]);
     }
 
     public function deleteArticle($article_id){
@@ -108,6 +142,14 @@ class SafeguardController extends Controller
             return response()->json(['message' => 'Video not found'], 404);
         }
         return response()->json(['message' => 'Video deleted successfully'], 200);
+    }
+    public function updateVideo(Request $request, $id){
+        $result = $this->videoService->update($request, $id);
+        return response()->json([
+            'success' => true,
+            'message' => 'video vlog updated',
+            'news_article' => $result,
+        ]);
     }
 
     public function showAllVideos()

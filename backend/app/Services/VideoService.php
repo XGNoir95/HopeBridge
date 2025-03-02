@@ -54,7 +54,20 @@ class VideoService
         }
         return false;
     }
-
+    public function update($request,$id){
+        $video=Video::findOrFail($id);
+        $validatedData = $request->validate([
+            'title' => 'string|max:255',
+            'description' => 'string',
+            'video_link'=>'required|string|url'
+        ]);
+        $video->update([
+            'title'=> $validatedData['title'],
+            'description'=> $validatedData['description'],
+            'video_link'=> $validatedData['video_link'],
+        ]);
+        return $video;
+    }
     public function showAllVideos()
     {
         $videos = DB::select('select * from videos');
