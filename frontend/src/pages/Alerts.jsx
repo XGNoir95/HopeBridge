@@ -56,7 +56,8 @@ function Alerts() {
   }, [selectedDivision]);
 
   const filteredPosts = disasterPosts.filter((post) => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDivision = selectedDivision ? post.division === selectedDivision : true;
     const matchesDistrict = selectedDistrict ? post.district === selectedDistrict : true;
@@ -99,8 +100,8 @@ function Alerts() {
             }}
           >
             <option value="">Select Division</option>
-            {divisions.map((division, index) => (
-              <option key={index} value={division.division}>
+            {divisions.map((division) => (
+              <option key={division.division} value={division.division}>
                 {division.division}
               </option>
             ))}
@@ -114,7 +115,7 @@ function Alerts() {
           >
             <option value="">Select District</option>
             {districts.map((district, index) => (
-              <option key={index} value={district}>
+              <option key={`${selectedDivision}-${district}-${index}`} value={district}>
                 {district}
               </option>
             ))}
@@ -129,11 +130,9 @@ function Alerts() {
             filteredPosts.map((post) => (
               <Link
                 key={post.id}
-                to={`/disaster-posts/${post.post_id}`} // URL with post_id
-                state={{ post }} // Pass the entire post object as state
+                to={`/disaster-posts/${post.post_id}`} // No additional parameters are passed
                 className="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:-translate-y-2 hover:shadow-2xl flex flex-col justify-between border-2 border-gray-200"
               >
-
                 <h2 className="text-2xl font-bold text-amber-900 text-center">{post.title}</h2>
                 <p className="text-lg text-gray-600 mt-2 line-clamp-3">
                   <strong>Description: </strong>
@@ -145,19 +144,34 @@ function Alerts() {
                 {post.files && (
                   <div className="mt-4">
                     {(() => {
-                      const images = JSON.parse(post.files);
-                      return (
-                        <>
-                          <img src={images[0]} alt="Disaster" className="w-full h-48 object-cover rounded-md" />
-                          {images.length > 1 && (
-                            <div className="flex gap-2 mt-2">
-                              {images.slice(1, 9).map((file, index) => (
-                                <img key={index} src={file} alt="Additional" className="w-16 h-16 object-cover rounded-md" />
-                              ))}
-                            </div>
-                          )}
-                        </>
-                      );
+                      try {
+                        const images = JSON.parse(post.files.replace(/\\/g, ""));
+                        return (
+                          <>
+                            <img
+                              src={images[0]}
+                              alt="Disaster"
+                              className="w-full h-48 object-cover rounded-md"
+                              key={`${post.id}-main`}
+                            />
+                            {images.length > 1 && (
+                              <div className="flex gap-2 mt-2">
+                                {images.slice(1, 9).map((file, index) => (
+                                  <img
+                                    key={`${post.id}-${index}`}
+                                    src={file}
+                                    alt="Additional"
+                                    className="w-16 h-16 object-cover rounded-md"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </>
+                        );
+                      } catch (e) {
+                        console.error("Error parsing images:", e);
+                        return null;
+                      }
                     })()}
                   </div>
                 )}

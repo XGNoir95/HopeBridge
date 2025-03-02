@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Book } from "lucide-react";
+import { Link } from "react-router-dom"; // Import Link for navigation
 
 const Safeguard = () => {
   const [activeTab, setActiveTab] = useState("news");
@@ -168,9 +169,12 @@ const Safeguard = () => {
                     {article.articleDescription}
                   </p>
                   <div className="flex gap-4 mt-4">
-                    <button className="bg-[#311B08] text-[#EBB380] text-xl py-2 px-4 rounded-lg hover:underline transition duration-300">
+                    <Link
+                      to={`/vlog-details/${article.articleId}`} // Link to the VlogDetails page
+                      className="bg-[#311B08] text-[#EBB380] text-xl py-2 px-4 rounded-lg hover:underline transition duration-300"
+                    >
                       Read more
-                    </button>
+                    </Link>
                     {isAdmin && (
                       <button
                         onClick={() => handleDeleteArticle(article.articleId)}
