@@ -23,6 +23,7 @@ import AdminProfile from "./pages/AdminProfile";
 import AdminInfo from "./components/AdminInfo";
 import AllReports from "./components/AllReports";
 import UploadVlogs from "./components/UploadVlogs";
+import VlogDetails from "./pages/VlogDetails";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="/admin-info" element={<AdminInfo />} />
           <Route path="/all-reports" element={<AllReports />} />
           <Route path="/upload-vlogs" element={<UploadVlogs />} />
+          <Route path="/vlog-details/:id" element={<VlogDetails />} />
         </Routes>
         <Footer />
       </div>

@@ -40,41 +40,27 @@ class SafeguardController extends Controller
         return response()->json(['success'=>false]); 
     }
 
-    public function updateArticle(Request $request,$post_id){
-        $article = newsArticle::findOrFail($post_id);
+    public function updateArticle(Request $request, $post_id)
+{
+    $article = newsArticle::findOrFail($post_id);
 
-        $validatedData = $request->validate([
-            'title' => 'string|max:255',
-            'description' => 'string',
-            'files' => 'nullable|array',
-            'files.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ]);
+    $validatedData = $request->validate([
+        'title' => 'string|max:255',
+        'articleDescription' => 'string',
+    ]);
 
-        $files = $request->file('files');
-        $urls = [];
-        if ($files && is_array($files)) {
-            foreach ($files as $file) {
-                $result = $file->storeOnCloudinary();
-                $urls[] = $result->getSecurePath();
-            }
-        }
+    // Update the news article
+    $article->update([
+        'title' => $validatedData['title'] ?? $article->title,
+        'articleDescription' => $validatedData['articleDescription'] ?? $article->articleDescription,
+    ]);
 
-        $existingFiles = json_decode($article->files, true) ?? [];
-        $updatedFiles = array_merge($existingFiles, $urls);
-
-        // Update the news article
-        $article->update([
-            'title' => $validatedData['title'] ?? $article->title,
-            'articleDescription' => $validatedData['description'] ?? $article->description,
-            'files' => json_encode($updatedFiles)
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'News article updated',
-            'news_article' => $article,
-        ]);
-    }
+    return response()->json([
+        'success' => true,
+        'message' => 'News article updated',
+        'newsArticle' => $article,
+    ]);
+}
 
     public function deleteArticle($article_id){
         $result =$this->newsArticleService->deleteArticle($article_id);
