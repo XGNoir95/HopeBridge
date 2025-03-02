@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Video;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class VideoService
 {
@@ -37,17 +38,18 @@ class VideoService
 
         return $video;
     }
-
+    // 
     public function getVideo($id)
     {
-        return Video::find($id);
+        $result =DB::table('videos')->where('video_id', $id)->first();
+        return $result;
     }
 
     public function deleteVideo($id)
     {
-        $video = Video::find($id);
-        if ($video) {
-            $video->delete();
+        $result=$this->getVideo($id);
+        if ($result) {
+            DB::delete('delete * from videos where video_id= ?',[$id]);
             return true;
         }
         return false;
@@ -55,6 +57,7 @@ class VideoService
 
     public function showAllVideos()
     {
+        $videos = DB::select('select * from videos');
         return Video::all();
     }
 }

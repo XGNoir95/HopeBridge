@@ -51,12 +51,13 @@ class DisasterPostService{
     }
     //get every post in the database
     public function getAllPost(){
-        $allPost=DB::table('disaster_posts')->get();
+        $allPost=DB::select("select * from disaster_posts");
         return $allPost;
     }
     //find a post by the ID
     public function getPost($post_id){
-        $result = DisasterPost::findOrFail($post_id);
+        $result =DB::select("select * from disaster_posts where post_id = ?",[$post_id]);
+
         return $result;
     }
     public function updatePost($request,$post_id){
@@ -66,7 +67,7 @@ class DisasterPostService{
     public function deletePost($post_id){
         $result = $this->getPost($post_id);
         if ($result) {
-            DB::table('disaster_posts')->where('post_id', $post_id)->delete();
+            DB::delete('delete from disaster_posts where post_id = ?',[$post_id]);
             return true;
         }
         return false;
@@ -74,9 +75,8 @@ class DisasterPostService{
     //all post of a user
     public function getUserPost($request){
         $userId = $request->attributes->get('user_id');
-        $results = DB::table('disaster_posts')->where('user_id', $userId)->get();
-
-        return $results;
+        $result =DB::select("select * from disaster_posts where user_id = ?",[$userId]);
+        return $result;
     }
     public function heatMapArray(){
         $posts = $this->getAllPost();
@@ -97,6 +97,7 @@ class DisasterPostService{
                 $city[$div]++;
             }
         }
+        // $city=DB::select("select division, COUNT(division) as count from disaster_posts group by division");
         foreach($city as $k => &$v) {
             $v=$v*20;
         }
