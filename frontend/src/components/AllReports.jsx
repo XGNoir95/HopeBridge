@@ -74,9 +74,7 @@ const AllReports = () => {
                                 {/* View Button */}
                                 <button
                                     className="w-30 bg-[#311B08] text-[#EBB380] px-4 py-2 rounded-lg hover:bg-amber-600 hover:text-white font-semibold"
-                                    onClick={() =>
-                                        navigate(`/disaster-posts/${post.post_id}`, { state: { post } })
-                                    }
+                                    onClick={() => navigate(`/disaster-posts/${post.post_id}`)}
                                 >
                                     View
                                 </button>
