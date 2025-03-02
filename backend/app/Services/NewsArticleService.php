@@ -47,21 +47,21 @@ class NewsArticleService{
 
     return $article;
 }
-    public function updateArticle($request){
-
+    public function updateArticle($request, $post_id){
+        
     }
     public function getAllArticle(){
-        $articles = DB::table('news_article')->get();
+        $articles=DB::select('select * from news_article');
         return $articles;
     }
     public function getArticle($articleId){
-        $result =newsArticle::find($articleId);
+        $result = DB::select('select * from news_article where articleId = ?',[$articleId]);
         return $result;
     }
     public function deleteArticle($articleId){
         $result = $this->getArticle($articleId);
         if ($result) {
-            DB::table('news_article')->where('articleId', $articleId)->delete();
+            DB::delete('delete from news_article where articleId = ?',[$articleId]);
             return true;
         }
         return false;

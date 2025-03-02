@@ -98,7 +98,7 @@ class UserService{
         $user =$this->getUserByid($id);
         if(!$user)
             return false;
-        DB::table('users')->where('user_id',$id)->delete();
+        DB::delete('select * from users where user_id= ?',[$id]);
 
         return true;
     }

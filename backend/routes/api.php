@@ -2,11 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\DisasterPostController;
 use App\Http\Controllers\SafeguardController;
