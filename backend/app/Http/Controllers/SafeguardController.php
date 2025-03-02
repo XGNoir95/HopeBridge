@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Services\NewsArticleService;
 use App\Services\VideoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SafeguardController extends Controller
 {

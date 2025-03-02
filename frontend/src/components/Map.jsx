@@ -19,14 +19,14 @@ const Map = () => {
           console.log("Parsed Post Counts:", postCounts);
 
           const updatedDisasterData = [
-            { division: "Dhaka", lat: 23.8103, lng: 90.4125, impact: postCounts["Dhaka"]*10 || 0 },
-            { division: "Chittagong", lat: 22.3569, lng: 91.7832, impact: postCounts["Chittagong"]*10 || 0 },
-            { division: "Rajshahi", lat: 24.3636, lng: 88.6241, impact: postCounts["Rajshahi"]*10 || 0 },
-            { division: "Khulna", lat: 22.8456, lng: 89.5403, impact: postCounts["Khulna"]*10 || 0 },
-            { division: "Barishal", lat: 22.701, lng: 90.3535, impact: postCounts["Barishal"]*10 || 0 },
-            { division: "Sylhet", lat: 24.8949, lng: 91.8687, impact: postCounts["Sylhet"]*10 || 0 },
-            { division: "Rangpur", lat: 25.7439, lng: 89.2752, impact: postCounts["Rangpur"]*10 || 0 },
-            { division: "Mymensingh", lat: 24.7471, lng: 90.4203, impact: postCounts["Mymensingh"]*10 || 0 },
+            { division: "Dhaka", lat: 23.8103, lng: 90.4125, impact: postCounts["Dhaka"] || 0 },
+            { division: "Chattogram", lat: 22.3569, lng: 91.7832, impact: postCounts["Chattogram"] || 0 },
+            { division: "Rajshahi", lat: 24.3636, lng: 88.6241, impact: postCounts["Rajshahi"] || 0 },
+            { division: "Khulna", lat: 22.8456, lng: 89.5403, impact: postCounts["Khulna"] || 0 },
+            { division: "Barishal", lat: 22.701, lng: 90.3535, impact: postCounts["Barishal"] || 0 },
+            { division: "Sylhet", lat: 24.8949, lng: 91.8687, impact: postCounts["Sylhet"] || 0 },
+            { division: "Rangpur", lat: 25.7439, lng: 89.2752, impact: postCounts["Rangpur"] || 0 },
+            { division: "Mymensingh", lat: 24.7471, lng: 90.4203, impact: postCounts["Mymensingh"] || 0 },
           ];
 
           console.log("Updated Disaster Data:", updatedDisasterData);

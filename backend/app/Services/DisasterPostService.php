@@ -82,7 +82,7 @@ class DisasterPostService{
         $posts = $this->getAllPost();
         $city = [
             'Dhaka' => 0,
-            'Chittagong' => 0,
+            'Chattogram' => 0,
             'Rajshahi' => 0,
             'Khulna' => 0,
             'Barishal' => 0,
@@ -96,6 +96,9 @@ class DisasterPostService{
             if (array_key_exists($div, $city)) {
                 $city[$div]++;
             }
+        }
+        foreach($city as $k => &$v) {
+            $v=$v*20;
         }
         return json_encode($city, JSON_PRETTY_PRINT);
     }
