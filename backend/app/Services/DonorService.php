@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\donor;
-use App\Models\User;
+use App\Models\Volunteer;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -39,7 +39,7 @@ class DonorService{
             'blood_group' => $user['blood_group'] ?? '',
             'donorPhone' => $user['userPhone'] ?? '',
             'donorMail' => $user['userMail'] ?? '',
-            'user_id' => $result['id'],
+            'user_id' => $result['user_id'],
             'division' => $result['division'],
             'district' => $result['district'],
             'gender' => $result['gender']
@@ -85,5 +85,59 @@ class DonorService{
         ";
         $result = DB::select($ques);
         return $result;
+    }
+    public function createVolunteer($user_id){
+        $result=DB::select('select user_id from users where user_id = ?',[$user_id]);
+        if($result){
+            return null;
+        }
+        $result=(array)$result[0];
+        $data=Volunteer::create([
+            'user_id'=>$user_id
+        ]);
+        $data=[
+            'volunteerName'=>$result['userName'],
+            'volunteerMail'=>$result['userMail'],
+            'Blood_group'=>$result['blood_group'],
+            'division'=>$result['division'],
+            'district'=>$result['district']
+        ];
+        return $data;
+    }
+    public function deleteVolunteer($id){
+        $result=DB::select('select * from volunteer where user_id = ?',[$id]);
+        if($result){
+            DB::delete('delete from volunteer where user_id= ?',[$id]);
+            return true;
+        }
+        return false;
+    }
+    public function getAllVolunteer(){
+        $sqlQuery ="
+            select
+            v.volunteer_id as VolunteerId,
+            u.userName as volunteerName,
+            u.userMail as volunteerMail,
+            u.blood_group as BloodGroup,
+            u.division as Divison,
+            u.district as District
+            from
+            volunteer as v
+            inner join 
+            users as u
+            where
+            v.user_id=u.user_id
+        ";
+        $result=DB::select($sqlQuery);
+        return $result;
+
+    }
+    public function getVolunterById($id){
+        $volunteers=$this->getAllVolunteer();
+        foreach($volunteers as $volunteer){
+            if($volunteer['VolunteerId']==$id)
+                return $volunteer;
+        }
+        return null;
     }
 }

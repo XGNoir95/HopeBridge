@@ -76,3 +76,16 @@ Route::get('/resources',[ShelterController::class,'indexDonation']);
 Route::post('/create-resources',[ShelterController::class,'storeDonation']);
 Route::get('/resources/{id}',[ShelterController::class,'showDonation']);
 Route::get('resources/{item}',[ShelterController::class,"itemQuantity"]);
+
+//donation route
+Route::get('/moneyDonation',[ShelterController::class,'indexMoneyDonation']);
+Route::get('/moneyDonation/{id}',[ShelterController::class,'showMoneyDonation']);
+Route::get('/donatedMoney',[ShelterController::class,'donationAmount']);
+Route::post('/create-moneyDonation',[ShelterController::class,'storeMoneyDonation']);
+Route::delete('/moneyDonation/{id}',[ShelterController::class,'deleteMoneyDonation']);
+
+//volunter route
+Route::get('/volunteer',[ShelterController::class,'indexVolunteer']);
+Route::get('/volunteer/{id}',[ShelterController::class,'showVolunteer']);
+Route::post('/create-volunteer',[ShelterController::class,'storeVolunteer']);
+Route::delete('/volunteer/{id}',[ShelterController::class,'destroyVolunteer']);
