@@ -106,4 +106,17 @@ class ShelterController extends Controller
             'message'=>'Failed to fetch Donation'
         ],404);
     }
+    public function itemQuantity($itemDescription){
+        $result =$this->arService->getQuantity($itemDescription);
+        if($result){
+            return response()->json([
+                'success'=>true,
+                'Donations'=>$result
+            ],200);
+        }
+        return response()->json([
+            'success'=>false,
+            'message'=>'Failed to fetch Amount'
+        ],404);
+    }
 }
