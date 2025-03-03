@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // For decoding the JWT token
 
 const Volunteers = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,53 @@ const Volunteers = () => {
   const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const token = localStorage.getItem("token"); // Get the JWT token from local storage
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
+
+        // Decode the token to get the user ID
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.uid; // Assuming `uid` is the key for user_id in the token
+
+        if (!userId) {
+          throw new Error("User ID not found in token");
+        }
+
+        // Fetch user data from the API
+        const response = await axios.get("http://localhost:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Update formData with the user's data
+        setFormData((prevData) => ({
+          ...prevData,
+          volunteerName: response.data.userName,
+          volunteerMail: response.data.userMail,
+          blood_group: response.data.blood_group,
+          division: response.data.division,
+          district: response.data.district,
+        }));
+
+        // Fetch districts for the user's division
+        if (response.data.division) {
+          fetchDistricts(response.data.division);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setMessage("Failed to fetch user data. Please try again.");
+      }
+    };
+
+    fetchUserData();
+  }, [token]);
 
   // Fetch divisions from API
   useEffect(() => {
@@ -55,17 +103,45 @@ const Volunteers = () => {
     setLoading(true);
     setMessage("");
 
+    if (!token) {
+      setMessage("Authentication required!");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Simulate API call for submission
-      console.log("Form Submitted", formData);
-      setMessage("Volunteer registration successful!");
-      setFormData({
-        volunteerName: "",
-        volunteerMail: "",
-        blood_group: "",
-        division: "",
-        district: "",
-      });
+      // Prepare the payload for the API request
+      const payload = {
+        volunteerName: formData.volunteerName,
+        volunteerMail: formData.volunteerMail,
+        blood_group: formData.blood_group,
+        division: formData.division,
+        district: formData.district,
+      };
+
+      // Submit the data to the backend
+      const response = await axios.post(
+        "http://localhost:8000/api/create-volunteer",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setMessage("Volunteer registration successful!");
+        setFormData({
+          volunteerName: "",
+          volunteerMail: "",
+          blood_group: "",
+          division: "",
+          district: "",
+        });
+      } else {
+        setMessage("Failed to register. Please try again.");
+      }
     } catch (error) {
       setMessage("Failed to register. Please try again.");
       console.error(error);
@@ -96,6 +172,7 @@ const Volunteers = () => {
               value={formData.volunteerName}
               onChange={handleChange}
               required
+              readOnly // Make the field non-editable
             />
 
             <label className="text-lg font-bold px-4 pb-2 mt-4">Email</label>
@@ -107,6 +184,7 @@ const Volunteers = () => {
               value={formData.volunteerMail}
               onChange={handleChange}
               required
+              readOnly // Make the field non-editable
             />
 
             <label className="text-lg font-bold px-4 pb-2 mt-4">Blood Group</label>
@@ -118,9 +196,10 @@ const Volunteers = () => {
               value={formData.blood_group}
               onChange={handleChange}
               required
+              readOnly // Make the field non-editable
             />
 
-            <label className="text-lg font-bold px-4 pb-2 mt-4">Location</label>
+            {/* <label className="text-lg font-bold px-4 pb-2 mt-4">Location</label>
             <div className="flex flex-col md:flex-row gap-4">
               <select
                 name="division"
@@ -128,6 +207,7 @@ const Volunteers = () => {
                 value={formData.division}
                 onChange={handleChange}
                 required
+                readOnly // Make the field non-editable
               >
                 <option value="" disabled>
                   Select Division
@@ -145,7 +225,7 @@ const Volunteers = () => {
                 value={formData.district}
                 onChange={handleChange}
                 required
-                disabled={!formData.division}
+                readOnly // Make the field non-editable
               >
                 <option value="" disabled>
                   Select District
@@ -156,7 +236,7 @@ const Volunteers = () => {
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
 
             <div className="flex px-4 py-5 justify-center">
               <button
