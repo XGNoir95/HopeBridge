@@ -75,3 +75,4 @@ Route::delete('/donor/{id}',[ShelterController::class,'destroyDonor']);
 Route::get('/resources',[ShelterController::class,'indexDonation']);
 Route::post('/create-resources',[ShelterController::class,'storeDonation']);
 Route::get('/resources/{id}',[ShelterController::class,'showDonation']);
+Route::get('resources/{item}',[ShelterController::class,"itemQuantity"]);
