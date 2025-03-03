@@ -1,12 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // Correct import for jwt-decode// For decoding the JWT token
 
 const DonateBlood = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    mail: "",
+    phone: "",
+    bloodGroup: "",
+    division: "", // City data will be displayed here
+    district: "",
+    gender: "",
+  });
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem("token"); // Check if the user is logged in
 
-  const handleSubmit = (e) => {
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
+
+        // Fetch user data from the API
+        const response = await axios.get("http://localhost:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request headers
+          },
+        });
+
+        // Update formData with the user's data
+        setFormData((prevData) => ({
+          ...prevData,
+          name: response.data.userName,
+          mail: response.data.userMail,
+          phone: response.data.userPhone,
+          bloodGroup: response.data.blood_group,
+          division: response.data.city, // City data is displayed as division
+          district: response.data.district,
+        }));
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError("Failed to fetch user data. Please try again.");
+      }
+    };
+
+    if (token) {
+      fetchUserData();
+    }
+  }, [token]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Check if the user is logged in
@@ -16,8 +68,39 @@ const DonateBlood = () => {
       return;
     }
 
-    // If logged in, proceed with submission
-    setIsSubmitted(true);
+    try {
+      // Decode the JWT token to get the user_id
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.uid; // Assuming `uid` is the key for user_id in the token
+
+      // Prepare the payload for the API request
+      const payload = {
+        id: userId, // Pass the user_id from the token
+        division: formData.division,
+        district: formData.district,
+        gender: formData.gender,
+      };
+
+      // Send the data to the backend
+      const response = await axios.post(
+        "http://localhost:8000/api/create-donor",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request headers
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setIsSubmitted(true); // Show success message
+      } else {
+        setError("Failed to submit donation. Please try again.");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      setError("An error occurred. Please check your input and try again.");
+    }
   };
 
   // If the user is not logged in, display a message and redirect options
@@ -71,58 +154,77 @@ const DonateBlood = () => {
           </div>
         ) : (
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && <p className="text-red-500 text-center">{error}</p>}
             <input
               type="text"
+              name="name"
               placeholder="Full Name"
+              value={formData.name}
+              onChange={handleChange}
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
+              readOnly // Make the field non-editable
               required
             />
             <input
               type="email"
+              name="mail"
               placeholder="Email Address"
+              value={formData.mail}
+              onChange={handleChange}
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
+              readOnly // Make the field non-editable
               required
             />
             <input
               type="tel"
+              name="phone"
               placeholder="Phone Number"
+              value={formData.phone}
+              onChange={handleChange}
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
+              readOnly // Make the field non-editable
               required
             />
             <input
               type="text"
+              name="bloodGroup"
               placeholder="Blood Group"
+              value={formData.bloodGroup}
+              onChange={handleChange}
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
+              readOnly // Make the field non-editable
               required
             />
-            <select
-              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
-              required
-            >
-              <option value="">Select Division</option>
-              <option value="Dhaka">Dhaka</option>
-              <option value="Chittagong">Chittagong</option>
-              <option value="Rajshahi">Rajshahi</option>
-              <option value="Khulna">Khulna</option>
-              <option value="Barisal">Barisal</option>
-              <option value="Sylhet">Sylhet</option>
-              <option value="Rangpur">Rangpur</option>
-              <option value="Mymensingh">Mymensingh</option>
-            </select>
             <input
               type="text"
-              placeholder="District"
+              name="division"
+              placeholder="Division (City)"
+              value={formData.division}
+              onChange={handleChange}
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
+              readOnly // Make the field non-editable
+              required
+            />
+            <input
+              type="text"
+              name="district"
+              placeholder="District"
+              value={formData.district}
+              onChange={handleChange}
+              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
+              readOnly // Make the field non-editable
               required
             />
             <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
               required
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
-              <option value="Other">Other</option>
             </select>
             <div className="flex justify-between gap-6">
               <Link
