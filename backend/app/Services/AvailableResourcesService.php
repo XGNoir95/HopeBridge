@@ -43,6 +43,7 @@ class AvailableResourcesService{
     // get quantity by itemDescription
     public function getQuantity($itemDescription){
         $result =DB::select('select itemDescription as Item,SUM(quantity) as Amount from available_resources where itemDescription =? group by Item',[$itemDescription]);
+        $result=(array)$result[0];
         return $result;
     }
 }
