@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode"; // Import jwt-decode
 
 const DonateMoney = () => {
   const [formData, setFormData] = useState({
@@ -11,10 +12,54 @@ const DonateMoney = () => {
     method: "",
   });
 
+  const [userId, setUserId] = useState(null); // State to store the user ID
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        if (!token) {
+          throw new Error("No token found in localStorage");
+        }
+
+        // Decode the token to get the user ID
+        const decodedToken = jwtDecode(token);
+        const userIdFromToken = decodedToken.uid; // Assuming `uid` is the key for user_id in the token
+
+        if (!userIdFromToken) {
+          throw new Error("User ID not found in token");
+        }
+
+        // Set the user ID
+        setUserId(userIdFromToken);
+
+        // Fetch user data from the API
+        const response = await axios.get("http://localhost:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Update formData with the user's name, email, and phone
+        setFormData((prevData) => ({
+          ...prevData,
+          fullName: response.data.userName,
+          email: response.data.userMail,
+          phone: response.data.userPhone, // Assuming the API returns the phone number
+        }));
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setError("Failed to fetch user data. Please try again.");
+      }
+    };
+
+    fetchUserData();
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +70,7 @@ const DonateMoney = () => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    setError(null);
 
     if (!token) {
       setMessage("Authentication required!");
@@ -32,10 +78,22 @@ const DonateMoney = () => {
       return;
     }
 
+    if (!userId) {
+      setMessage("User ID not found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     try {
+      const payload = {
+        id: userId, // Include the user ID in the payload
+        amount: formData.amount,
+        paymentMethod: formData.method, // Map `method` to `paymentMethod`
+      };
+
       const response = await axios.post(
-        "http://localhost:8000/api/donate-money",
-        formData,
+        "http://localhost:8000/api/create-moneyDonation",
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,7 +101,7 @@ const DonateMoney = () => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 200 && response.data.success) {
         setMessage("Thank you for your donation!");
         setFormData({
           fullName: "",
@@ -52,6 +110,8 @@ const DonateMoney = () => {
           amount: "",
           method: "",
         });
+      } else {
+        setMessage("Failed to process the donation. Please try again.");
       }
     } catch (error) {
       setMessage("Failed to process the donation. Please try again.");
@@ -110,6 +170,7 @@ const DonateMoney = () => {
           </div>
         ) : (
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && <p className="text-red-500 text-center">{error}</p>}
             <input
               type="text"
               name="fullName"
@@ -117,6 +178,7 @@ const DonateMoney = () => {
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
               value={formData.fullName}
               onChange={handleChange}
+              readOnly // Make the field non-editable
               required
             />
             <input
@@ -126,6 +188,7 @@ const DonateMoney = () => {
               className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
               value={formData.email}
               onChange={handleChange}
+              readOnly // Make the field non-editable
               required
             />
             <input

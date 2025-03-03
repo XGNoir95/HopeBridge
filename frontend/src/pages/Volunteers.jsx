@@ -74,7 +74,7 @@ const Volunteers = () => {
   };
 
   return (
-    <div className="relative flex size-full min-h-screen flex-col overflow-x-hidden bg-gray-100">
+    <div className="py-20 relative flex size-full min-h-screen flex-col overflow-x-hidden bg-gray-100">
       <div className="layout-container flex h-full grow flex-col items-center py-10">
         {/* Wider Card Container */}
         <div className="w-full md:w-[780px] max-w-[1024px] py-5 border border-amber-900 rounded-xl shadow-lg bg-white p-4 md:p-8">
