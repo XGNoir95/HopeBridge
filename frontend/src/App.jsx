@@ -24,11 +24,13 @@ import AdminInfo from "./components/AdminInfo";
 import AllReports from "./components/AllReports";
 import UploadVlogs from "./components/UploadVlogs";
 import VlogDetails from "./pages/VlogDetails";
+import Volunteers from "./pages/Volunteers";
+import ContactUs from "./pages/ContactUs"; // Import the ContactUs component
 
 function App() {
   return (
     <Router>
-      <ScrollToTop /> {/* Add this here */}
+      <ScrollToTop />
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <Routes>
@@ -45,14 +47,16 @@ function App() {
           <Route path="/donate-blood" element={<DonateBlood />} />
           <Route path="/donate-goods" element={<DonateGoods />} />
           <Route path="/disaster-posts/:post_id" element={<DisasterPostDetail />} />
-          <Route path="edit-profile" element={<EditProfile />} />
-          <Route path="my-reports" element={<MyReports />} />
-          <Route path="profile-info" element={<ProfileInfo />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/profile-info" element={<ProfileInfo />} />
           <Route path="/admin-dashboard" element={<AdminProfile />} />
           <Route path="/admin-info" element={<AdminInfo />} />
           <Route path="/all-reports" element={<AllReports />} />
           <Route path="/upload-vlogs" element={<UploadVlogs />} />
           <Route path="/vlog-details/:id" element={<VlogDetails />} />
+          <Route path="/volunteers" element={<Volunteers />} />
+          <Route path="/contact-us" element={<ContactUs />} /> {/* Add the ContactUs route */}
         </Routes>
         <Footer />
       </div>

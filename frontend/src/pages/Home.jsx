@@ -7,9 +7,7 @@ import Map from '../components/Map';
 const Home = () => {
   return (
     <div className="flex-1">
-
       <Hero />
-
 
       <div className="container mx-auto py-16 px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
@@ -37,11 +35,11 @@ const Home = () => {
             </div>
           </Link>
 
-          <Link to="/join" className="block transform transition duration-300 hover:scale-105">
+          {/* ✅ Fixed the Link to navigate to Volunteers Page */}
+          <Link to="/volunteers" className="block transform transition duration-300 hover:scale-105">
             <div className="text-center p-6 bg-white rounded-lg shadow-lg cursor-pointer">
               <div className="flex justify-center mb-4">
                 <HandshakeIcon size={60} className="text-[#311B08]" />
-
               </div>
               <h3 className="text-2xl font-bold mb-2">Join</h3>
               <p className="text-gray-600 p-4">
@@ -53,11 +51,9 @@ const Home = () => {
         </div>
       </div>
 
-
       <div className="bg-gray-100 py-16 my-10">
         <Map />
       </div>
-
 
       <div className="bg-gray-100 py-16">
         <div className="container mx-auto px-4">
