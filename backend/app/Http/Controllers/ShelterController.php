@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Shelter;
 use App\Services\DonorService;
+use App\Services\AvailableResourcesService;
 
 class ShelterController extends Controller
 {
     protected $donorservice;
+    protected $arService;
 
-    public function __construct(DonorService $donorservice) {
+    public function __construct(DonorService $donorservice, AvailableResourcesService $arService) {
         $this->donorservice = $donorservice; // Corrected this line
+        $this->arService=$arService;
     }
     public function storeDonor(Request $request){
         $result=$this->donorservice->createDonor($request);
@@ -62,6 +65,45 @@ class ShelterController extends Controller
         return response()->json([
             'success'=>false,
             'message'=>'Failed to Delete Donor'
+        ],404);
+    }
+    public function storeDonation(Request $request){
+        $result=$this->arService->createDonation($request);
+        if($result){
+            return response()->json([
+                'success'=>true,
+                'Donations'=>$result
+            ],200);
+        }
+        return response()->json([
+            'success'=>false,
+            'message'=>'Failed to create Donation'
+        ],404);
+    }
+    public function indexDonation(){
+        $result=$this->arService->getAllDonation();
+        if($result){
+            return response()->json([
+                'success'=>true,
+                'Donations'=>$result
+            ],200);
+        }
+        return response()->json([
+            'success'=>false,
+            'message'=>'Failed to fetch Donations'
+        ],404);
+    }
+    public function showDonation($id){
+        $result =$this->arService->getDonation($id);
+        if($result){
+            return response()->json([
+                'success'=>true,
+                'Donations'=>$result
+            ],200);
+        }
+        return response()->json([
+            'success'=>false,
+            'message'=>'Failed to fetch Donation'
         ],404);
     }
 }

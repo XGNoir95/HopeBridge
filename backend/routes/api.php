@@ -67,6 +67,11 @@ Route::post('videos/{id}/update',[SafeguardController::class,'updateVideo']);
 
 //Donor route
 Route::get('/donor',[ShelterController::class,'indexDonor']);
-Route::get('/donor/{id}',[SafeguardController::class,'showDonor']);
-Route::post('/create-donor',[SafeguardController::class,'storeDonor']);
-Route::delete('/donor/{id}',[SafeguardController::class,'destroyDonor']);
+Route::get('/donor/{id}',[ShelterController::class,'showDonor']);
+Route::post('/create-donor',[ShelterController::class,'storeDonor']);
+Route::delete('/donor/{id}',[ShelterController::class,'destroyDonor']);
+
+//resources route
+Route::get('/resources',[ShelterController::class,'indexDonation']);
+Route::post('/create-resources',[ShelterController::class,'storeDonation']);
+Route::get('/resources/{id}',[ShelterController::class,'showDonation']);

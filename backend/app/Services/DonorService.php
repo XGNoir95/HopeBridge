@@ -10,37 +10,41 @@ use Illuminate\Support\Facades\Log;
 
 class DonorService{
     public function createDonor($request){
-        $validator = Validator::make($request, [
-            'id' => 'required|integer|max:255',
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'id' => 'required|integer',
             'division' => 'required|string|max:255',
-            'district'=>'required|string|max:255',
-            'gender'=>'required|string|max:10'
+            'district' => 'required|string|max:255',
+            'gender' => 'required|string|max:10'
         ]);
-    
+
         if ($validator->fails()) {
-            throw new \InvalidArgumentException($validator->errors()->first());
+            return response()->json(['error' => $validator->errors()], 422);
         }
-        $user_id=$request->attirbute->get('id');
+
         $validatedData = $validator->validated();
-        $result=donor::create([
-            'user_id'=>$validatedData['id'],
-            'divison'=>$validatedData['division'],
-            'district'=>$validatedData['district'],
-            'gender'=>$validatedData['gender']
+        $userData = DB::select("select * from users WHERE user_id = ?", [$validatedData['id']]);
+        if(!$userData)
+            return null;
+        $user = (array) $userData[0];
+        $result = Donor::create([
+            'user_id' => $validatedData['id'],
+            'division' => $validatedData['division'],
+            'district' => $validatedData['district'],
+            'gender' => $validatedData['gender']
         ]);
-        $userData=DB::select("select * from users where user_id = ?",[$user_id]);
-        $donorData =[
-            'donorName'=>$userData['userName'],
-            'blood_group'=>$userData['blood_group'],
-            'donorPhone'=>$userData['userPhone'],
-            'donorMail'=>$userData['userMail'],
-            'user_id'=>'id',
-            'division'=>'divison',
-            'district'=>'district',
-            'gender'=>'gender'
-        ];
-        $result= json_encode($donorData,JSON_PRETTY_PRINT);
-        return $result;
+        $donorData = [
+            'donorName' => $user['userName'] ?? '',
+            'blood_group' => $user['blood_group'] ?? '',
+            'donorPhone' => $user['userPhone'] ?? '',
+            'donorMail' => $user['userMail'] ?? '',
+            'user_id' => $result['id'],
+            'division' => $result['division'],
+            'district' => $result['district'],
+            'gender' => $result['gender']
+        ];    
+        return $donorData;
     }
     //delete donor data
     public function deleteDonor($id){
@@ -50,12 +54,12 @@ class DonorService{
             return true;
         }
     }
-    // find donor by user_id
+    // find donor by donor_id
     public function getDonorById($id){
-        $don=$this->getAllDonor();
-        foreach($don as $key){
-            if($don['user_id']==$id)
-                return $key;
+        $donors=$this->getAllDonor();
+        foreach($donors as $donor){
+            if($donor['DonorId']==$id)
+                return $donor;
         }
         return null;
     }
@@ -63,6 +67,7 @@ class DonorService{
     public function getAllDonor(){
         $ques = "
             SELECT 
+            d.donorId as DonorId,
             u.user_id AS user_id,
             u.userName AS donorName,
             u.userMail AS donorMail,

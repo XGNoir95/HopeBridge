@@ -16,9 +16,11 @@ class CreateAvailableResourcesTable extends Migration
         Schema::create('available_resources', function (Blueprint $table) {
             $table->increments('itemId');
             $table->string('donorName');
+            $table->string('donorMail');
             $table->string('itemDescription');
-            $table->string('quantity');
+            $table->integer('quantity');
             $table->string('pickUpLocation');
+            $table->timestamps();
         });
     }
 
