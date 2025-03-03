@@ -2,14 +2,18 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\donor;
 use App\Models\Volunteer;
-use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
-class DonorService{
-    public function createDonor($request){
+class DonorService
+{
+    public function createDonor($request)
+    {
         $data = $request->all();
 
         $validator = Validator::make($data, [
@@ -25,7 +29,7 @@ class DonorService{
 
         $validatedData = $validator->validated();
         $userData = DB::select("select * from users WHERE user_id = ?", [$validatedData['id']]);
-        if(!$userData)
+        if (!$userData)
             return null;
         $user = (array) $userData[0];
         $result = Donor::create([
@@ -43,28 +47,31 @@ class DonorService{
             'division' => $result['division'],
             'district' => $result['district'],
             'gender' => $result['gender']
-        ];    
+        ];
         return $donorData;
     }
     //delete donor data
-    public function deleteDonor($id){
-        $result =DB::select('select donorId from donor where donorId= ?',[$id]);
-        if($result){
-            DB::delete('Delete from donor where donorId = ?',[$id]);
+    public function deleteDonor($id)
+    {
+        $result = DB::select('select donorId from donor where donorId= ?', [$id]);
+        if ($result) {
+            DB::delete('Delete from donor where donorId = ?', [$id]);
             return true;
         }
     }
     // find donor by donor_id
-    public function getDonorById($id){
-        $donors=$this->getAllDonor();
-        foreach($donors as $donor){
-            if($donor['DonorId']==$id)
+    public function getDonorById($id)
+    {
+        $donors = $this->getAllDonor();
+        foreach ($donors as $donor) {
+            if ($donor->DonorId == $id)
                 return $donor;
         }
         return null;
     }
     // get all donor
-    public function getAllDonor(){
+    public function getAllDonor()
+    {
         $ques = "
             SELECT 
             d.donorId as DonorId,
@@ -86,35 +93,51 @@ class DonorService{
         $result = DB::select($ques);
         return $result;
     }
-    public function createVolunteer($request){
-        $id=$request->attributes->get('user_id');
-        $result=DB::select('select * from users where user_id = ?',[$id]);
-        if(empty($result)){
+    public function createVolunteer($request)
+    {
+
+        $userId = $request->attributes->get('user_id');
+
+        $userData = User::where('user_id', $userId)->first();
+        if (!$userData) {
             return null;
         }
-        $result=(array)$result[0];
-        $data=Volunteer::create([
-            'user_id'=>$id
+
+        // $result=DB::select('select user_id from users where user_id = ?',[$user_id]);
+        // if($result){
+        //     return null;
+        // }
+        //$result=(array)$result[0];
+
+        $existingVolunteer = Volunteer::where('user_id', $userId)->first();
+        if ($existingVolunteer) {
+            return response()->json(['success' => false, 'message' => 'User is already a volunteer'], 409);
+        }
+        $volunteer = Volunteer::create([
+            'user_id' => $userId
         ]);
-        $data=[
-            'volunteerName'=>$result['userName'],
-            'volunteerMail'=>$result['userMail'],
-            'Blood_group'=>$result['blood_group'],
-            'division'=>$result['division'],
-            'district'=>$result['district']
+        $volunteerData = [
+            'volunteerName' => $userData->userName,
+            'volunteerMail' => $userData->userMail,
+            'blood_group' => $userData->blood_group,
+            'division' => $userData->division,
+            'district' => $userData->district
         ];
-        return $data;
+        return $volunteerData;
     }
-    public function deleteVolunteer($id){
-        $result=DB::select('select * from volunteer where user_id = ?',[$id]);
-        if($result){
-            DB::delete('delete from volunteer where user_id= ?',[$id]);
+
+    public function deleteVolunteer($id)
+    {
+        $result = DB::select('select * from volunteer where user_id = ?', [$id]);
+        if ($result) {
+            DB::delete('delete from volunteer where user_id= ?', [$id]);
             return true;
         }
         return false;
     }
-    public function getAllVolunteer(){
-        $sqlQuery ="
+    public function getAllVolunteer()
+    {
+        $sqlQuery = "
             select
             v.volunteer_id as VolunteerId,
             u.userName as volunteerName,
@@ -128,14 +151,14 @@ class DonorService{
             where
             v.user_id=u.user_id
         ";
-        $result=DB::select($sqlQuery);
+        $result = DB::select($sqlQuery);
         return $result;
-
     }
-    public function getVolunterById($id){
-        $volunteers=$this->getAllVolunteer();
-        foreach($volunteers as $volunteer){
-            if($volunteer['VolunteerId']==$id)
+    public function getVolunterById($id)
+    {
+        $volunteers = $this->getAllVolunteer();
+        foreach ($volunteers as $volunteer) {
+            if ($volunteer->VolunteerId == $id)
                 return $volunteer;
         }
         return null;
