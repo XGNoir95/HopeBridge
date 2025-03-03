@@ -1,5 +1,6 @@
 import React from 'react';
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const Footer = () => {
   return (
@@ -27,13 +28,13 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-wrap justify-center space-x-2 sm:space-x-4 text-sm mb-4">
-            <a href="#" className="hover:text-orange-300 transition-colors">About</a>
+            <Link to="/about" className="hover:text-orange-300 transition-colors">About</Link>
             <span className="hidden sm:inline">|</span>
-            <a href="#" className="hover:text-orange-300 transition-colors">Privacy</a>
+            <Link to="/privacy" className="hover:text-orange-300 transition-colors">Privacy</Link>
             <span className="hidden sm:inline">|</span>
-            <a href="#" className="hover:text-orange-300 transition-colors">Terms of Use</a>
+            <Link to="/terms" className="hover:text-orange-300 transition-colors">Terms of Use</Link>
             <span className="hidden sm:inline">|</span>
-            <a href="#" className="hover:text-orange-300 transition-colors">Contact Us</a>
+            <Link to="/contact-us" className="hover:text-orange-300 transition-colors">Contact Us</Link>
           </div>
 
           <p className="text-sm mt-4">© 2024 All rights reserved by HopeBridge</p>
