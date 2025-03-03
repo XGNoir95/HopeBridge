@@ -64,3 +64,9 @@ Route::get('/articles', [SafeguardController::class, 'articleIndex']);
 Route::get('/articles/{id}', [SafeguardController::class, 'showArticle']);
 Route::post('articles/{id}/update',[SafeguardController::class,'updateArticle']);
 Route::post('videos/{id}/update',[SafeguardController::class,'updateVideo']);
+
+//Donor route
+Route::get('/donor',[ShelterController::class,'indexDonor']);
+Route::get('/donor/{id}',[SafeguardController::class,'showDonor']);
+Route::post('/create-donor',[SafeguardController::class,'storeDonor']);
+Route::delete('/donor/{id}',[SafeguardController::class,'destroyDonor']);
