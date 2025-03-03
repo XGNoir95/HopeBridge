@@ -86,14 +86,15 @@ class DonorService{
         $result = DB::select($ques);
         return $result;
     }
-    public function createVolunteer($user_id){
-        $result=DB::select('select user_id from users where user_id = ?',[$user_id]);
-        if($result){
+    public function createVolunteer($request){
+        $id=$request->attributes->get('user_id');
+        $result=DB::select('select * from users where user_id = ?',[$id]);
+        if(empty($result)){
             return null;
         }
         $result=(array)$result[0];
         $data=Volunteer::create([
-            'user_id'=>$user_id
+            'user_id'=>$id
         ]);
         $data=[
             'volunteerName'=>$result['userName'],
@@ -119,7 +120,6 @@ class DonorService{
             u.userName as volunteerName,
             u.userMail as volunteerMail,
             u.blood_group as BloodGroup,
-            u.division as Divison,
             u.district as District
             from
             volunteer as v

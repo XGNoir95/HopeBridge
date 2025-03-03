@@ -11,7 +11,7 @@ class DonatedMoneyService{
     public function createDonation($request){
         $data=$request->all();
         $validator=validator::make($data,[
-            'id'=>'required|integer|unique',
+            'id'=>'required|integer',
             'amount'=>'required|integer',
             'paymentMethod'=>'required|string'
         ]);
@@ -77,9 +77,9 @@ class DonatedMoneyService{
     }
     public function donatedAmount(){
         $donations=$this->getAllDonation();
-        (int)$totalAmount=0;
+        $totalAmount=0;
         foreach($donations as $donation){
-            $totalAmount+=(int)$donation['amount'];
+            $totalAmount+=$donation->Amount;
         }
         $data=[
             'totalDonatedMoney'=>$totalAmount

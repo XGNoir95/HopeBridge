@@ -15,6 +15,7 @@ class CreateDonatedMoneyTable extends Migration
     {
         Schema::create('donated_money', function (Blueprint $table) {
             $table->increments('donation_id');
+            $table->integer('user_id');
             $table->integer('amount');
             $table->string('paymentMethod');
             $table->timestamps();

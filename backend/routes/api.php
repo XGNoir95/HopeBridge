@@ -87,5 +87,5 @@ Route::delete('/moneyDonation/{id}',[ShelterController::class,'deleteMoneyDonati
 //volunter route
 Route::get('/volunteer',[ShelterController::class,'indexVolunteer']);
 Route::get('/volunteer/{id}',[ShelterController::class,'showVolunteer']);
-Route::post('/create-volunteer',[ShelterController::class,'storeVolunteer']);
+Route::post('/create-volunteer',[ShelterController::class,'storeVolunteer'])->middleware('jwt');
 Route::delete('/volunteer/{id}',[ShelterController::class,'destroyVolunteer']);

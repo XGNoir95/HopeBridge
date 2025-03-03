@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Volunteer;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,6 @@ class CreateVolunteerTable extends Migration
         Schema::create('volunteer', function (Blueprint $table) {
             $table->increments('volunteer_id');
             $table->integer('user_id')->unique();
-            $table->timestamps();
         });
     }
 
