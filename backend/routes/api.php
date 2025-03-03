@@ -64,3 +64,14 @@ Route::get('/articles', [SafeguardController::class, 'articleIndex']);
 Route::get('/articles/{id}', [SafeguardController::class, 'showArticle']);
 Route::post('articles/{id}/update',[SafeguardController::class,'updateArticle']);
 Route::post('videos/{id}/update',[SafeguardController::class,'updateVideo']);
+
+//Donor route
+Route::get('/donor',[ShelterController::class,'indexDonor']);
+Route::get('/donor/{id}',[ShelterController::class,'showDonor']);
+Route::post('/create-donor',[ShelterController::class,'storeDonor']);
+Route::delete('/donor/{id}',[ShelterController::class,'destroyDonor']);
+
+//resources route
+Route::get('/resources',[ShelterController::class,'indexDonation']);
+Route::post('/create-resources',[ShelterController::class,'storeDonation']);
+Route::get('/resources/{id}',[ShelterController::class,'showDonation']);

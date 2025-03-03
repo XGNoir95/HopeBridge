@@ -3,7 +3,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
 
 class CreateAvailableResourcesTable extends Migration
 {
@@ -14,11 +13,14 @@ class CreateAvailableResourcesTable extends Migration
      */
     public function up()
     {
-        Schema::create('availablResources', function (Blueprint $table) {
-            $table->integer('resourceId')->primary();
-			$table->integer('clothes');
-			$table->integer('food');
-			$table->string('bloodDonor',255);
+        Schema::create('available_resources', function (Blueprint $table) {
+            $table->increments('itemId');
+            $table->string('donorName');
+            $table->string('donorMail');
+            $table->string('itemDescription');
+            $table->integer('quantity');
+            $table->string('pickUpLocation');
+            $table->timestamps();
         });
     }
 
@@ -29,6 +31,6 @@ class CreateAvailableResourcesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('availablResources');
+        Schema::dropIfExists('available_resources');
     }
 }
