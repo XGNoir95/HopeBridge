@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { X, AlertTriangle } from "lucide-react"; // Import the close icon and AlertTriangle
+import { X, AlertTriangle } from "lucide-react";
 
 function DisasterPostDetail() {
-  const { post_id } = useParams(); // Extract post_id from the URL
+  const { post_id } = useParams();
   const navigate = useNavigate();
-  const [post, setPost] = useState(null); // State to store the fetched post
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-  const [selectedImage, setSelectedImage] = useState(null); // Selected image for modal
-  const [userRole, setUserRole] = useState(""); // State to store user role
-  const [isEditing, setIsEditing] = useState(false); // State to toggle edit mode
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [userRole, setUserRole] = useState("");
+  const [isEditing, setIsEditing] = useState(false); // State for edit mode
   const [formData, setFormData] = useState({
     title: "",
     district: "",
     division: "",
     description: "",
-  }); // State for form data
+  });
 
   // State for divisions and districts
   const [divisions, setDivisions] = useState([]);
@@ -37,7 +37,14 @@ function DisasterPostDetail() {
     axios
       .get(`https://bdapis.com/api/v1.2/division/${division}`)
       .then((response) => {
-        const districtNames = response.data.data.map((item) => item.district);
+        console.log("District API Response:", response.data); // Debugging
+        const data = response.data.data;
+
+        // Handle both array and object responses
+        const districtNames = Array.isArray(data)
+          ? data.map((item) => item.district)
+          : Object.values(data).map((item) => item.district);
+
         setDistricts(districtNames);
       })
       .catch((error) => console.error("Error fetching districts:", error));
@@ -46,44 +53,34 @@ function DisasterPostDetail() {
   // Fetch post details from the backend
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role"); // Fetch role from localStorage
+    const role = localStorage.getItem("role");
 
-    if (!token) {
-      console.error("No token found, redirecting to login...");
+    if (!token || !post_id) {
       navigate("/login");
       return;
     }
 
-    if (!post_id) {
-      console.error("No post_id found in URL, redirecting to /alerts...");
-      navigate("/alerts");
-      return;
-    }
-
     if (role) {
-      setUserRole(role); // Set user role from localStorage
+      setUserRole(role);
     }
 
-    // Fetch post details
     axios
       .get(`http://localhost:8000/api/user/posts/${post_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log("API Response:", response.data); // Debugging
+        console.log("API Response:", response.data);
         if (response.data.user_post) {
-          setPost(response.data.user_post);
+          const postData = response.data.user_post[0]; // Access the first element
+          setPost(postData);
           setFormData({
-            title: response.data.user_post.title,
-            district: response.data.user_post.district,
-            division: response.data.user_post.division,
-            description: response.data.user_post.description,
+            title: postData.title,
+            district: postData.district,
+            division: postData.division,
+            description: postData.description,
           });
           // Fetch districts for the current division
-          fetchDistricts(response.data.user_post.division);
-          setLoading(false);
-        } else {
-          setError("Post data not found in response");
+          fetchDistricts(postData.division);
           setLoading(false);
         }
       })
@@ -97,26 +94,14 @@ function DisasterPostDetail() {
   // Handle division change
   const handleDivisionChange = (e) => {
     const { value } = e.target;
-    setFormData({ ...formData, division: value, district: "" });
-    fetchDistricts(value);
+    setFormData({ ...formData, division: value, district: "" }); // Reset district when division changes
+    fetchDistricts(value); // Fetch districts for the selected division
   };
 
   // Handle district change
   const handleDistrictChange = (e) => {
     const { value } = e.target;
     setFormData({ ...formData, district: value });
-  };
-
-  // Open modal with the selected image
-  const openModal = (image) => {
-    setSelectedImage(image);
-    setIsModalOpen(true);
-  };
-
-  // Close modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedImage(null);
   };
 
   // Handle delete post
@@ -133,6 +118,23 @@ function DisasterPostDetail() {
         console.error("Error deleting post:", error);
         setError("Failed to delete post");
       });
+  };
+
+  // Handle donate button click
+  const handleDonate = () => {
+    navigate("/donate"); // Redirect to the donation page
+  };
+
+  // Open modal with the selected image
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
   };
 
   // Handle form input changes
@@ -171,33 +173,20 @@ function DisasterPostDetail() {
     window.location.reload(); // Reload the page to reset the form
   };
 
-  // Handle donate button click
-  const handleDonate = () => {
-    navigate("/donate"); // Redirect to the donation page
-  };
-
   // Handle errors
   if (error) return <div className="px-12 py-8 text-red-500">{error}</div>;
 
   // Show loading state
-  if (loading) return <div className="px-12 py-8">Loading...</div>;
+  if (loading || !post) return <div className="px-12 py-8">Loading...</div>;
 
-  // Redirect to alerts page if no post is found after loading
-  if (!loading && !post) {
-    console.log("No post found, redirecting to /alerts...");
-    navigate("/alerts");
-    return null;
-  }
-
-  // Parse images correctly
+  // Parse images
   let images = [];
   try {
-    images = post.files ? JSON.parse(post.files.replace(/\\/g, "")) : [];
+    images = post.files ? JSON.parse(post.files) : [];
   } catch (e) {
     console.error("Error parsing images:", e);
     images = [];
   }
-  console.log("Parsed images:", images); // Debugging
 
   return (
     <div className="bg-white min-h-screen">
@@ -208,8 +197,7 @@ function DisasterPostDetail() {
           Disaster Briefings
         </h1>
         <p className="text-xl max-w-3xl mx-auto">
-          Stay informed about recent disasters and emergencies. Check alerts, provide assistance,
-          and help affected communities recover. Together, we can make a difference.
+          Stay informed about recent disasters and emergencies.
         </p>
       </header>
 
@@ -370,7 +358,7 @@ function DisasterPostDetail() {
                     <button
                       onClick={handleDonate}
                       className="bg-[#311B08] text-xl font-semibold text-[#EBB380] px-8 py-2 rounded-lg hover:underline transition duration-300"
-                      >
+                    >
                       Donate
                     </button>
                   </div>
