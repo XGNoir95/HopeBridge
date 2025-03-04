@@ -53,16 +53,14 @@ class UserService{
             'district' => 'string|max:255',
             'city' => 'string|max:255',
             'blood_group' => 'string|max:255',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Handle profile picture upload
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
             $result = $file->storeOnCloudinary();
             $validatedData['profile_picture'] = json_encode([$result->getSecurePath()]);
-        } elseif ($request->input('profile_picture') === null) {
-            $validatedData['profile_picture'] = null;
         } else {
-            $validatedData['profile_picture'] = $user->profile_picture;
+            unset($validatedData['profile_picture']);
         }
         $user->update($validatedData);
         return $user;
@@ -71,7 +69,7 @@ class UserService{
 
     public function loginGo($request){
         $data = $request->validate([
-            'userMail' => 'required|string|email',  // Change to 'userMail' instead of 'email'
+            'userMail' => 'required|string|email',
             'password' => 'required|string',
         ]);
         $user = $this->getUserByMail($data['userMail']);
