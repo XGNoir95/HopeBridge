@@ -111,7 +111,7 @@ class DonorService
 
         $existingVolunteer = Volunteer::where('user_id', $userId)->first();
         if ($existingVolunteer) {
-            return response()->json(['success' => false, 'message' => 'User is already a volunteer'], 409);
+            return null;
         }
         $volunteer = Volunteer::create([
             'user_id' => $userId
