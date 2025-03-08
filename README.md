@@ -80,47 +80,39 @@ Demo Figma UI: [**Figma Link**](https://www.figma.com/design/VGfJWjiebvbJB0Nst4b
 # API Endpoints
 
 ### **1. User Management:**
-- **POST /register** - Register a new user (volunteer, donor, medical professional, etc.)  
+- **POST /register** - Register a new user (volunteer, donor)
 - **POST /login** - Login an existing user and return authentication token  
-- **GET /profile** - Get the profile of the logged-in user  
-- **PUT /profile** - Update user profile details (name, contact, preferences, etc.)  
+- **GET /user** - Get the profile of the logged-in user  
+- **POST /user/update-user** - Update user profile details (name, contact, preferences, etc.)  
 
 ### **2. Donation Management:**
-- **GET /donations** - Get a list of all donations made  
-- **POST /donations** - Create a new donation (financial or goods)  
-- **GET /donor-history/{userId}** - Get a specific user's donation history  
-- **POST /donor-history** - Record and track donation history (financial or goods)  
+- **GET /donatedMoney** - Get total amount donated money  
+- **POST /create-moneyDonation** - Create a new financial donation 
+- **GET /donor** - Get All the Donor's information
 
-### **3. Volunteer Management:**
-- **GET /volunteers** - Get a list of all available volunteers  
-- **POST /volunteers** - Register a new volunteer  
-- **GET /medical-volunteers** - Get a list of all available medical volunteers  
-- **POST /medical-volunteers** - Register medical professionals for volunteering  
+
+### **3. Resource Management:**
+- **GET /resources** - Get a list of all available resources  
+- **POST /create-resources** - Create a donation post of clothes, foods etc 
+- **GET /resources/{id}** - Get a specific donation information
+
 
 ### **4. Disaster Management:**
-- **POST /disasters** - Report a new disaster with location, severity, and impact details  
-- **GET /disasters** - Get a list of all reported disasters  
-- **GET /disasters/{id}** - Get details of a specific disaster  
-- **GET /alerts** - Get a list of all active disaster alerts  
-- **POST /alerts** - Create a new alert for urgent disaster response needs  
+- **POST /create-post** - Report a new disaster with location, severity, and impact details  
+- **GET /disaster-posts** - Get a list of all reported disasters  
+- **GET /disaster-posts/{post_id}** - Get details of a specific disaster    
 
-### **5. Resource Management:**
-- **POST /resources** - Add new resources (blood donations, supplies) available for disaster relief  
-- **GET /resources** - Get a list of available resources (blood, food, medical supplies)  
-- **GET /resources/{type}** - Filter available resources by type (e.g., blood, food, water, medical)  
+### **5. volunteer Management:**
+- **PSOT /create-volunteer** - Register a user as a new Volunteer  
+- **GET /volunteer** - Get a list of available volunteer
+- **GET /volunteer/{id}** - Get information of a specific volunteer
+- **GET /donor/{id}** - Get a speicific Donor's information
+- **POST /create-donor** - Register a new user as Donor 
 
-### **6. Shelter Management:**
-- **POST /shelters** - Add a new shelter for disaster relief  
-- **GET /shelters/{id}** - Get details of a specific shelter  
-- **GET /shelter** - Get a list of all shelters available for disaster victims  
-
-### **7. Feedback and Support:**
-- **POST /feedback** - Submit feedback or suggestions regarding disaster relief operations  
-- **GET /feedback** - Get all user feedback and suggestions  
-
-### **8. Emergency and Contact Management:**
-- **POST /emergency-contact** - Create an emergency contact for volunteers or disaster relief workers  
-- **GET /emergency-contact** - Get emergency contact details for users  
+### **6. Article Management:**
+- **POST /article** - Add a new shelter for disaster relief  
+- **GET /article/{id}** - Get details of a specific shelter  
+- **GET /article** - Get a list of all article regarding any disaster or situations    
 
 ---
 
@@ -140,3 +132,17 @@ Demo Figma UI: [**Figma Link**](https://www.figma.com/design/VGfJWjiebvbJB0Nst4b
 - Integrate Disaster alerts and Disaster reporting features.
 - Implement donor and resource management features.
 - Test all features thoroughly.
+
+
+## Installation and Run procedure
+
+### Frontend commands:
+- required: npm install
+- running command: npm run dev
+
+### Backend commands:
+- required: composer install
+- required: composer require lcobucci/jwt
+- required: php artisan migrate
+- required: start xampp apache and MySql
+- running command: php artisan serve
