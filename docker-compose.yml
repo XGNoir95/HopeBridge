@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/php/Dockerfile
-    container_name: trendy-app
+    container_name: hopebridge-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -19,7 +19,7 @@ services:
   # Web Server (Nginx)
   webserver:
     image: nginx:alpine
-    container_name: trendy-webserver
+    container_name: hopebridge-webserver
     restart: unless-stopped
     ports:
       - "8000:80"
@@ -34,7 +34,7 @@ services:
   # MySQL Database
   db:
     image: mysql:8.0
-    container_name: trendy-db
+    container_name: hopebridge-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: hopebridgedb
@@ -50,7 +50,7 @@ services:
   # phpMyAdmin
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: trendy-phpmyadmin
+    container_name: hopebridge-phpmyadmin
     restart: unless-stopped
     ports:
       - "8080:80"
@@ -68,7 +68,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/node/Dockerfile
-    container_name: trendy-frontend
+    container_name: hopebridge-frontend
     restart: unless-stopped
     ports:
       - "5173:5173"
