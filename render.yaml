@@ -2,7 +2,7 @@ services:
   - name: hopebridge-db
     type: pserv
     runtime: docker
-    plan: starter
+    plan: free
     dockerfilePath: ./docker/mysql/Dockerfile
     envVars:
       - key: MYSQL_DATABASE
