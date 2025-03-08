@@ -42,8 +42,6 @@ services:
         value: password
       - key: CLOUDINARY_URL
         value: cloudinary://366673975893178:atCasDRMLxzLa9AKPQ9J8eLCIog@dubi9peal
-    dependsOn:
-      - hopebridge-db
 
   - name: hopebridge-frontend
     type: web
@@ -53,5 +51,3 @@ services:
     envVars:
       - key: VITE_API_BASE_URL
         value: https://hopebridge.onrender.com/api
-    dependsOn:
-      - hopebridge-app
