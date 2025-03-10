@@ -15,20 +15,11 @@ return [
     |
     */
 
-    'paths' => ['*'],
-
-    'allowed_methods' => ['*'],
-
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:5173')],
-
-    'allowed_origins_patterns' => [],
-
+    'paths' => ['api/*', 'sanctum/csrf-cookie'], // Specify your routes
+    'allowed_methods' => ['*'], // Or specify methods like ['GET', 'POST']
+    'allowed_origins' => ['*'], // Change '*' to your frontend URL in production
     'allowed_headers' => ['*'],
-
     'exposed_headers' => [],
-
     'max_age' => 0,
-
-    'supports_credentials' => true,
-
+    'supports_credentials' => false, // Change to true if using cookies/sessions
 ];
