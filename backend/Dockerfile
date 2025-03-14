@@ -22,10 +22,16 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy existing application directory contents
 COPY . .
 
+# Ensure necessary directories exist
+RUN mkdir -p storage/framework/{sessions,views,cache} bootstrap/cache
+
+# Set proper permissions
+RUN chmod -R 777 storage bootstrap/cache
+
 # Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set file permissions
+# Set correct file permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 # Expose port 9000 and start PHP-FPM
