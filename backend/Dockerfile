@@ -17,14 +17,16 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy composer files first for better caching
-COPY composer.json composer.lock ./
+# Set environment variable to allow Composer to run as root
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# Copy the rest of the application
+# Copy current directory contents to working directory
 COPY . .
+
+# Install PHP dependencies (only if composer.json exists)
+RUN if [ -f "composer.json" ]; then \
+        composer install --no-dev --optimize-autoloader; \
+    fi
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
