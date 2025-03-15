@@ -17,7 +17,7 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'], // Specify your routes
     'allowed_methods' => ['*'], // Or specify methods like ['GET', 'POST']
-    'allowed_origins' => ['https://hope-bridge-three.vercel.app'], 
+    'allowed_origins' => ['*'], 
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
