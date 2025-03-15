@@ -39,7 +39,7 @@ const DonateMoney = () => {
         setUserId(userIdFromToken);
 
         // Fetch user data from the API
-        const response = await axios.get("http://localhost:8000/api/user", {
+        const response = await axios.get("/api/user", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -92,7 +92,7 @@ const DonateMoney = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8000/api/create-moneyDonation",
+        "/api/create-moneyDonation",
         payload,
         {
           headers: {

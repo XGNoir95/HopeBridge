@@ -9,7 +9,7 @@ const Map = () => {
   useEffect(() => {
     const fetchDisasterData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/disaster-posts/RedZone');
+        const response = await fetch('/api/disaster-posts/RedZone');
         const data = await response.json();
 
         console.log("Received API Response:", data);

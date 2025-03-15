@@ -18,7 +18,7 @@ const AdminProfile = () => {
         const fetchAdminProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:8000/api/admin', {
+                const response = await fetch('/api/admin', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

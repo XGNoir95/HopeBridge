@@ -25,7 +25,7 @@ const DonateGoods = () => {
         }
 
         // Fetch user data from the API
-        const response = await axios.get("http://localhost:8000/api/user", {
+        const response = await axios.get("/api/user", {
           headers: {
             Authorization: `Bearer ${token}`, // Include the token in the request headers
           },
@@ -62,7 +62,7 @@ const DonateGoods = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/create-resources",
+        "/api/create-resources",
         formData
       );
       console.log("API Response:", response.data);

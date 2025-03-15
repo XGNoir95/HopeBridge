@@ -25,7 +25,7 @@ const VlogDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`http://localhost:8000/api/articles/${id}`);
+        const response = await axios.get(`/api/articles/${id}`);
         if (response.data.success && response.data.newsArticle) {
           // Extract the first article from the array (since the API returns an array)
           setArticle(response.data.newsArticle[0]);
@@ -65,7 +65,7 @@ const VlogDetails = () => {
     try {
       console.log("Sending update request with data:", formData); // Debugging
       const response = await axios.post(
-        `http://localhost:8000/api/articles/${id}/update`,
+        `/api/articles/${id}/update`,
         {
           title: formData.title,
           articleDescription: formData.articleDescription,

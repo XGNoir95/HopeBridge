@@ -34,7 +34,7 @@ const Volunteers = () => {
         }
 
         // Fetch user data from the API
-        const response = await axios.get("http://localhost:8000/api/user", {
+        const response = await axios.get("/api/user", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -121,7 +121,7 @@ const Volunteers = () => {
 
       // Submit the data to the backend
       const response = await axios.post(
-        "http://localhost:8000/api/create-volunteer",
+        "/api/create-volunteer",
         payload,
         {
           headers: {

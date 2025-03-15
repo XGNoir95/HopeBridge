@@ -45,7 +45,7 @@ const UploadVlogs = () => {
             });
 
             try {
-                const response = await fetch('http://localhost:8000/api/create-article', {
+                const response = await fetch('/api/create-article', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -74,7 +74,7 @@ const UploadVlogs = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:8000/api/create-video', {
+                const response = await fetch('/api/create-video', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,

@@ -17,7 +17,7 @@ export default function Form() {
     setRole(null);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/login", {
+      const response = await axios.post("/api/login", {
         userMail: email,
         password: password,
       });

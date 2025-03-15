@@ -58,7 +58,7 @@ const Relief = () => {
   useEffect(() => {
     const fetchDonors = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/donor");
+        const response = await axios.get("/api/donor");
         if (response.data.success) {
           setDonors(response.data.donors);
         } else {
@@ -79,7 +79,7 @@ const Relief = () => {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/resources");
+        const response = await axios.get("/api/resources");
         if (response.data.success) {
           setResources(response.data.Donations);
         } else {
@@ -100,7 +100,7 @@ const Relief = () => {
   useEffect(() => {
     const fetchDonatedAmount = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/donatedMoney");
+        const response = await axios.get("/api/donatedMoney");
         if (response.data.success) {
           const donatedAmount = response.data.DonatedAmount?.totalDonatedMoney || 0;
           setTotalDonatedAmount(donatedAmount);
@@ -122,7 +122,7 @@ const Relief = () => {
   useEffect(() => {
     const fetchVolunteers = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/volunteer");
+        const response = await axios.get("/api/volunteer");
         if (response.data.success) {
           setVolunteers(response.data.volunteer);
         } else {

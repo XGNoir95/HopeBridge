@@ -65,7 +65,7 @@ function DisasterPostDetail() {
     }
 
     axios
-      .get(`http://localhost:8000/api/user/posts/${post_id}`, {
+      .get(`/api/user/posts/${post_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
@@ -108,7 +108,7 @@ function DisasterPostDetail() {
   const handleDelete = () => {
     const token = localStorage.getItem("token");
     axios
-      .delete(`http://localhost:8000/api/disaster-posts/${post_id}`, {
+      .delete(`/api/disaster-posts/${post_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
@@ -152,7 +152,7 @@ function DisasterPostDetail() {
     const token = localStorage.getItem("token");
 
     axios
-      .post(`http://localhost:8000/api/disaster-posts/${post_id}/update`, formData, {
+      .post(`/api/disaster-posts/${post_id}/update`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {

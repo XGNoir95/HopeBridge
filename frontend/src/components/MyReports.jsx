@@ -7,7 +7,7 @@ const MyReports = ({ userPosts, setUserPosts }) => {
     const handleDeletePost = async (postId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:8000/api/disaster-posts/${postId}`, {
+            const response = await fetch(`/api/disaster-posts/${postId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,

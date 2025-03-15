@@ -91,7 +91,7 @@ const ReportIncident = () => {
     });
 
     try {
-      await axios.post("http://localhost:8000/api/create-post", data, {
+      await axios.post("/api/create-post", data, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,

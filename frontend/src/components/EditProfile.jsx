@@ -29,7 +29,7 @@ const EditProfile = ({
                 formData.append('profile_picture', fileInput.files[0]);
             }
 
-            const response = await fetch('http://localhost:8000/api/user/update-user', {
+            const response = await fetch('/api/user/update-user', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

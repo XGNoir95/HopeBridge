@@ -28,7 +28,7 @@ const Profile = () => {
         const fetchUserProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:8000/api/user', {
+                const response = await fetch('/api/user', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -67,7 +67,7 @@ const Profile = () => {
             const fetchUserPosts = async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    const response = await fetch('http://localhost:8000/api/user/posts', {
+                    const response = await fetch('/api/user/posts', {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,

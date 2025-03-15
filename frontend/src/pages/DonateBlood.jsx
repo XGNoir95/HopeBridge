@@ -27,7 +27,7 @@ const DonateBlood = () => {
         }
 
         // Fetch user data from the API
-        const response = await axios.get("http://localhost:8000/api/user", {
+        const response = await axios.get("/api/user", {
           headers: {
             Authorization: `Bearer ${token}`, // Include the token in the request headers
           },
@@ -83,7 +83,7 @@ const DonateBlood = () => {
 
       // Send the data to the backend
       const response = await axios.post(
-        "http://localhost:8000/api/create-donor",
+        "/api/create-donor",
         payload,
         {
           headers: {

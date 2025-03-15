@@ -19,7 +19,7 @@ const Safeguard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:8000/api/articles");
+      const response = await fetch("/api/articles");
       if (!response.ok) {
         throw new Error("Failed to fetch news articles");
       }
@@ -37,7 +37,7 @@ const Safeguard = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:8000/api/show-videos");
+      const response = await fetch("/api/show-videos");
       if (!response.ok) {
         throw new Error("Failed to fetch videos");
       }
@@ -72,7 +72,7 @@ const Safeguard = () => {
   const handleDeleteArticle = async (articleId) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:8000/api/articles/${articleId}`, {
+      const response = await fetch(`/api/articles/${articleId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -94,7 +94,7 @@ const Safeguard = () => {
   const handleDeleteVideo = async (videoId) => {
     const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:8000/api/videos/${videoId}`, {
+      const response = await fetch(`/api/videos/${videoId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
