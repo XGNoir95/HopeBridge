@@ -35,9 +35,15 @@ RUN mkdir -p storage/framework/sessions \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-# Configure Nginx
+# Set up .env if it doesn't exist
+RUN if [ ! -f ".env" ]; then \
+    cp .env.example .env || echo "No .env.example file found"; \
+    php artisan key:generate || echo "Could not generate key"; \
+    fi
+
+# Configure Nginx to use the PORT environment variable
 RUN echo 'server {\n\
-    listen 80;\n\
+    listen $PORT default_server;\n\
     server_name _;\n\
     root /var/www/html/public;\n\
     index index.php;\n\
@@ -50,27 +56,51 @@ RUN echo 'server {\n\
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
         include fastcgi_params;\n\
     }\n\
-}' > /etc/nginx/sites-available/default \
-    && ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+    # Deny access to .htaccess files\n\
+    location ~ /\.ht {\n\
+        deny all;\n\
+    }\n\
+    # Add 404 page\n\
+    error_page 404 /index.php;\n\
+}' > /etc/nginx/conf.d/default.conf
 
-# Create start script
+# Remove default Nginx config
+RUN rm -f /etc/nginx/sites-enabled/default
+
+# Create start script that uses the PORT environment variable
 RUN echo '#!/bin/bash\n\
+# Default PORT to 8080 if not set by Render\n\
+export PORT=${PORT:-8080}\n\
+# Replace the PORT placeholder with the actual port\n\
+sed -i "s/\$PORT/$PORT/g" /etc/nginx/conf.d/default.conf\n\
+# Laravel optimizations\n\
 if [ -f "artisan" ]; then\n\
-    php artisan config:clear\n\
-    php artisan cache:clear\n\
-    php artisan route:clear\n\
+    php artisan config:cache\n\
+    php artisan route:cache\n\
+    php artisan view:cache\n\
+    # Fix storage permissions\n\
+    chmod -R 775 storage bootstrap/cache\n\
+    chown -R www-data:www-data storage bootstrap/cache\n\
 fi\n\
+# Print directory structure for debugging\n\
+echo "Directory structure:"\n\
+ls -la\n\
+echo "Public directory:"\n\
+ls -la public || echo "Public directory not found"\n\
+# Start services\n\
 service nginx start\n\
 php-fpm\n' > /start.sh \
     && chmod +x /start.sh
 
 # Set environment variables for Laravel
 ENV APP_ENV=production
-ENV APP_DEBUG=true
+ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
+# Default to port 8080, will be overridden by Render
+ENV PORT=8080
 
-# Expose port 80
-EXPOSE 80
+# Expose the PORT 
+EXPOSE 8080
 
 # Start Nginx and PHP-FPM
 CMD ["/start.sh"]
