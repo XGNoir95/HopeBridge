@@ -24,30 +24,35 @@ const ReportIncident = () => {
 
   useEffect(() => {
     if (token) {
-      axios.get("/bdapi/api/v1.2/divisions")
+      axios.get("https://bdapis.com/api/v1.2/divisions", {
+        headers: {
+          "Accept": "application/json"
+        }
+      })
         .then((response) => setDivisions(response.data.data))
-        .catch((error) => console.error("Error fetching divisions:", error));
+        .catch((error) => {
+          console.error("Error fetching divisions:", error);
+          // Fallback to empty array if API fails
+          setDivisions([]);
+        });
     }
   }, [token]);
 
   const fetchDistricts = (division) => {
-    axios.get(`/bdapi/api/v1.2/division/${division}`)
-      .then((response) => {
-        const districtNames = response.data.data.map((item) => item.district);
-        setDistricts(districtNames);
-      })
-      .catch((error) => console.error("Error fetching districts:", error));
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-
-    if (name === "division") {
-      setFormData({ ...formData, division: value, district: "" });
-      fetchDistricts(value);
+  axios.get(`https://bdapis.com/api/v1.2/division/${division}`, {
+    headers: {
+      "Accept": "application/json"
     }
-  };
+  })
+    .then((response) => {
+      const districtNames = response.data.data.map((item) => item.district);
+      setDistricts(districtNames);
+    })
+    .catch((error) => {
+      console.error("Error fetching districts:", error);
+      setDistricts([]);
+    });
+};
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
