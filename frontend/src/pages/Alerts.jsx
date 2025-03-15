@@ -16,7 +16,7 @@ function Alerts() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     axios
-      .get("http://localhost:8000/api/disaster-posts", {
+      .get("https://hopebridge-1.onrender.com/api/disaster-posts", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
