@@ -10,7 +10,7 @@ const AllReports = () => {
         const fetchAllReports = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:8000/api/disaster-posts', {
+                const response = await fetch('https://hopebridge-1.onrender.com/api/disaster-posts', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
