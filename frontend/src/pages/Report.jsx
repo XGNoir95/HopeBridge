@@ -24,14 +24,14 @@ const ReportIncident = () => {
 
   useEffect(() => {
     if (token) {
-      axios.get("https://bdapis.com/api/v1.2/divisions")
+      axios.get("https://corsproxy.io/?https://bdapis.com/api/v1.2/divisions")
         .then((response) => setDivisions(response.data.data))
         .catch((error) => console.error("Error fetching divisions:", error));
     }
   }, [token]);
 
   const fetchDistricts = (division) => {
-    axios.get(`https://bdapis.com/api/v1.2/division/${division}`)
+    axios.get(`https://corsproxy.io/?https://bdapis.com/api/v1.2/division/${division}`)
       .then((response) => {
         const districtNames = response.data.data.map((item) => item.district);
         setDistricts(districtNames);
