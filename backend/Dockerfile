@@ -1,8 +1,6 @@
 FROM php:8.0-fpm
-
 # Set the working directory
 WORKDIR /var/www/html
-
 # Install dependencies and Nginx
 RUN apt-get update && apt-get install -y \
     curl \
@@ -14,19 +12,14 @@ RUN apt-get update && apt-get install -y \
     zip \
     nginx \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
 # Set environment variable to allow Composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER=1
-
 # Copy the backend directory to the working directory
 COPY backend/ .
-
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
-
 # Ensure storage directories exist with proper permissions
 RUN mkdir -p storage/framework/sessions \
     storage/framework/views \
@@ -34,13 +27,20 @@ RUN mkdir -p storage/framework/sessions \
     bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
-
-# Configure Nginx to use the PORT environment variable
+# Configure Nginx to use the PORT environment variable with CORS headers
 RUN echo 'server {\n\
     listen $PORT default_server;\n\
     server_name _;\n\
     root /var/www/html/public;\n\
     index index.php;\n\
+    # Add CORS headers for all routes\n\
+    add_header Access-Control-Allow-Origin "*" always;\n\
+    add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;\n\
+    add_header Access-Control-Allow-Headers "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization" always;\n\
+    # Handle OPTIONS preflight requests\n\
+    if ($request_method = "OPTIONS") {\n\
+        return 204;\n\
+    }\n\
     location / {\n\
         try_files $uri $uri/ /index.php?$query_string;\n\
     }\n\
@@ -55,10 +55,8 @@ RUN echo 'server {\n\
     }\n\
     error_page 404 /index.php;\n\
 }' > /etc/nginx/conf.d/default.conf
-
 # Remove default Nginx config
 RUN rm -f /etc/nginx/sites-enabled/default
-
 # Create start script that uses the PORT environment variable
 RUN echo '#!/bin/bash\n\
 # Default PORT to 8080 if not set by Render\n\
@@ -81,16 +79,13 @@ ls -la public\n\
 service nginx start\n\
 php-fpm\n' > /start.sh \
     && chmod +x /start.sh
-
 # Set environment variables for Laravel
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
 # Default to port 8080, will be overridden by Render
 ENV PORT=8080
-
 # Expose the PORT
 EXPOSE 8080
-
 # Start Nginx and PHP-FPM
 CMD ["/start.sh"]
