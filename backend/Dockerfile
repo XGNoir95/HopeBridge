@@ -21,25 +21,19 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set environment variable to allow Composer to run as root
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copy current directory contents to working directory
-COPY . .
+# Copy the backend directory to the working directory
+COPY backend/ .
 
 # Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader || echo "Composer install failed"
+RUN composer install --no-dev --optimize-autoloader
 
-# Create storage directories with proper permissions
+# Ensure storage directories exist with proper permissions
 RUN mkdir -p storage/framework/sessions \
     storage/framework/views \
     storage/framework/cache \
     bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
-
-# Set up .env if it doesn't exist
-RUN if [ ! -f ".env" ]; then \
-    cp .env.example .env || echo "No .env.example file found"; \
-    php artisan key:generate || echo "Could not generate key"; \
-    fi
 
 # Configure Nginx to use the PORT environment variable
 RUN echo 'server {\n\
@@ -56,11 +50,9 @@ RUN echo 'server {\n\
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
         include fastcgi_params;\n\
     }\n\
-    # Deny access to .htaccess files\n\
     location ~ /\.ht {\n\
         deny all;\n\
     }\n\
-    # Add 404 page\n\
     error_page 404 /index.php;\n\
 }' > /etc/nginx/conf.d/default.conf
 
@@ -74,19 +66,17 @@ export PORT=${PORT:-8080}\n\
 # Replace the PORT placeholder with the actual port\n\
 sed -i "s/\$PORT/$PORT/g" /etc/nginx/conf.d/default.conf\n\
 # Laravel optimizations\n\
-if [ -f "artisan" ]; then\n\
-    php artisan config:cache\n\
-    php artisan route:cache\n\
-    php artisan view:cache\n\
-    # Fix storage permissions\n\
-    chmod -R 775 storage bootstrap/cache\n\
-    chown -R www-data:www-data storage bootstrap/cache\n\
-fi\n\
+php artisan config:cache\n\
+php artisan route:cache\n\
+php artisan view:cache\n\
+# Fix storage permissions again just to be sure\n\
+chmod -R 775 storage bootstrap/cache\n\
+chown -R www-data:www-data storage bootstrap/cache\n\
 # Print directory structure for debugging\n\
 echo "Directory structure:"\n\
 ls -la\n\
 echo "Public directory:"\n\
-ls -la public || echo "Public directory not found"\n\
+ls -la public\n\
 # Start services\n\
 service nginx start\n\
 php-fpm\n' > /start.sh \
@@ -99,7 +89,7 @@ ENV LOG_CHANNEL=stderr
 # Default to port 8080, will be overridden by Render
 ENV PORT=8080
 
-# Expose the PORT 
+# Expose the PORT
 EXPOSE 8080
 
 # Start Nginx and PHP-FPM
