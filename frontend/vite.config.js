@@ -17,5 +17,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/bdapi/, '/api')
       }
     }
+  },
+  preview: {
+    port: process.env.PORT || 5173,
+    host: '0.0.0.0',
+    allowedHosts: [
+      'hopebridge-kxqs.onrender.com',
+      'localhost',
+      '*.onrender.com'  // This will allow all onrender.com subdomains
+    ]
   }
 })
