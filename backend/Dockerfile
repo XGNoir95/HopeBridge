@@ -24,69 +24,49 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # Copy current directory contents to working directory
 COPY . .
 
-# Create required storage directory structure if not exists
-RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache
-
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader || echo "Composer install failed"
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage
+# Create storage directories with proper permissions
+RUN mkdir -p storage/framework/sessions \
+    storage/framework/views \
+    storage/framework/cache \
+    bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
-# Better Nginx configuration
-RUN echo 'server { \
-    listen 80 default_server; \
-    listen [::]:80 default_server; \
-    \
-    root /var/www/html/public; \
-    index index.php; \
-    \
-    server_name _; \
-    \
-    location / { \
-        try_files $uri $uri/ /index.php?$query_string; \
-    } \
-    \
-    location ~ \.php$ { \
-        include snippets/fastcgi-php.conf; \
-        fastcgi_pass unix:/var/run/php/php8.0-fpm.sock; \
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \
-        include fastcgi_params; \
-    } \
-    \
-    location ~ /\.ht { \
-        deny all; \
-    } \
-}' > /etc/nginx/sites-available/default
-
-# Fix PHP-FPM socket configuration
-RUN echo '[www] \
-user = www-data \
-group = www-data \
-listen = /var/run/php/php8.0-fpm.sock \
-listen.owner = www-data \
-listen.group = www-data \
-pm = dynamic \
-pm.max_children = 5 \
-pm.start_servers = 2 \
-pm.min_spare_servers = 1 \
-pm.max_spare_servers = 3' > /usr/local/etc/php-fpm.d/www.conf \
-    && mkdir -p /var/run/php
+# Configure Nginx
+RUN echo 'server {\n\
+    listen 80;\n\
+    server_name _;\n\
+    root /var/www/html/public;\n\
+    index index.php;\n\
+    location / {\n\
+        try_files $uri $uri/ /index.php?$query_string;\n\
+    }\n\
+    location ~ \.php$ {\n\
+        fastcgi_pass 127.0.0.1:9000;\n\
+        fastcgi_index index.php;\n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
+        include fastcgi_params;\n\
+    }\n\
+}' > /etc/nginx/sites-available/default \
+    && ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Create start script
-RUN echo '#!/bin/bash \n\
-php artisan config:clear \n\
-php artisan route:clear \n\
-php artisan cache:clear \n\
-php artisan key:generate --force \n\
-service nginx start \n\
-php-fpm' > /start.sh \
+RUN echo '#!/bin/bash\n\
+if [ -f "artisan" ]; then\n\
+    php artisan config:clear\n\
+    php artisan cache:clear\n\
+    php artisan route:clear\n\
+fi\n\
+service nginx start\n\
+php-fpm\n' > /start.sh \
     && chmod +x /start.sh
 
 # Set environment variables for Laravel
 ENV APP_ENV=production
-ENV APP_DEBUG=false
+ENV APP_DEBUG=true
 ENV LOG_CHANNEL=stderr
 
 # Expose port 80
