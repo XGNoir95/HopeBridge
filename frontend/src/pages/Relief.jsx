@@ -46,7 +46,7 @@ const Relief = () => {
 
   // Fetch districts
   useEffect(() => {
-    axios.get("https://bdapis.com/api/v1.2/districts")
+    axios.get("/bdapis.com/api/v1.2/districts")
       .then((response) => {
         const districtNames = response.data.data.map((item) => item.district);
         setDistricts(districtNames);

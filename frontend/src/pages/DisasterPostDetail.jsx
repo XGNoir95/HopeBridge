@@ -27,7 +27,7 @@ function DisasterPostDetail() {
   // Fetch divisions from the API
   useEffect(() => {
     axios
-      .get("https://bdapis.com/api/v1.2/divisions")
+      .get("/bdapis.com/api/v1.2/divisions")
       .then((response) => setDivisions(response.data.data))
       .catch((error) => console.error("Error fetching divisions:", error));
   }, []);
@@ -35,7 +35,7 @@ function DisasterPostDetail() {
   // Fetch districts based on the selected division
   const fetchDistricts = (division) => {
     axios
-      .get(`https://bdapis.com/api/v1.2/division/${division}`)
+      .get(`/bdapis.com/api/v1.2/division/${division}`)
       .then((response) => {
         console.log("District API Response:", response.data); // Debugging
         const data = response.data.data;

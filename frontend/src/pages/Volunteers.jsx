@@ -66,7 +66,7 @@ const Volunteers = () => {
   // Fetch divisions from API
   useEffect(() => {
     axios
-      .get("https://bdapis.com/api/v1.2/divisions")
+      .get("/bdapis.com/api/v1.2/divisions")
       .then((response) => setDivisions(response.data.data))
       .catch((error) => {
         console.error("Error fetching divisions:", error);
@@ -77,7 +77,7 @@ const Volunteers = () => {
   // Fetch districts from API
   const fetchDistricts = (division) => {
     axios
-      .get(`https://bdapis.com/api/v1.2/division/${division}`)
+      .get(`/bdapis.com/api/v1.2/division/${division}`)
       .then((response) => {
         const districtNames = response.data.data.map((item) => item.district);
         setDistricts(districtNames);

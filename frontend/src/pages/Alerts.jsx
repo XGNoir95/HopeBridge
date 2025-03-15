@@ -32,7 +32,7 @@ function Alerts() {
 
   useEffect(() => {
     axios
-      .get("https://bdapis.com/api/v1.2/divisions")
+      .get("/bdapis.com/api/v1.2/divisions")
       .then((response) => {
         setDivisions(response.data.data);
       })
@@ -44,7 +44,7 @@ function Alerts() {
   useEffect(() => {
     if (selectedDivision) {
       axios
-        .get(`https://bdapis.com/api/v1.2/division/${selectedDivision}`)
+        .get(`/bdapis.com/api/v1.2/division/${selectedDivision}`)
         .then((response) => {
           const districtNames = response.data.data.map((item) => item.district);
           setDistricts(districtNames);

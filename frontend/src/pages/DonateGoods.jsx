@@ -39,7 +39,7 @@ const DonateGoods = () => {
         }));
 
         // Fetch districts from the BD API
-        const districtsResponse = await axios.get("https://bdapis.com/api/v1.1/districts");
+        const districtsResponse = await axios.get("/bdapis.com/api/v1.1/districts");
         setDistricts(districtsResponse.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
