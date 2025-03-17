@@ -1,7 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.heat';
+import React, { useEffect, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet.heat";
+
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+const customIcon = new L.Icon({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41], // Default size
+  iconAnchor: [12, 41], // Point of the icon which corresponds to marker's location
+  popupAnchor: [1, -34], // Point where popup should open
+});
 
 const Map = () => {
   const [disasterData, setDisasterData] = useState([]);
@@ -9,7 +20,7 @@ const Map = () => {
   useEffect(() => {
     const fetchDisasterData = async () => {
       try {
-        const response = await fetch('/api/disaster-posts/RedZone');
+        const response = await fetch("/api/disaster-posts/RedZone");
         const data = await response.json();
 
         console.log("Received API Response:", data);
@@ -46,32 +57,27 @@ const Map = () => {
     if (disasterData.length === 0) return;
 
     // Initialize the map
-    const map = L.map('map').setView([23.685, 90.3563], 7); // Center on Bangladesh
+    const map = L.map("map").setView([23.685, 90.3563], 7); // Center on Bangladesh
 
     // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© Adnan Shahriar',
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© Adnan Shahriar",
     }).addTo(map);
 
     // Prepare heatmap data
-    const heatmapData = disasterData.map((disaster) => [
-      disaster.lat,
-      disaster.lng,
-      disaster.impact,
-    ]);
+    const heatmapData = disasterData.map((disaster) => [disaster.lat, disaster.lng, disaster.impact]);
 
     // Add heatmap layer
     L.heatLayer(heatmapData, {
       radius: 70,
       blur: 30,
       maxZoom: 13,
-     // minOpacity: 0.1,
     }).addTo(map);
 
     // Add markers for each division
     disasterData.forEach((disaster) => {
-      L.marker([disaster.lat, disaster.lng])
-        .bindPopup(`<b>${disaster.division}</b><br>Disaster: ${disaster.type}<br>Impact Level: ${disaster.impact}`)
+      L.marker([disaster.lat, disaster.lng], { icon: customIcon }) // Use the custom icon
+        .bindPopup(`<b>${disaster.division}</b><br>Impact Level: ${disaster.impact}`)
         .addTo(map);
     });
 
@@ -84,10 +90,8 @@ const Map = () => {
   return (
     <div className="flex justify-center items-center flex-col">
       <h1 className="text-[#311B08] font-bold text-5xl mb-4">Disaster Heatmap of Bangladesh</h1>
-      <p className="text-gray-600 mb-8 text-xl">
-        Visualizing disaster data across different divisions in Bangladesh.
-      </p>
-      <div id="map" style={{ height: '700px', width: '100%', maxWidth: '1200px', borderRadius: '10px', overflow: 'hidden' }}></div>
+      <p className="text-gray-600 mb-8 text-xl">Visualizing disaster data across different divisions in Bangladesh.</p>
+      <div id="map" style={{ height: "700px", width: "100%", maxWidth: "1200px", borderRadius: "10px", overflow: "hidden" }}></div>
     </div>
   );
 };
