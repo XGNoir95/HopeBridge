@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
+import data from "../data.json";
 
 function Alerts() {
   const [disasterPosts, setDisasterPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [divisions, setDivisions] = useState([]);
+  //const [divisions, setDivisions] = useState([]);
+  const [divisions, setDivisions] = useState(data.divisions);
   const [districts, setDistricts] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
@@ -30,30 +32,43 @@ function Alerts() {
       });
   }, []);
 
-  useEffect(() => {
-    axios
-      .get("/bdapis.com/api/v1.2/divisions")
-      .then((response) => {
-        setDivisions(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching divisions:", error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("/bdapis.com/api/v1.2/divisions")
+  //     .then((response) => {
+  //       setDivisions(response.data.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching divisions:", error);
+  //     });
+  // }, []);
+
+  // useEffect(() => {
+  //   if (selectedDivision) {
+  //     axios
+  //       .get(`/bdapis.com/api/v1.2/division/${selectedDivision}`)
+  //       .then((response) => {
+  //         const districtNames = response.data.data.map((item) => item.district);
+  //         setDistricts(districtNames);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching districts:", error);
+  //       });
+  //   }
+  // }, [selectedDivision]);
 
   useEffect(() => {
     if (selectedDivision) {
-      axios
-        .get(`/bdapis.com/api/v1.2/division/${selectedDivision}`)
-        .then((response) => {
-          const districtNames = response.data.data.map((item) => item.district);
-          setDistricts(districtNames);
-        })
-        .catch((error) => {
-          console.error("Error fetching districts:", error);
-        });
+      const selectedDivisionData = divisions.find((div) => div.division === selectedDivision);
+      if (selectedDivisionData) {
+        setDistricts(selectedDivisionData.districts);
+      } else {
+        setDistricts([]);
+      }
+    } else {
+      setDistricts([]);
     }
-  }, [selectedDivision]);
+  }, [selectedDivision, divisions]);
 
   const filteredPosts = disasterPosts.filter((post) => {
     const matchesSearch =
