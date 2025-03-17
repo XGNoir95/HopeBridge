@@ -1,356 +1,460 @@
+//disaster post
+
 import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import { ChevronLeft, ChevronRight, Network } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { X, AlertTriangle } from "lucide-react";
+import data from "../data.json";
 
-// Custom Arrow Components
-const CustomPrevArrow = (props) => (
-  <button
-    {...props}
-    className="absolute left-0 z-10 p-3 bg-[#311B08] rounded-full text-white hover:bg-amber-900 transition-colors duration-300"
-    style={{ top: "50%", transform: "translateY(-50%)" }}
-  >
-    <ChevronLeft size={24} />
-  </button>
-);
-
-const CustomNextArrow = (props) => (
-  <button
-    {...props}
-    className="absolute right-0 z-10 p-3 bg-[#311B08] rounded-full text-white hover:bg-amber-900 transition-colors duration-300"
-    style={{ top: "50%", transform: "translateY(-50%)" }}
-  >
-    <ChevronRight size={24} />
-  </button>
-);
-
-const Relief = () => {
-  const [donors, setDonors] = useState([]);
-  const [resources, setResources] = useState([]);
-  const [volunteers, setVolunteers] = useState([]);
-  const [loadingDonors, setLoadingDonors] = useState(true);
-  const [loadingResources, setLoadingResources] = useState(true);
-  const [loadingVolunteers, setLoadingVolunteers] = useState(true);
-  const [errorDonors, setErrorDonors] = useState(null);
-  const [errorResources, setErrorResources] = useState(null);
-  const [errorVolunteers, setErrorVolunteers] = useState(null);
-  const [totalDonatedAmount, setTotalDonatedAmount] = useState(0);
-  const [loadingDonatedAmount, setLoadingDonatedAmount] = useState(true);
-  const [errorDonatedAmount, setErrorDonatedAmount] = useState(null);
-  const [districts, setDistricts] = useState([]);
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate for redirection
-
-  // Fetch districts
-  useEffect(() => {
-    axios.get("/bdapis.com/api/v1.2/districts")
-      .then((response) => {
-        const districtNames = response.data.data.map((item) => item.district);
-        setDistricts(districtNames);
-      })
-      .catch((error) => console.error("Error fetching districts:", error));
-  }, []);
-
-  // Fetch donor data
-  useEffect(() => {
-    const fetchDonors = async () => {
-      try {
-        const response = await axios.get("/api/donor");
-        if (response.data.success) {
-          setDonors(response.data.donors);
-        } else {
-          setErrorDonors("Failed to fetch donor data.");
-        }
-      } catch (error) {
-        console.error("Error fetching donor data:", error);
-        setErrorDonors("An error occurred while fetching donor data.");
-      } finally {
-        setLoadingDonors(false);
-      }
-    };
-
-    fetchDonors();
-  }, []);
-
-  // Fetch resource data
-  useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const response = await axios.get("/api/resources");
-        if (response.data.success) {
-          setResources(response.data.Donations);
-        } else {
-          setErrorResources("Failed to fetch resource data.");
-        }
-      } catch (error) {
-        console.error("Error fetching resource data:", error);
-        setErrorResources("An error occurred while fetching resource data.");
-      } finally {
-        setLoadingResources(false);
-      }
-    };
-
-    fetchResources();
-  }, []);
-
-  // Fetch total donated amount
-  useEffect(() => {
-    const fetchDonatedAmount = async () => {
-      try {
-        const response = await axios.get("/api/donatedMoney");
-        if (response.data.success) {
-          const donatedAmount = response.data.DonatedAmount?.totalDonatedMoney || 0;
-          setTotalDonatedAmount(donatedAmount);
-        } else {
-          setErrorDonatedAmount("Failed to fetch donated amount.");
-        }
-      } catch (error) {
-        console.error("Error fetching donated amount:", error);
-        setErrorDonatedAmount("An error occurred while fetching donated amount.");
-      } finally {
-        setLoadingDonatedAmount(false);
-      }
-    };
-
-    fetchDonatedAmount();
-  }, []);
-
-  // Fetch volunteer data
-  useEffect(() => {
-    const fetchVolunteers = async () => {
-      try {
-        const response = await axios.get("/api/volunteer");
-        if (response.data.success) {
-          setVolunteers(response.data.volunteer);
-        } else {
-          setErrorVolunteers("Failed to fetch volunteer data.");
-        }
-      } catch (error) {
-        console.error("Error fetching volunteer data:", error);
-        setErrorVolunteers("An error occurred while fetching volunteer data.");
-      } finally {
-        setLoadingVolunteers(false);
-      }
-    };
-
-    fetchVolunteers();
-  }, []);
-
-  // Filter data based on the selected district
-  const filteredResources = selectedDistrict
-    ? resources.filter((resource) =>
-        resource.pickUpLocation.toLowerCase().includes(selectedDistrict.toLowerCase())
-      )
-    : resources;
-
-  const filteredDonors = selectedDistrict
-    ? donors.filter((donor) =>
-        donor.district.toLowerCase().includes(selectedDistrict.toLowerCase())
-      )
-    : donors;
-
-  const filteredVolunteers = selectedDistrict
-    ? volunteers.filter((volunteer) =>
-        volunteer.District.toLowerCase().includes(selectedDistrict.toLowerCase())
-      )
-    : volunteers;
-
-  // Slider settings
-  const getSliderSettings = (itemCount) => ({
-    dots: true,
-    infinite: itemCount > 1,
-    speed: 500,
-    slidesToShow: Math.min(itemCount, 3),
-    slidesToScroll: 1,
-    arrows: itemCount > 1,
-    prevArrow: <CustomPrevArrow />,
-    nextArrow: <CustomNextArrow />,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: Math.min(itemCount, 2),
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1,
-        },
-      },
-    ],
+function DisasterPostDetail() {
+  const { post_id } = useParams();
+  const navigate = useNavigate();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [userRole, setUserRole] = useState("");
+  const [isEditing, setIsEditing] = useState(false); // State for edit mode
+  const [formData, setFormData] = useState({
+    title: "",
+    district: "",
+    division: "",
+    description: "",
   });
 
-  // Handle reset button click
-  const handleReset = () => {
-    setSelectedDistrict(""); // Clear the selected district
-    window.location.reload(); // Reload the page
+  // State for divisions and districts
+  //const [divisions, setDivisions] = useState([]);
+  const [divisions, setDivisions] = useState(data.divisions); 
+  const [districts, setDistricts] = useState([]);
+
+  // Fetch divisions from the API
+  // useEffect(() => {
+  //   axios
+  //     .get("/bdapis.com/api/v1.2/divisions")
+  //     .then((response) => setDivisions(response.data.data))
+  //     .catch((error) => console.error("Error fetching divisions:", error));
+  // }, []);
+
+  // Fetch districts based on the selected division
+  // const fetchDistricts = (division) => {
+  //   axios
+  //     .get(`/bdapis.com/api/v1.2/division/${division}`)
+  //     .then((response) => {
+  //       console.log("District API Response:", response.data); // Debugging
+  //       const data = response.data.data;
+
+  //       // Handle both array and object responses
+  //       const districtNames = Array.isArray(data)
+  //         ? data.map((item) => item.district)
+  //         : Object.values(data).map((item) => item.district);
+
+  //       setDistricts(districtNames);
+  //     })
+  //     .catch((error) => console.error("Error fetching districts:", error));
+  // };
+
+  // Fetch post details from the backend
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const role = localStorage.getItem("role");
+
+  //   if (!token || !post_id) {
+  //     navigate("/login");
+  //     return;
+  //   }
+
+  //   if (role) {
+  //     setUserRole(role);
+  //   }
+
+  //   axios
+  //     .get(`/api/user/posts/${post_id}`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     })
+  //     .then((response) => {
+  //       console.log("API Response:", response.data);
+  //       if (response.data.user_post) {
+  //         const postData = response.data.user_post[0]; // Access the first element
+  //         setPost(postData);
+  //         setFormData({
+  //           title: postData.title,
+  //           district: postData.district,
+  //           division: postData.division,
+  //           description: postData.description,
+  //         });
+  //         // Fetch districts for the current division
+  //         fetchDistricts(postData.division);
+  //         setLoading(false);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching post details:", error);
+  //       setError("Failed to load post details");
+  //       setLoading(false);
+  //     });
+  // }, [post_id, navigate]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+  
+    if (!token || !post_id) {
+      navigate("/login");
+      return;
+    }
+  
+    if (role) {
+      setUserRole(role);
+    }
+  
+    axios
+      .get(`/api/user/posts/${post_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        console.log("API Response:", response.data);
+        if (response.data.user_post) {
+          const postData = response.data.user_post[0]; // Access the first element
+          setPost(postData);
+          setFormData({
+            title: postData.title,
+            district: postData.district,
+            division: postData.division,
+            description: postData.description,
+          });
+          // Fetch districts for the current division
+          const selectedDivisionData = divisions.find(
+            (div) => div.division === postData.division
+          );
+          if (selectedDivisionData) {
+            setDistricts(selectedDivisionData.districts);
+          }
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching post details:", error);
+        setError("Failed to load post details");
+        setLoading(false);
+      });
+  }, [post_id, navigate, divisions]);
+
+  // Handle division change
+  const handleDivisionChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, division: value, district: "" }); // Reset district when division changes
+
+    // Find the selected division in the static data
+    const selectedDivisionData = divisions.find(
+      (div) => div.division === value
+    );
+    if (selectedDivisionData) {
+      setDistricts(selectedDivisionData.districts); // Set districts for the selected division
+    } else {
+      setDistricts([]); // Reset districts if no division is selected
+    }
   };
+
+  // Handle district change
+  const handleDistrictChange = (e) => {
+    const { value } = e.target;
+    setFormData({ ...formData, district: value });
+  };
+
+  // Handle delete post
+  const handleDelete = () => {
+    const token = localStorage.getItem("token");
+    axios
+      .delete(`/api/disaster-posts/${post_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        navigate("/alerts"); // Redirect to alerts page after deletion
+      })
+      .catch((error) => {
+        console.error("Error deleting post:", error);
+        setError("Failed to delete post");
+      });
+  };
+
+  // Handle donate button click
+  const handleDonate = () => {
+    navigate("/donate"); // Redirect to the donation page
+  };
+
+  // Open modal with the selected image
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+  };
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  // Handle form submission for updating post
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    axios
+      .post(`/api/disaster-posts/${post_id}/update`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        console.log("Post updated successfully:", response.data);
+        setPost(response.data.user_post); // Update the post state with new data
+        setIsEditing(false); // Exit edit mode
+        window.location.reload(); // Reload the page to reflect changes
+      })
+      .catch((error) => {
+        console.error("Error updating post:", error);
+        setError("Failed to update post");
+      });
+  };
+
+  // Handle cancel edit
+  const handleCancel = () => {
+    setIsEditing(false);
+    window.location.reload(); // Reload the page to reset the form
+  };
+
+  // Handle errors
+  if (error) return <div className="px-12 py-8 text-red-500">{error}</div>;
+
+  // Show loading state
+  if (loading || !post) return <div className="px-12 py-8">Loading...</div>;
+
+  // Parse images
+  let images = [];
+  try {
+    images = post.files ? JSON.parse(post.files) : [];
+  } catch (e) {
+    console.error("Error parsing images:", e);
+    images = [];
+  }
 
   return (
     <div className="bg-white min-h-screen">
       {/* Header Section */}
-      <header className="bg-[url('/login3.png')] text-white py-16 text-center">
+      <header className="bg-[url('/details.png')] text-white py-16 text-center">
         <h1 className="text-5xl font-bold mb-4 flex justify-center items-center gap-2">
-          <Network size={45} className="text-amber-500" />
-          The Relief Network
+          <AlertTriangle size={45} className="text-amber-500" />
+          Disaster Briefings
         </h1>
         <p className="text-xl max-w-3xl mx-auto">
-          Connecting communities in need with resources and support. Find available resources, blood donors, and relief assistance in your area. Together, we can build a stronger, more resilient community.
+          Stay informed about recent disasters and emergencies.
         </p>
       </header>
 
-      {/* District Dropdown and Reset Button */}
-      <div className="my-10 flex justify-center mb-10 gap-4">
-        <select
-          className="border border-gray-300 p-4 rounded-xl w-full max-w-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
-          value={selectedDistrict}
-          onChange={(e) => setSelectedDistrict(e.target.value)}
-        >
-          <option value="" disabled>Select District</option>
-          {districts.map((district, index) => (
-            <option key={index} value={district}>
-              {district}
-            </option>
-          ))}
-        </select>
+      <div className="mx-18 my-20 h-full bg-white text-black px-4 md:px-10">
+        <div className="flex flex-col lg:flex-row gap-8 px-4 md:px-12">
+          {/* Image Container */}
+          <div className="flex-grow lg:w-1/2">
+            <div className="w-full">
+              {images.length > 0 && (
+                <img
+                  src={images[0]}
+                  alt="Main Image"
+                  className="w-full h-auto max-h-[500px] object-cover rounded-lg cursor-pointer"
+                  onClick={() => openModal(images[0])} // Open modal with the main image
+                />
+              )}
+            </div>
+            {/* Additional Images */}
+            {images.length > 1 && (
+              <div className="flex gap-4 mt-4">
+                {images.slice(1).map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="w-32 h-32 object-cover rounded-lg cursor-pointer border border-gray-300"
+                    onClick={() => openModal(image)} // Open modal with the clicked image
+                  />
+                ))}
+              </div>
+            )}
+          </div>
 
-        <button
-          onClick={handleReset}
-          className="bg-[#311B08] text-[#EBB380] px-6 py-2 rounded-xl font-semibold hover:bg-amber-900 transition-colors duration-300"
-        >
-          Reset
-        </button>
-      </div>
+          {/* Details Section */}
+          <div className="flex-grow lg:w-1/2 p-4">
+            {isEditing ? (
+              // Edit Form
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-2xl font-medium text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="text-lg my-2 w-full p-2 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-2xl font-medium text-gray-700">
+                    Division
+                  </label>
+                  <select
+                    name="division"
+                    value={formData.division}
+                    onChange={handleDivisionChange}
+                    className="text-lg my-2 w-full p-2 border border-gray-300 rounded-lg"
+                    required
+                  >
+                    <option value="" disabled>
+                      Select Division
+                    </option>
+                    {divisions.map((division, index) => (
+                      <option key={index} value={division.division}>
+                        {division.division}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-2xl font-medium text-gray-700">
+                    District
+                  </label>
+                  <select
+                    name="district"
+                    value={formData.district}
+                    onChange={handleDistrictChange}
+                    className="text-lg my-2 w-full p-2 border border-gray-300 rounded-lg"
+                    required
+                    disabled={!formData.division}
+                  >
+                    <option value="" disabled>
+                      Select District
+                    </option>
+                    {districts.map((district, index) => (
+                      <option key={index} value={district}>
+                        {district}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-2xl font-medium text-gray-700">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    className="text-lg my-2 w-full p-2 border border-gray-300 rounded-lg"
+                    rows="4"
+                    required
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <button
+                    type="submit"
+                    className="bg-green-500 text-lg font-semibold text-white px-4 py-2 rounded-lg hover:bg-green-900 transition duration-300"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="bg-gray-500 text-lg font-semibold text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              // Display Post Details
+              <>
+                <h1 className="text-3xl lg:text-5xl font-bold mb-4">
+                  {post.title}
+                </h1>
+                <p className="text-xl lg:text-2xl text-gray-700 mb-6">
+                  <strong>Location:</strong> {post.district}, {post.division}
+                </p>
+                <p className="text-xl lg:text-2xl text-gray-700 mb-6">
+                  <strong>Time:</strong> {post.event_time}, {post.event_date}
+                </p>
+                <p className="text-xl lg:text-2xl text-gray-700 mb-6">
+                  <strong>Description:</strong>
+                </p>
+                <p className="text-lg lg:text-xl text-gray-700 text-justify">
+                  {post.description}
+                </p>
 
-      <div className="container mx-auto px-6 py-auto">
-        {/* Total Donated Amount Section */}
-        <div className="bg-[#311B08] text-white p-6 rounded-xl shadow-lg mb-10 text-center">
-          <h2 className="text-3xl font-extrabold mb-4">Total Funds Raised till now: </h2>
-          {loadingDonatedAmount ? (
-            <p className="text-gray-300">Loading donated amount...</p>
-          ) : errorDonatedAmount ? (
-            <p className="text-red-300">{errorDonatedAmount}</p>
-          ) : (
-            <p className="text-4xl font-bold text-amber-500">
-              ৳{totalDonatedAmount.toLocaleString()}
-            </p>
-          )}
+                {/* Admin Buttons */}
+                {userRole === "admin" && (
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="bg-green-500 text-xl font-semibold text-white px-8 py-2 rounded-lg hover:bg-green-900 transition duration-300"
+                    >
+                      Update
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="bg-red-500 text-xl font-semibold text-white px-8 py-2 rounded-lg hover:bg-red-900 transition duration-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+
+                {/* Donate Button for Users */}
+                {userRole === "user" && (
+                  <div className="flex gap-4 mt-6">
+                    <button
+                      onClick={handleDonate}
+                      className="bg-[#311B08] text-xl font-semibold text-[#EBB380] px-8 py-2 rounded-lg hover:underline transition duration-300"
+                    >
+                      Donate
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Available Resources */}
-        <section className="mb-10">
-          <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Resources:</h2>
-          {loadingResources ? (
-            <p className="text-center text-gray-600">Loading resource data...</p>
-          ) : errorResources ? (
-            <p className="text-center text-red-500">{errorResources}</p>
-          ) : filteredResources.length === 0 ? (
-            <p className="text-center text-gray-600 font-semibold text-2xl">No matching resources found.</p>
-          ) : (
+        {/* Modal for full-screen image view */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
             <div className="relative">
-              <Slider {...getSliderSettings(filteredResources.length)}>
-                {filteredResources.map((resource, index) => (
-                  <div key={index} className="p-5">
-                    <div className="bg-gray-100 border border-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
-                      <p className="font-bold text-gray-800 text-2xl">{resource.itemDescription}</p>
-                      <p className="text-gray-600 text-lg">
-                        Quantity: <span className="font-medium text-amber-600">{resource.quantity}</span>
-                      </p>
-                      <p className="text-gray-600 text-lg font-semibold">Location: {resource.pickUpLocation}</p>
-                      <button
-                        onClick={() => navigate("/contact-us")} // Redirect to ContactUs page
-                        className="bg-[#311B08] text-[#EBB380] px-5 py-2 mt-4 rounded-xl text-lg font-semibold hover:underline transition-colors duration-300"
-                      >
-                        Request
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </Slider>
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute -top-10 right-0 bg-white p-2 rounded-full hover:bg-gray-200 transition duration-300"
+              >
+                <X size={24} className="text-gray-800" /> {/* Close icon */}
+              </button>
+              {/* Display the selected image */}
+              <img
+                src={selectedImage}
+                alt="Full Screen"
+                className="object-cover rounded-lg max-w-[90vw] max-h-[90vh]"
+              />
             </div>
-          )}
-        </section>
-
-        {/* Available Blood Donors */}
-        <section className="mb-10">
-          <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Blood Donors:</h2>
-          {loadingDonors ? (
-            <p className="text-center text-gray-600">Loading donor data...</p>
-          ) : errorDonors ? (
-            <p className="text-center text-red-500">{errorDonors}</p>
-          ) : filteredDonors.length === 0 ? (
-            <p className="text-center text-gray-600 font-semibold text-2xl">No matching donors found.</p>
-          ) : (
-            <div className="relative">
-              <Slider {...getSliderSettings(filteredDonors.length)}>
-                {filteredDonors.map((donor, index) => (
-                  <div key={index} className="p-5">
-                    <div className="bg-gray-100 border border-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
-                      <p className="font-bold text-gray-800 text-2xl mb-1">{donor.donorName}</p>
-                      <p className="text-gray-600 text-lg font-bold">
-                        Blood Type: <span className="font-medium text-amber-600">{donor.blood_group}</span>
-                      </p>
-                      <p className="text-gray-600 text-lg">Contact: {donor.donorPhone}</p>
-                      <p className="text-gray-600 text-lg font-semibold">
-                        Location: {donor.district}
-                      </p>
-                      <button
-                        onClick={() => navigate("/contact-us")} // Redirect to ContactUs page
-                        className="bg-[#311B08] text-[#EBB380] px-5 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
-                      >
-                        Contact
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </Slider>
-            </div>
-          )}
-        </section>
-
-        {/* Available Volunteers */}
-        <section className="mb-10">
-          <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Volunteers:</h2>
-          {loadingVolunteers ? (
-            <p className="text-center text-gray-600">Loading volunteer data...</p>
-          ) : errorVolunteers ? (
-            <p className="text-center text-red-500">{errorVolunteers}</p>
-          ) : filteredVolunteers.length === 0 ? (
-            <p className="text-center text-gray-600 font-semibold text-2xl">No matching volunteers found.</p>
-          ) : (
-            <div className="relative">
-              <Slider {...getSliderSettings(filteredVolunteers.length)}>
-                {filteredVolunteers.map((volunteer, index) => (
-                  <div key={index} className="p-5">
-                    <div className="bg-gray-100 border border-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
-                      <p className="font-bold text-gray-800 text-2xl mb-1">{volunteer.volunteerName}</p>
-                      <p className="text-gray-600 text-lg">Email: {volunteer.volunteerMail}</p>
-                      <p className="text-gray-600 text-lg font-bold">
-                        Blood Type: <span className="font-medium text-amber-600">{volunteer.BloodGroup}</span>
-                      </p>
-                      <p className="text-gray-600 text-lg font-semibold">
-                        Location: {volunteer.District}
-                      </p>
-                      <button
-                        onClick={() => navigate("/contact-us")} // Redirect to ContactUs page
-                        className="bg-[#311B08] text-[#EBB380] px-5 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
-                      >
-                        Contact
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </Slider>
-            </div>
-          )}
-        </section>
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
 
-export default Relief;
+export default DisasterPostDetail;

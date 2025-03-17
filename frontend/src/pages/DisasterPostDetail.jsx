@@ -1,7 +1,10 @@
+//disaster post
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { X, AlertTriangle } from "lucide-react";
+import data from "../data.json";
 
 function DisasterPostDetail() {
   const { post_id } = useParams();
@@ -21,49 +24,90 @@ function DisasterPostDetail() {
   });
 
   // State for divisions and districts
-  const [divisions, setDivisions] = useState([]);
+  //const [divisions, setDivisions] = useState([]);
+  const [divisions, setDivisions] = useState(data.divisions); 
   const [districts, setDistricts] = useState([]);
 
   // Fetch divisions from the API
-  useEffect(() => {
-    axios
-      .get("/bdapis.com/api/v1.2/divisions")
-      .then((response) => setDivisions(response.data.data))
-      .catch((error) => console.error("Error fetching divisions:", error));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("/bdapis.com/api/v1.2/divisions")
+  //     .then((response) => setDivisions(response.data.data))
+  //     .catch((error) => console.error("Error fetching divisions:", error));
+  // }, []);
 
   // Fetch districts based on the selected division
-  const fetchDistricts = (division) => {
-    axios
-      .get(`/bdapis.com/api/v1.2/division/${division}`)
-      .then((response) => {
-        console.log("District API Response:", response.data); // Debugging
-        const data = response.data.data;
+  // const fetchDistricts = (division) => {
+  //   axios
+  //     .get(`/bdapis.com/api/v1.2/division/${division}`)
+  //     .then((response) => {
+  //       console.log("District API Response:", response.data); // Debugging
+  //       const data = response.data.data;
 
-        // Handle both array and object responses
-        const districtNames = Array.isArray(data)
-          ? data.map((item) => item.district)
-          : Object.values(data).map((item) => item.district);
+  //       // Handle both array and object responses
+  //       const districtNames = Array.isArray(data)
+  //         ? data.map((item) => item.district)
+  //         : Object.values(data).map((item) => item.district);
 
-        setDistricts(districtNames);
-      })
-      .catch((error) => console.error("Error fetching districts:", error));
-  };
+  //       setDistricts(districtNames);
+  //     })
+  //     .catch((error) => console.error("Error fetching districts:", error));
+  // };
 
   // Fetch post details from the backend
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const role = localStorage.getItem("role");
+
+  //   if (!token || !post_id) {
+  //     navigate("/login");
+  //     return;
+  //   }
+
+  //   if (role) {
+  //     setUserRole(role);
+  //   }
+
+  //   axios
+  //     .get(`/api/user/posts/${post_id}`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     })
+  //     .then((response) => {
+  //       console.log("API Response:", response.data);
+  //       if (response.data.user_post) {
+  //         const postData = response.data.user_post[0]; // Access the first element
+  //         setPost(postData);
+  //         setFormData({
+  //           title: postData.title,
+  //           district: postData.district,
+  //           division: postData.division,
+  //           description: postData.description,
+  //         });
+  //         // Fetch districts for the current division
+  //         fetchDistricts(postData.division);
+  //         setLoading(false);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching post details:", error);
+  //       setError("Failed to load post details");
+  //       setLoading(false);
+  //     });
+  // }, [post_id, navigate]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-
+  
     if (!token || !post_id) {
       navigate("/login");
       return;
     }
-
+  
     if (role) {
       setUserRole(role);
     }
-
+  
     axios
       .get(`/api/user/posts/${post_id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -80,7 +124,12 @@ function DisasterPostDetail() {
             description: postData.description,
           });
           // Fetch districts for the current division
-          fetchDistricts(postData.division);
+          const selectedDivisionData = divisions.find(
+            (div) => div.division === postData.division
+          );
+          if (selectedDivisionData) {
+            setDistricts(selectedDivisionData.districts);
+          }
           setLoading(false);
         }
       })
@@ -89,13 +138,22 @@ function DisasterPostDetail() {
         setError("Failed to load post details");
         setLoading(false);
       });
-  }, [post_id, navigate]);
+  }, [post_id, navigate, divisions]);
 
   // Handle division change
   const handleDivisionChange = (e) => {
     const { value } = e.target;
     setFormData({ ...formData, division: value, district: "" }); // Reset district when division changes
-    fetchDistricts(value); // Fetch districts for the selected division
+
+    // Find the selected division in the static data
+    const selectedDivisionData = divisions.find(
+      (div) => div.division === value
+    );
+    if (selectedDivisionData) {
+      setDistricts(selectedDivisionData.districts); // Set districts for the selected division
+    } else {
+      setDistricts([]); // Reset districts if no division is selected
+    }
   };
 
   // Handle district change
@@ -260,7 +318,9 @@ function DisasterPostDetail() {
                     className="text-lg my-2 w-full p-2 border border-gray-300 rounded-lg"
                     required
                   >
-                    <option value="" disabled>Select Division</option>
+                    <option value="" disabled>
+                      Select Division
+                    </option>
                     {divisions.map((division, index) => (
                       <option key={index} value={division.division}>
                         {division.division}
@@ -280,7 +340,9 @@ function DisasterPostDetail() {
                     required
                     disabled={!formData.division}
                   >
-                    <option value="" disabled>Select District</option>
+                    <option value="" disabled>
+                      Select District
+                    </option>
                     {districts.map((district, index) => (
                       <option key={index} value={district}>
                         {district}
@@ -320,7 +382,9 @@ function DisasterPostDetail() {
             ) : (
               // Display Post Details
               <>
-                <h1 className="text-3xl lg:text-5xl font-bold mb-4">{post.title}</h1>
+                <h1 className="text-3xl lg:text-5xl font-bold mb-4">
+                  {post.title}
+                </h1>
                 <p className="text-xl lg:text-2xl text-gray-700 mb-6">
                   <strong>Location:</strong> {post.district}, {post.division}
                 </p>
