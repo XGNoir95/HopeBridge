@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { useNavigate } from "react-router-dom";
+import data from "../data.json";
 
 const ReportIncident = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +17,8 @@ const ReportIncident = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [divisions, setDivisions] = useState([]);
+  //const [divisions, setDivisions] = useState([]);
+  const [divisions, setDivisions] = useState(data.divisions);
   const [districts, setDistricts] = useState([]);
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -24,35 +26,36 @@ const ReportIncident = () => {
 
   useEffect(() => {
     if (token) {
-      axios.get("https://bdapis.com/api/v1.2/divisions", {
-        headers: {
-          "Accept": "application/json"
-        }
-      })
+      axios.get("https://bdapis.com/api/v1.2/divisions")
         .then((response) => setDivisions(response.data.data))
-        .catch((error) => {
-          console.error("Error fetching divisions:", error);
-          // Fallback to empty array if API fails
-          setDivisions([]);
-        });
+        .catch((error) => console.error("Error fetching divisions:", error));
     }
   }, [token]);
 
   const fetchDistricts = (division) => {
-  axios.get(`https://bdapis.com/api/v1.2/division/${division}`, {
-    headers: {
-      "Accept": "application/json"
+    axios.get(`https://bdapis.com/api/v1.2/division/${division}`)
+      .then((response) => {
+        const districtNames = response.data.data.map((item) => item.district);
+        setDistricts(districtNames);
+      })
+      .catch((error) => console.error("Error fetching districts:", error));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // if (name === "division") {
+    //   setFormData({ ...formData, division: value, district: "" });
+    //   fetchDistricts(value);
+    // } 
+    
+    //BD API SERVER NOT WORKING
+    if (name === "division") {
+      const selectedDivision = divisions.find((div) => div.division === value);
+      setDistricts(selectedDivision ? selectedDivision.districts : []);
     }
-  })
-    .then((response) => {
-      const districtNames = response.data.data.map((item) => item.district);
-      setDistricts(districtNames);
-    })
-    .catch((error) => {
-      console.error("Error fetching districts:", error);
-      setDistricts([]);
-    });
-};
+  };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
