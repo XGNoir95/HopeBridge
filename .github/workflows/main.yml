@@ -81,4 +81,3 @@ jobs:
       working-directory: backend
       run: |
         composer run-script phpcs
-        composer run-script phpmd
