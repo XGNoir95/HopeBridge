@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Video extends Model
 {
     use HasFactory;
+
     protected $table = 'videos';
 
     protected $primaryKey = 'video_id';

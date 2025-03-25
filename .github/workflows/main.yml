@@ -1,0 +1,83 @@
+name: test_project
+
+on:
+  pull_request:
+    branches:
+      - developer
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.0'
+
+    - name: Install Composer
+      run: sudo apt-get update && sudo apt-get install -y composer
+
+    - name: Set up .env file
+      working-directory: backend
+      run: |
+        cp .env.example .env
+        echo "APP_KEY=$(php artisan key:generate --show)" >> .env
+        echo "DB_CONNECTION=mysql" >> .env
+        echo "DB_HOST=127.0.0.1" >> .env
+        echo "DB_PORT=3306" >> .env
+        echo "DB_DATABASE=test_db" >> .env
+        echo "DB_USERNAME=root" >> .env
+        echo "DB_PASSWORD=root" >> .env
+
+    # 🛑 New Step: Wait for MySQL to be Ready
+    - name: Wait for MySQL to be ready
+      run: |
+        for i in {1..30}; do
+          if mysqladmin ping -h 127.0.0.1 --silent; then
+            echo "MySQL is ready!"
+            exit 0
+          fi
+          echo "Waiting for MySQL... ($i/30)"
+          sleep 2
+        done
+        echo "MySQL did not start in time!"
+        exit 1
+
+    - name: Install dependencies
+      working-directory: backend
+      run: composer install
+
+    - name: Run migrations
+      working-directory: backend
+      run: php artisan migrate --force
+
+    - name: Run seeders
+      working-directory: backend
+      run: php artisan db:seed
+
+    - name: Run tests
+      working-directory: backend
+      run: php artisan test
+
+    - name: Run code quality checks
+      working-directory: backend
+      run: |
+        composer run-script phpcs

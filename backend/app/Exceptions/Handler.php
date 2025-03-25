@@ -7,9 +7,8 @@ use Throwable;
 
 class Handler extends ExceptionHandler
 {
-
     /**
-     * The render method is responsible for rendering the exception as an HTTP response. 
+     * The render method is responsible for rendering the exception as an HTTP response.
      * You can customize this method to return a custom response (such as JSON or a specific view)
      * when an exception occurs.
      *
@@ -28,5 +27,4 @@ class Handler extends ExceptionHandler
             'exception' => (string) $exception
         ], 200);
     }
-
 }

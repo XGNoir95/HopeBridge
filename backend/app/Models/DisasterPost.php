@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -8,8 +9,8 @@ class DisasterPost extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'post_id';
 
+    protected $primaryKey = 'post_id';
     protected $fillable = [
         'user_id',
         'title',

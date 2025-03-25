@@ -55,10 +55,10 @@ class AdminController extends Controller
         if (!$admin) {
             return response()->json(['message' => 'Admin not found'], 404);
         }
-    
-        $profilePicture = $admin->profile_picture ? json_decode($admin->profile_picture, true) 
+
+        $profilePicture = $admin->profile_picture ? json_decode($admin->profile_picture, true)
             : ['https://cdn.vectorstock.com/i/500p/52/38/avatar-icon-vector-11835238.jpg'];
-    
+
         return response()->json([
             'admin_id' => $admin->admin_id,
             'adminMail' => $admin->adminMail,

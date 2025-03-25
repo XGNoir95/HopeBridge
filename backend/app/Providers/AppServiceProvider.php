@@ -6,18 +6,11 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services, such as custom services you want to provide, like EmailService, UsersService etc.
-     *
-     * @return void
-     */
     public function register()
     {
-        //
         $this->app->singleton('UserService', function ($app) {
             return new \App\Services\UserService();
         });
-    
     }
 
     /**

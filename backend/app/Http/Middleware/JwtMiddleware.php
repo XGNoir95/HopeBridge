@@ -44,12 +44,12 @@ class JwtMiddleware
             Log::info('JWT Token Claims:', ['claims' => $claims]);
 
             $userId = $claims['uid'] ?? null;
-            $userRole = $claims['role']?? null;
+            $userRole = $claims['role'] ?? null;
 
             if (!$userId) {
                 return response()->json(['message' => 'User ID not found in token'], 401);
             }
-            
+
             $request->attributes->add([
                 'user_id' => $userId,
                 'user_role' => $userRole,

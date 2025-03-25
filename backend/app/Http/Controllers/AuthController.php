@@ -19,15 +19,16 @@ class AuthController extends Controller
     //Register a new user.
     protected $UserService;
     protected $AdminService;
-    public function __construct(UserService $UserService,AdminService $AdminService){
+    public function __construct(UserService $UserService, AdminService $AdminService)
+    {
         $this->UserService = $UserService;
-        $this->AdminService = $AdminService;   
+        $this->AdminService = $AdminService;
     }
     public function register(Request $request)
     {
-        $user=$this->UserService->createUser($request->all());
-        if(!$user){
-            return response()->json(["message"=> "Registration Failed"]  ,400);
+        $user = $this->UserService->createUser($request->all());
+        if (!$user) {
+            return response()->json(["message" => "Registration Failed"], 400);
         }
         return response()->json([
             'message' => 'User created successfully',
@@ -40,17 +41,15 @@ class AuthController extends Controller
     {
         $admin = $this->AdminService->loginGo($request);
         $user = $this->UserService->loginGo($request);
-        $role=null;
-    
+        $role = null;
+
         if ($admin) {
             $role = 'admin';
-            $token =$this->UserService->getToken($admin->admin_id,$role);
-        }
-        else if($user){
+            $token = $this->UserService->getToken($admin->admin_id, $role);
+        } elseif ($user) {
             $role = 'user';
-            $token =$this->UserService->getToken($user->user_id,$role);
-        }
-        else {
+            $token = $this->UserService->getToken($user->user_id, $role);
+        } else {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 

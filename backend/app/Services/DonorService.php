@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\donor;
+use App\Models\Donor;
 use App\Models\Volunteer;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,8 +29,9 @@ class DonorService
 
         $validatedData = $validator->validated();
         $userData = DB::select("select * from users WHERE user_id = ?", [$validatedData['id']]);
-        if (!$userData)
+        if (!$userData) {
             return null;
+        }
         $user = (array) $userData[0];
         $result = Donor::create([
             'user_id' => $validatedData['id'],
@@ -64,8 +65,9 @@ class DonorService
     {
         $donors = $this->getAllDonor();
         foreach ($donors as $donor) {
-            if ($donor->DonorId == $id)
+            if ($donor->DonorId == $id) {
                 return $donor;
+            }
         }
         return null;
     }
@@ -158,8 +160,9 @@ class DonorService
     {
         $volunteers = $this->getAllVolunteer();
         foreach ($volunteers as $volunteer) {
-            if ($volunteer->VolunteerId == $id)
+            if ($volunteer->VolunteerId == $id) {
                 return $volunteer;
+            }
         }
         return null;
     }

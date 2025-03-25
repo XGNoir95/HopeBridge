@@ -38,33 +38,34 @@ class VideoService
 
         return $video;
     }
-    // 
+    //
     public function getVideo($id)
     {
-        $result =DB::table('videos')->where('video_id', $id)->first();
+        $result = DB::table('videos')->where('video_id', $id)->first();
         return $result;
     }
 
     public function deleteVideo($id)
     {
-        $result=$this->getVideo($id);
+        $result = $this->getVideo($id);
         if ($result) {
-            DB::delete('delete * from videos where video_id= ?',[$id]);
+            DB::delete('delete * from videos where video_id= ?', [$id]);
             return true;
         }
         return false;
     }
-    public function update($request,$id){
-        $video=Video::findOrFail($id);
+    public function update($request, $id)
+    {
+        $video = Video::findOrFail($id);
         $validatedData = $request->validate([
             'title' => 'string|max:255',
             'description' => 'string',
-            'video_link'=>'required|string|url'
+            'video_link' => 'required|string|url'
         ]);
         $video->update([
-            'title'=> $validatedData['title'],
-            'description'=> $validatedData['description'],
-            'video_link'=> $validatedData['video_link'],
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'video_link' => $validatedData['video_link'],
         ]);
         return $video;
     }
