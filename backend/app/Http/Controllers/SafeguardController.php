@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\newsArticle;
+use App\Models\NewsArticle;
 use App\Models\Video;
 use App\Services\NewsArticleService;
 use App\Services\VideoService;

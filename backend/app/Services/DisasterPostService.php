@@ -104,8 +104,8 @@ class DisasterPostService
             }
         }
         // $city=DB::select("select division, COUNT(division) as count from disaster_posts group by division");
-        foreach ($city as $k => &$v) {
-            $v = $v * 20;
+        foreach ($city as &$v) {
+            $v *= 20;
         }
         return json_encode($city, JSON_PRETTY_PRINT);
     }
