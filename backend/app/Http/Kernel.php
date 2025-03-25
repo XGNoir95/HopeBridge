@@ -26,8 +26,8 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'api' => [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class, //  ensures that requests originating from the frontend (typically a browser) are treated as stateful. Used to persist cookies across requests
-            \Illuminate\Routing\Middleware\SubstituteBindings::class, // responsible for automatically substituting route parameter bindings in a controller action when you have route parameters like {id} or {slug}.
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 

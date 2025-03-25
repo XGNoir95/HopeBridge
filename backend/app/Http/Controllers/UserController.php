@@ -43,7 +43,9 @@ class UserController extends Controller
         }
 
         $profilePicture = $user->profile_picture ? json_decode($user->profile_picture, true)
-            : ['https://static.vecteezy.com/system/resources/thumbnails/002/002/403/small/man-with-beard-avatar-character-isolated-icon-free-vector.jpg'];
+            : ['https://static.vecteezy.com/system/resources/
+			thumbnails/002/002/403/small/
+			man-with-beard-avatar-character-isolated-icon-free-vector.jpg'];
 
         return response()->json([
             'user_id' => $user->user_id,
