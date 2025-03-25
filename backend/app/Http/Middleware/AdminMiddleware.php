@@ -15,6 +15,6 @@ class AdminMiddleware
             return response()->json(['message' => 'Access denied. Admins only.'], 403);
         }
 
-        return $next($request); 
+        return $next($request);
     }
 }

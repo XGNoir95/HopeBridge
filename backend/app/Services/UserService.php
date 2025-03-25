@@ -11,11 +11,12 @@ use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
-
 use Request;
 
-class UserService{
-    public function createUser($data){
+class UserService
+{
+    public function createUser($data)
+    {
         // Create a new user instance
         $validator = Validator::make($data, [
             'userName' => 'required|string|max:255',
@@ -42,7 +43,8 @@ class UserService{
         ]);
         return $user;
     }
-    public function updateUser($request){
+    public function updateUser($request)
+    {
         // Update user attributes
         $user = User::find($request->get('user_id'));
 
@@ -67,7 +69,8 @@ class UserService{
     }
 
 
-    public function loginGo($request){
+    public function loginGo($request)
+    {
         $data = $request->validate([
             'userMail' => 'required|string|email',
             'password' => 'required|string',
@@ -78,29 +81,34 @@ class UserService{
         }
         return $user;
     }
-    public function getUserList(){
+    public function getUserList()
+    {
         // $user = User::all();
-        $user =DB::table('users')->get();
+        $user = DB::table('users')->get();
         return $user->toArray();
     }
-    public function getUserById($request){
+    public function getUserById($request)
+    {
         $userId = $request->get('user_id');
-        $user = DB::table('users')->where('user_id',$userId)->first();
+        $user = DB::table('users')->where('user_id', $userId)->first();
         return $user;
     }
-    public function getUserByMail($mail) {
-        $user = DB::table('users')->where('userMail',$mail)->first();
+    public function getUserByMail($mail)
+    {
+        $user = DB::table('users')->where('userMail', $mail)->first();
         return $user;
     }
-    public function deleteUser($id){
-        $user =$this->getUserByid($id);
-        if(!$user)
+    public function deleteUser($id)
+    {
+        $user = $this->getUserByid($id);
+        if (!$user) {
             return false;
-        DB::delete('select * from users where user_id= ?',[$id]);
+        }
+        DB::delete('select * from users where user_id= ?', [$id]);
 
         return true;
     }
-    protected function issueJwtToken($userId,$role)
+    protected function issueJwtToken($userId, $role)
     {
         $config = Configuration::forSymmetricSigner(
             new Sha256(),
@@ -118,8 +126,9 @@ class UserService{
 
         return $token->toString();
     }
-    public function getToken($id,$role){
-        $token = $this->issueJwtToken($id,$role);
+    public function getToken($id, $role)
+    {
+        $token = $this->issueJwtToken($id, $role);
         return $token;
     }
 }

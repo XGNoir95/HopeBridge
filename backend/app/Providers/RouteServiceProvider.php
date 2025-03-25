@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
-
     /**
      * The controller namespace for the application.
      *

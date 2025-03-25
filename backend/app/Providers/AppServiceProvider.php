@@ -17,7 +17,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('UserService', function ($app) {
             return new \App\Services\UserService();
         });
-    
     }
 
     /**
