@@ -15,7 +15,9 @@ class AvailableResourcesService{
             'mail'=>'required|string',
             'itemDescription'=>'required|string|max:255',
             'quantity'=>'required|integer',
-            'pickUpLocation'=>'required|string'
+            'pickUpLocation'=>'required|string',
+            'pickUpDate'=>'required|date',
+            'expirationDate'=>'required|date|after_or_equal:pickUpDate'
         ]);
         if($validator->fails()){
             return null;
@@ -26,7 +28,9 @@ class AvailableResourcesService{
             'donorMail'=>$validatedData['mail'],    
             'itemDescription'=>$validatedData['itemDescription'],
             'quantity'=>$validatedData['quantity'],
-            'pickUpLocation'=>$validatedData['pickUpLocation']
+            'pickUpLocation'=>$validatedData['pickUpLocation'],
+            'pickUpDate'=>$validatedData['pickUpDate'],
+            'expirationDate'=>$validatedData['expirationDate']
         ]);
         return $donation;
     }
@@ -42,7 +46,7 @@ class AvailableResourcesService{
     }
     // get quantity by itemDescription
     public function getQuantity($itemDescription){
-        $result =DB::select('select itemDescription as Item,SUM(quantity) as Amount from available_resources where itemDescription =? group by Item',[$itemDescription]);
+        $result =DB::select('select itemDescription as Item,SUM(quantity) as Amount, pickUpDate as PickUpDate, expirationDate as Expiration  from available_resources where itemDescription =? group by Item',[$itemDescription]);
         $result=(array)$result[0];
         return $result;
     }

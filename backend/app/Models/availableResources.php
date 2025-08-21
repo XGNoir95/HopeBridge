@@ -16,6 +16,8 @@ class availableResources extends Model
         'donorMail',
         'itemDescription',
         'quantity',
-        'pickUpLocation'
+        'pickUpLocation',
+        'pickUpDate',
+        'expirationDate'
     ];
 }
