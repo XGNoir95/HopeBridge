@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+<<<<<<< HEAD
 class AvailableResourcesService
 {
     public function createDonation($request)
@@ -18,17 +19,41 @@ class AvailableResourcesService
             'itemDescription' => 'required|string|max:255',
             'quantity' => 'required|integer',
             'pickUpLocation' => 'required|string'
+=======
+class AvailableResourcesService{
+    public function createDonation($request){
+        $data=$request->all();
+        $validator=validator::make($data,[
+            'name'=>'required|string|max:255',
+            'mail'=>'required|string',
+            'itemDescription'=>'required|string|max:255',
+            'quantity'=>'required|integer',
+            'pickUpLocation'=>'required|string',
+            'pickUpDate'=>'required|date',
+            'expirationDate'=>'required|date|after_or_equal:pickUpDate'
+>>>>>>> 29590d0 (added pick up and expiration date in available resources)
         ]);
         if ($validator->fails()) {
             return null;
         }
         $validatedData = $validator->validated();
+<<<<<<< HEAD
         $donation = availableResources::create([
             'donorName' => $validatedData['name'],
             'donorMail' => $validatedData['mail'],
             'itemDescription' => $validatedData['itemDescription'],
             'quantity' => $validatedData['quantity'],
             'pickUpLocation' => $validatedData['pickUpLocation']
+=======
+        $donation=availableResources::create([
+            'donorName'=>$validatedData['name'],
+            'donorMail'=>$validatedData['mail'],    
+            'itemDescription'=>$validatedData['itemDescription'],
+            'quantity'=>$validatedData['quantity'],
+            'pickUpLocation'=>$validatedData['pickUpLocation'],
+            'pickUpDate'=>$validatedData['pickUpDate'],
+            'expirationDate'=>$validatedData['expirationDate']
+>>>>>>> 29590d0 (added pick up and expiration date in available resources)
         ]);
         return $donation;
     }
@@ -45,6 +70,7 @@ class AvailableResourcesService
         return $result;
     }
     // get quantity by itemDescription
+<<<<<<< HEAD
     public function getQuantity($itemDescription)
     {
         $result = DB::select('select 
@@ -52,6 +78,11 @@ class AvailableResourcesService
 		from available_resources
 		where itemDescription =? group by Item', [$itemDescription]);
         $result = (array)$result[0];
+=======
+    public function getQuantity($itemDescription){
+        $result =DB::select('select itemDescription as Item,SUM(quantity) as Amount, pickUpDate as PickUpDate, expirationDate as Expiration  from available_resources where itemDescription =? group by Item',[$itemDescription]);
+        $result=(array)$result[0];
+>>>>>>> 29590d0 (added pick up and expiration date in available resources)
         return $result;
     }
 }
