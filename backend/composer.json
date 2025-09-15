@@ -13,7 +13,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "lcobucci/jwt": "^4.0",
-        "nesbot/carbon": "^2.72"
+        "nesbot/carbon": "^2.72",
+        "php-ai/php-ml": "^0.10.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

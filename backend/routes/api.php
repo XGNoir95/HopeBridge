@@ -7,7 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ShelterController;
 use App\Http\Controllers\DisasterPostController;
 use App\Http\Controllers\SafeguardController;
-
+use App\Http\Controllers\ChatbotController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -89,3 +89,10 @@ Route::get('/volunteer',[ShelterController::class,'indexVolunteer']);
 Route::get('/volunteer/{id}',[ShelterController::class,'showVolunteer']);
 Route::post('/create-volunteer',[ShelterController::class,'storeVolunteer'])->middleware('jwt');
 Route::delete('/volunteer/{id}',[ShelterController::class,'destroyVolunteer']);
+
+//chatbot route
+Route::middleware(['chatbot.limit'])->group(function () {
+    Route::post('/chat', [ChatbotController::class, 'handle']);
+    Route::get('/chat/messages', [ChatbotController::class, 'index']);
+    Route::get('/chat/messages/{id}', [ChatbotController::class, 'show']);
+});

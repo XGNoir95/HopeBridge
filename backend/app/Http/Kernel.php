@@ -42,5 +42,6 @@ class Kernel extends HttpKernel
         'test.middleware' => \App\Http\Middleware\TestMiddleware::class,
         'jwt' => \App\Http\Middleware\JwtMiddleware::class,
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'chatbot.limit' => \App\Http\Middleware\ChatbotRateLimit::class,
     ];
 }
