@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Package } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const DonateGoods = () => {
@@ -9,38 +10,38 @@ const DonateGoods = () => {
     mail: "",
     itemDescription: "",
     quantity: "",
-    pickUpLocation: "", // Renamed from district to pickUpLocation
+    pickUpLocation: "",
   });
   const [error, setError] = useState(null);
-  const [districts, setDistricts] = useState([]); // State for districts
+  const [districts, setDistricts] = useState([]);
+  const [divisions, setDivisions] = useState([]);
+  const [selectedDivision, setSelectedDivision] = useState("");
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  // Fetch user data and districts on component mount
+  // Fetch user data and divisions on component mount
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Retrieve the JWT token from localStorage using the correct key
-        const token = localStorage.getItem("token"); // Use "token" as the key
         if (!token) {
           throw new Error("No token found in localStorage");
         }
 
-        // Fetch user data from the API
         const response = await axios.get("http://localhost:8000/api/user", {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the request headers
+            Authorization: `Bearer ${token}`,
           },
         });
 
-        // Update formData with the user's name and email
         setFormData((prevData) => ({
           ...prevData,
           name: response.data.userName,
           mail: response.data.userMail,
         }));
 
-        // Fetch districts from the BD API
-        const districtsResponse = await axios.get("https://bdapis.com/api/v1.1/districts");
-        setDistricts(districtsResponse.data.data);
+        // Fetch divisions from the BD API
+        const divisionsResponse = await axios.get("https://bdapi.vercel.app/api/v.1/division");
+        setDivisions(divisionsResponse.data.data);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to fetch data. Please try again.");
@@ -48,24 +49,49 @@ const DonateGoods = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [token]);
+
+  // Fetch districts when a division is selected
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (!selectedDivision) return;
+      
+      try {
+        const division = divisions.find(div => div.name === selectedDivision);
+        if (division) {
+          const districtsResponse = await axios.get(
+            `https://bdapi.vercel.app/api/v.1/district/${division.id}`
+          );
+          setDistricts(districtsResponse.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching districts:", error);
+        setError("Failed to load districts. Please try again.");
+      }
+    };
+
+    fetchDistricts();
+  }, [selectedDivision, divisions]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleDivisionChange = (e) => {
+    setSelectedDivision(e.target.value);
+    setFormData({ ...formData, pickUpLocation: "" });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    console.log("Submitting form with data:", formData);
 
     try {
       const response = await axios.post(
         "http://localhost:8000/api/create-resources",
         formData
       );
-      console.log("API Response:", response.data);
       if (response.data.success) {
         setIsSubmitted(true);
       } else {
@@ -77,97 +103,257 @@ const DonateGoods = () => {
     }
   };
 
-  return (
-    <div className="bg-gradient-to-r from-[#F9F5F0] to-[#F0E6D8] min-h-screen py-16 px-4">
-      <h2 className="text-4xl font-bold text-center mb-8 text-[#311B08]">
-        Donate Goods
-      </h2>
-      <p className="text-center mb-6 text-[#5A3A22]">
-        Provide essential goods to those in need by filling the form below.
-      </p>
-      <div className="max-w-2xl mx-auto bg-gradient-to-r from-[#FFFFFF] to-[#F9F5F0] p-8 rounded-2xl shadow-2xl border border-[#EBB380]">
-        {isSubmitted ? (
-          <div className="text-center">
-            <p className="text-green-600 font-semibold mb-4 text-2xl">
-              Thank you for donating goods!
+  if (!token) {
+    return (
+      <div className="flex min-h-screen">
+        <div className="hidden lg:flex lg:w-[40%] bg-[#311B08] flex-col items-center justify-center p-8 text-white">
+          <div className="text-center space-y-6">
+            <h1 className="text-3xl font-bold mb-4">Welcome Back</h1>
+            <p className="text-lg opacity-90">
+              Support disaster relief efforts by donating essential goods
             </p>
-            <Link
-              to="/donate"
-              className="inline-block bg-[#311B08] text-white px-6 py-3 rounded-lg hover:bg-[#4a2c12] transition-transform transform hover:scale-105"
-            >
-              Back to Donation Page
-            </Link>
+            <p className="text-sm opacity-75">
+              Your donations provide immediate relief to those in need.
+            </p>
           </div>
-        ) : (
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && <p className="text-red-500 text-center">{error}</p>}
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
-              readOnly // Make the field non-editable
-            />
-            <input
-              type="email"
-              name="mail"
-              placeholder="Email Address"
-              value={formData.mail}
-              onChange={handleChange}
-              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
-              readOnly // Make the field non-editable
-            />
-            <input
-              type="text"
-              name="itemDescription"
-              placeholder="Item Description"
-              value={formData.itemDescription}
-              onChange={handleChange}
-              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
-              required
-            />
-            <input
-              type="number"
-              name="quantity"
-              placeholder="Quantity"
-              value={formData.quantity}
-              onChange={handleChange}
-              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
-              required
-            />
-            {/* District Dropdown (renamed as Pickup Location) */}
-            <select
-              name="pickUpLocation"
-              value={formData.pickUpLocation}
-              onChange={handleChange}
-              className="w-full p-4 rounded-xl bg-white text-[#311B08] border border-[#EBB380] focus:outline-none focus:ring-2 focus:ring-[#311B08] transition-all"
-              required
+        </div>
+
+        <div className="w-full lg:w-[60%] flex items-center justify-center bg-gray-50 p-4 lg:p-8">
+          <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+            <p className="text-xl lg:text-2xl font-bold text-gray-900 mb-4">
+              You need to be logged in to donate goods.
+            </p>
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full bg-[#311B08] text-white font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all mb-4"
             >
-              <option value="" disabled>Select Pickup Location</option>
-              {districts.map((district, index) => (
-                <option key={index} value={district.district}>
-                  {district.district}
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-between gap-6">
-              <Link
-                to="/donate"
-                className="w-1/2 bg-[#5A3A22] text-white p-4 rounded-xl hover:bg-[#4a2c12] transition-transform transform hover:scale-105 text-center"
+              Log In
+            </button>
+            <p className="text-gray-600">
+              Don't have an account?{" "}
+              <span
+                className="text-[#311B08] cursor-pointer hover:underline font-semibold"
+                onClick={() => navigate("/register")}
               >
-                Back
-              </Link>
-              <button
-                type="submit"
-                className="w-1/2 bg-[#311B08] text-white p-4 rounded-xl hover:bg-[#4a2c12] transition-transform transform hover:scale-105"
-              >
-                Submit
-              </button>
+                Create one
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen lg:h-screen overflow-hidden">
+      {/* Left Sidebar - Fixed width with proper constraints */}
+      <div className="hidden lg:flex lg:w-[45%] bg-[#311B08] flex-col items-center justify-center p-6 text-white overflow-hidden">
+        <div className="text-center flex flex-col items-center justify-center h-full max-w-full">
+          {/* Icon and Title in the same row */}
+          <div className="flex items-center justify-center mb-3">
+            <Package size={60} className="text-gray-300 mr-3 flex-shrink-0" />
+            <h1 className="text-2xl xl:text-3xl font-bold text-amber-500">Donate Goods</h1>
+          </div>
+
+          {/* Description */}
+          <p className="text-[1.3rem] opacity-90 leading-relaxed mx-4 text-center mb-6">
+            Your essential goods donations provide immediate relief to families in crisis.
+            Every item you donate helps someone rebuild their life after disaster strikes.
+          </p>
+
+          {/* Image with no extra spacing */}
+          <div className="w-[85%] h-[65%] flex items-center justify-center">
+            <img
+              src="/goods.png"
+              alt="Goods Donation"
+              className="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+
+          {/* Description at the bottom */}
+          <p className="text-[1.3rem] opacity-90 leading-relaxed mx-4 text-center mt-4">
+            Join compassionate donors providing essential supplies to communities in their time of greatest need.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Form Section - Fixed width with proper constraints */}
+      <div className="w-full lg:w-[55%] bg-gray-50 flex flex-col">
+        <div className="flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-8 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-10 lg:py-15 w-full max-h-full overflow-y-auto">
+
+              {/* Mobile header - only visible on small screens */}
+              <div className="lg:hidden text-center mb-4 sm:mb-6">
+                <div className="flex justify-center mb-3">
+                  <Package size={40} className="text-amber-500" />
+                </div>
+                <h1 className="text-[1.8rem] font-bold text-[#311B08] mb-2">Donate Goods</h1>
+                <p className="text-xl font-semibold text-gray-600 px-2">
+                  Provide essential goods to those in need.
+                </p>
+              </div>
+
+              {/* Back arrow and Create donation header */}
+              <div className="flex items-center mb-4 sm:mb-6 lg:mb-8">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="mr-3 p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                >
+                  <svg className="lg:mt-1 w-5 h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </button>
+                <h2 className="text-[1.3rem] xl:text-[1.9rem] font-bold text-[#311B08] flex-1 min-w-0">
+                  Donate your goods
+                </h2>
+              </div>
+
+              {isSubmitted && (
+                <div className="text-center py-8 sm:py-15 mb-6 sm:mb-8 rounded-lg bg-green-100 text-green-600">
+                  <p className="text-2xl font-semibold mb-4">Thank you for donating goods!</p>
+                  <Link
+                    to="/donate"
+                    className="inline-block bg-[#311B08] font-semibold hover:text-white text-amber-500 px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all"
+                  >
+                    Back to Donation Page
+                  </Link>
+                </div>
+              )}
+
+              {error && (
+                <div className="text-center p-4 mb-4 sm:mb-6 rounded-lg bg-red-100 text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
+
+              {!isSubmitted && (
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-base text-lg font-semibold text-gray-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      className="w-full px-3 px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base bg-gray-100"
+                      placeholder="Full Name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      readOnly
+                      required
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-base text-lg font-semibold text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="mail"
+                      className="w-full px-3 px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base bg-gray-100"
+                      placeholder="Email Address"
+                      value={formData.mail}
+                      onChange={handleChange}
+                      readOnly
+                      required
+                    />
+                  </div>
+
+                  {/* Item Description and Quantity */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-base text-lg font-semibold text-gray-700 mb-2">
+                        Item Description
+                      </label>
+                      <input
+                        type="text"
+                        name="itemDescription"
+                        className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base"
+                        placeholder="Item Description"
+                        value={formData.itemDescription}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-lg font-semibold text-gray-700 mb-2">
+                        Quantity
+                      </label>
+                      <input
+                        type="number"
+                        name="quantity"
+                        className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base"
+                        placeholder="Quantity"
+                        value={formData.quantity}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Division and District */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-lg font-semibold text-gray-700 mb-2">
+                        Division
+                      </label>
+                      <select
+                        name="division"
+                        value={selectedDivision}
+                        onChange={handleDivisionChange}
+                        className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base"
+                        required
+                      >
+                        <option value="" disabled>Select Division</option>
+                        {divisions.map((division) => (
+                          <option key={division.id} value={division.name}>
+                            {division.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-lg font-semibold text-gray-700 mb-2">
+                        Pickup Location
+                      </label>
+                      <select
+                        name="pickUpLocation"
+                        value={formData.pickUpLocation}
+                        onChange={handleChange}
+                        className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base disabled:bg-gray-100"
+                        required
+                        disabled={!selectedDivision}
+                      >
+                        <option value="" disabled>Select Pickup Location</option>
+                        {districts.map((district) => (
+                          <option key={district.id} value={district.name}>
+                            {district.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-2 sm:pt-4">
+                    <button
+                      type="submit"
+                      className="w-full bg-[#311B08] text-lg lg:text-xl font-semibold text-amber-500 py-4 lg:py-5 px-6 rounded-lg hover:bg-[#EBB380] hover:text-[#311B08] transition-all"
+                    >
+                      Submit Donation
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-          </form>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

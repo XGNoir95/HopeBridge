@@ -53,43 +53,43 @@ const Navbar = () => {
         <div
           className={`absolute md:static top-16 right-4 bg-[#311B08] w-48 md:w-auto rounded-lg md:flex md:space-x-10 p-4 md:p-0 shadow-lg md:shadow-none transition-all duration-300 ease-in-out ${isOpen ? "block" : "hidden"}`}
         >
-          <Link to="/" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+          <Link to="/" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
             Home
           </Link>
-          <Link to="/alerts" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+          <Link to="/alerts" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
             Alerts
           </Link>
-          <Link to="/relief" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+          <Link to="/relief" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
             Relief
           </Link>
-          <Link to="/safeguard" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+          <Link to="/safeguard" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
             Safeguard
           </Link>
 
           {isAuthenticated ? (
             <>
               {role === "admin" ? (
-                <Link to="/admin-dashboard" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+                <Link to="/admin-dashboard" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
                   Admin Panel
                 </Link>
               ) : (
-                <Link to="/profile" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+                <Link to="/profile" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
                   Profile
                 </Link>
               )}
               <button
                 onClick={handleLogout}
-                className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0"
+                className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+              <Link to="/login" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
                 Login
               </Link>
-              <Link to="/register" className="block md:inline text-xl text-[#EBB380] transition-colors p-2 md:p-0">
+              <Link to="/register" className="block md:inline text-xl text-amber-500 hover:font-bold transition-colors p-2 md:p-0">
                 Register
               </Link>
             </>

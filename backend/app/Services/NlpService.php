@@ -141,36 +141,36 @@ class NlpService
                 ],
             ],
         ],
-        'adminDashboard' => [
-            'keywords' => ['admin', 'admin dashboard'],
-            'responses' => [
-                [
-                    'text' => 'Admin dashboard is here.',
-                    'link' => '/admin-dashboard',
-                    'linkText' => 'Go to Admin Dashboard',
-                ],
-            ],
-        ],
-        'allReports' => [
-            'keywords' => ['all reports', 'see all reports'],
-            'responses' => [
-                [
-                    'text' => 'Admins can see all reports here.',
-                    'link' => '/all-reports',
-                    'linkText' => 'View All Reports',
-                ],
-            ],
-        ],
-        'uploadVlogs' => [
-            'keywords' => ['upload vlogs', 'add vlog'],
-            'responses' => [
-                [
-                    'text' => 'Upload your vlogs here.',
-                    'link' => '/upload-vlogs',
-                    'linkText' => 'Upload Vlogs',
-                ],
-            ],
-        ],
+        // 'adminDashboard' => [
+        //     'keywords' => ['admin', 'admin dashboard'],
+        //     'responses' => [
+        //         [
+        //             'text' => 'Admin dashboard is here.',
+        //             'link' => '/admin-dashboard',
+        //             'linkText' => 'Go to Admin Dashboard',
+        //         ],
+        //     ],
+        // ],
+        // 'allReports' => [
+        //     'keywords' => ['all reports', 'see all reports'],
+        //     'responses' => [
+        //         [
+        //             'text' => 'Admins can see all reports here.',
+        //             'link' => '/all-reports',
+        //             'linkText' => 'View All Reports',
+        //         ],
+        //     ],
+        // ],
+        // 'uploadVlogs' => [
+        //     'keywords' => ['upload vlogs', 'add vlog'],
+        //     'responses' => [
+        //         [
+        //             'text' => 'Upload your vlogs here.',
+        //             'link' => '/upload-vlogs',
+        //             'linkText' => 'Upload Vlogs',
+        //         ],
+        //     ],
+        // ],
         'volunteers' => [
             'keywords' => ['volunteers', 'helping people', 'join volunteers'],
             'responses' => [

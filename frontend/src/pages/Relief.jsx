@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { ChevronLeft, ChevronRight, Network } from "lucide-react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import { useNavigate } from "react-router-dom";
 
 // Custom Arrow Components
 const CustomPrevArrow = (props) => (
@@ -40,19 +40,63 @@ const Relief = () => {
   const [totalDonatedAmount, setTotalDonatedAmount] = useState(0);
   const [loadingDonatedAmount, setLoadingDonatedAmount] = useState(true);
   const [errorDonatedAmount, setErrorDonatedAmount] = useState(null);
+  const [divisions, setDivisions] = useState([]);
   const [districts, setDistricts] = useState([]);
+  const [allDistricts, setAllDistricts] = useState([]);
+  const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  const navigate = useNavigate(); // Initialize useNavigate for redirection
+  const [selectedBloodType, setSelectedBloodType] = useState("");
+  
+  const navigate = useNavigate();
+  const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
-  // Fetch districts
+  // Fetch divisions and districts
   useEffect(() => {
-    axios.get("https://bdapis.com/api/v1.2/districts")
-      .then((response) => {
-        const districtNames = response.data.data.map((item) => item.district);
-        setDistricts(districtNames);
-      })
-      .catch((error) => console.error("Error fetching districts:", error));
+    const fetchDivisionsAndDistricts = async () => {
+      try {
+        const divisionsResponse = await axios.get("https://bdapi.vercel.app/api/v.1/division");
+        setDivisions(divisionsResponse.data.data);
+        
+        const allDistrictsData = [];
+        for (const division of divisionsResponse.data.data) {
+          const districtsResponse = await axios.get(
+            `https://bdapi.vercel.app/api/v.1/district/${division.id}`
+          );
+          
+          // Add division info to each district
+          const districtsWithDivision = districtsResponse.data.data.map(district => ({
+            ...district,
+            divisionId: division.id,
+            divisionName: division.name
+          }));
+          
+          allDistrictsData.push(...districtsWithDivision);
+        }
+
+        setAllDistricts(allDistrictsData);
+      } catch (error) {
+        console.error("Error fetching districts:", error);
+      }
+    };
+
+    fetchDivisionsAndDistricts();
   }, []);
+
+  // Update districts when division changes
+  useEffect(() => {
+    if (selectedDivision) {
+      const selectedDivisionObj = divisions.find(div => div.name === selectedDivision);
+      if (selectedDivisionObj) {
+        const filteredDistricts = allDistricts.filter(district => 
+          district.divisionId === selectedDivisionObj.id
+        );
+        setDistricts(filteredDistricts.map(district => district.name));
+      }
+    } else {
+      setDistricts([]);
+    }
+    setSelectedDistrict(""); // Reset district when division changes
+  }, [selectedDivision, allDistricts, divisions]);
 
   // Fetch donor data
   useEffect(() => {
@@ -139,23 +183,54 @@ const Relief = () => {
     fetchVolunteers();
   }, []);
 
-  // Filter data based on the selected district
-  const filteredResources = selectedDistrict
-    ? resources.filter((resource) =>
-        resource.pickUpLocation.toLowerCase().includes(selectedDistrict.toLowerCase())
-      )
+  // Filter data based on selections
+  const filteredResources = selectedDivision || selectedDistrict
+    ? resources.filter((resource) => {
+        const divisionMatch = selectedDivision && !selectedDistrict
+          ? resource.pickUpLocation.toLowerCase().includes(selectedDivision.toLowerCase())
+          : true;
+        const districtMatch = selectedDistrict
+          ? resource.pickUpLocation.toLowerCase().includes(selectedDistrict.toLowerCase())
+          : divisionMatch;
+        return districtMatch;
+      })
     : resources;
 
-  const filteredDonors = selectedDistrict
-    ? donors.filter((donor) =>
-        donor.district.toLowerCase().includes(selectedDistrict.toLowerCase())
-      )
+  const filteredDonors = selectedDivision || selectedDistrict || selectedBloodType
+    ? donors.filter((donor) => {
+        const divisionMatch = selectedDivision && !selectedDistrict
+          ? donor.district.toLowerCase().includes(selectedDivision.toLowerCase()) ||
+            // Check if donor's district belongs to selected division
+            allDistricts.some(dist => 
+              dist.name.toLowerCase() === donor.district.toLowerCase() && 
+              divisions.some(div => div.id === dist.divisionId && div.name === selectedDivision)
+            )
+          : true;
+        const districtMatch = selectedDistrict
+          ? donor.district.toLowerCase().includes(selectedDistrict.toLowerCase())
+          : divisionMatch;
+        const bloodMatch = selectedBloodType
+          ? donor.blood_group === selectedBloodType
+          : true;
+        return districtMatch && bloodMatch;
+      })
     : donors;
 
-  const filteredVolunteers = selectedDistrict
-    ? volunteers.filter((volunteer) =>
-        volunteer.District.toLowerCase().includes(selectedDistrict.toLowerCase())
-      )
+  const filteredVolunteers = selectedDivision || selectedDistrict
+    ? volunteers.filter((volunteer) => {
+        const divisionMatch = selectedDivision && !selectedDistrict
+          ? volunteer.District.toLowerCase().includes(selectedDivision.toLowerCase()) ||
+            // Check if volunteer's district belongs to selected division
+            allDistricts.some(dist => 
+              dist.name.toLowerCase() === volunteer.District.toLowerCase() && 
+              divisions.some(div => div.id === dist.divisionId && div.name === selectedDivision)
+            )
+          : true;
+        const districtMatch = selectedDistrict
+          ? volunteer.District.toLowerCase().includes(selectedDistrict.toLowerCase())
+          : divisionMatch;
+        return districtMatch;
+      })
     : volunteers;
 
   // Slider settings
@@ -184,10 +259,11 @@ const Relief = () => {
     ],
   });
 
-  // Handle reset button click
+  // Handle reset
   const handleReset = () => {
-    setSelectedDistrict(""); // Clear the selected district
-    window.location.reload(); // Reload the page
+    setSelectedDivision("");
+    setSelectedDistrict("");
+    setSelectedBloodType("");
   };
 
   return (
@@ -203,33 +279,77 @@ const Relief = () => {
         </p>
       </header>
 
-      {/* District Dropdown and Reset Button */}
-      <div className="my-10 flex justify-center mb-10 gap-4">
-        <select
-          className="border border-gray-300 p-4 rounded-xl w-full max-w-lg shadow-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
-          value={selectedDistrict}
-          onChange={(e) => setSelectedDistrict(e.target.value)}
-        >
-          <option value="" disabled>Select District</option>
-          {districts.map((district, index) => (
-            <option key={index} value={district}>
-              {district}
-            </option>
-          ))}
-        </select>
+      <div className="container mx-auto px-6 py-8">
+        {/* Navigation to Shelter Page */}
+        <div className="flex justify-center mb-8 text-[1.2rem]">
+          <div className="bg-gray-100 p-1 rounded-lg">
+            <span className="px-10 py-3 rounded-lg font-semibold bg-[#311B08] text-amber-500">
+              Resources & Donors
+            </span>
+            <button
+              onClick={() => navigate("/shelter")}
+              className="px-10 py-3 rounded-lg font-semibold text-gray-600 hover:text-gray-800 transition-colors duration-300"
+            >
+              Emergency Shelters
+            </button>
+          </div>
+        </div>
 
-        <button
-          onClick={handleReset}
-          className="bg-[#311B08] text-[#EBB380] px-6 py-2 rounded-xl font-semibold hover:bg-amber-900 transition-colors duration-300"
-        >
-          Reset
-        </button>
-      </div>
+        {/* Division, District and Blood Type Filters */}
+        <div className="mb-10">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            <select
+              className="border border-gray-300 p-4 rounded-xl flex-1 shadow-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+              value={selectedDivision}
+              onChange={(e) => setSelectedDivision(e.target.value)}
+            >
+              <option value="">All Divisions</option>
+              {divisions.map((division) => (
+                <option key={division.id} value={division.name}>
+                  {division.name}
+                </option>
+              ))}
+            </select>
 
-      <div className="container mx-auto px-6 py-auto">
+            <select
+              className="border border-gray-300 p-4 rounded-xl flex-1 shadow-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+              value={selectedDistrict}
+              onChange={(e) => setSelectedDistrict(e.target.value)}
+              disabled={!selectedDivision}
+            >
+              <option value="">{selectedDivision ? "All Districts" : "Select Division First"}</option>
+              {districts.map((district, index) => (
+                <option key={index} value={district}>
+                  {district}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="border border-gray-300 p-4 rounded-xl flex-1 shadow-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+              value={selectedBloodType}
+              onChange={(e) => setSelectedBloodType(e.target.value)}
+            >
+              <option value="">All Blood Types</option>
+              {bloodTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={handleReset}
+              className="bg-[#311B08] text-amber-500 px-8 py-4 rounded-xl font-semibold hover:underline text-lg transition-colors duration-300 whitespace-nowrap"
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
         {/* Total Donated Amount Section */}
         <div className="bg-[#311B08] text-white p-6 rounded-xl shadow-lg mb-10 text-center">
-          <h2 className="text-3xl font-extrabold mb-4">Total Funds Raised till now: </h2>
+          <h2 className="text-3xl font-extrabold mb-4">Total Funds Raised till now:</h2>
           {loadingDonatedAmount ? (
             <p className="text-gray-300">Loading donated amount...</p>
           ) : errorDonatedAmount ? (
@@ -262,7 +382,7 @@ const Relief = () => {
                       </p>
                       <p className="text-gray-600 text-lg font-semibold">Location: {resource.pickUpLocation}</p>
                       <button
-                        onClick={() => navigate("/contact-us")} // Redirect to ContactUs page
+                        onClick={() => navigate("/contact-us")}
                         className="bg-[#311B08] text-[#EBB380] px-5 py-2 mt-4 rounded-xl text-lg font-semibold hover:underline transition-colors duration-300"
                       >
                         Request
@@ -299,7 +419,7 @@ const Relief = () => {
                         Location: {donor.district}
                       </p>
                       <button
-                        onClick={() => navigate("/contact-us")} // Redirect to ContactUs page
+                        onClick={() => navigate("/contact-us")}
                         className="bg-[#311B08] text-[#EBB380] px-5 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
                       >
                         Contact
@@ -336,7 +456,7 @@ const Relief = () => {
                         Location: {volunteer.District}
                       </p>
                       <button
-                        onClick={() => navigate("/contact-us")} // Redirect to ContactUs page
+                        onClick={() => navigate("/contact-us")}
                         className="bg-[#311B08] text-[#EBB380] px-5 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
                       >
                         Contact

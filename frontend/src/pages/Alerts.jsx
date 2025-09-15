@@ -32,7 +32,7 @@ function Alerts() {
 
   useEffect(() => {
     axios
-      .get("https://bdapis.com/api/v1.2/divisions")
+      .get("https://bdapi.vercel.app/api/v.1/division")
       .then((response) => {
         setDivisions(response.data.data);
       })
@@ -43,17 +43,19 @@ function Alerts() {
 
   useEffect(() => {
     if (selectedDivision) {
-      axios
-        .get(`https://bdapis.com/api/v1.2/division/${selectedDivision}`)
-        .then((response) => {
-          const districtNames = response.data.data.map((item) => item.district);
-          setDistricts(districtNames);
-        })
-        .catch((error) => {
-          console.error("Error fetching districts:", error);
-        });
+      const divisionId = divisions.find(div => div.name === selectedDivision)?.id;
+      if (divisionId) {
+        axios
+          .get(`https://bdapi.vercel.app/api/v.1/district/${divisionId}`)
+          .then((response) => {
+            setDistricts(response.data.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching districts:", error);
+          });
+      }
     }
-  }, [selectedDivision]);
+  }, [selectedDivision, divisions]);
 
   const filteredPosts = disasterPosts.filter((post) => {
     const matchesSearch =
@@ -101,8 +103,8 @@ function Alerts() {
           >
             <option value="">Select Division</option>
             {divisions.map((division) => (
-              <option key={division.division} value={division.division}>
-                {division.division}
+              <option key={division.id} value={division.name}>
+                {division.name}
               </option>
             ))}
           </select>
@@ -114,9 +116,9 @@ function Alerts() {
             disabled={!selectedDivision}
           >
             <option value="">Select District</option>
-            {districts.map((district, index) => (
-              <option key={`${selectedDivision}-${district}-${index}`} value={district}>
-                {district}
+            {districts.map((district) => (
+              <option key={district.id} value={district.name}>
+                {district.name}
               </option>
             ))}
           </select>
@@ -130,7 +132,7 @@ function Alerts() {
             filteredPosts.map((post) => (
               <Link
                 key={post.id}
-                to={`/disaster-posts/${post.post_id}`} // No additional parameters are passed
+                to={`/disaster-posts/${post.post_id}`}
                 className="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:-translate-y-2 hover:shadow-2xl flex flex-col justify-between border-2 border-gray-200"
               >
                 <h2 className="text-2xl font-bold text-amber-900 text-center">{post.title}</h2>

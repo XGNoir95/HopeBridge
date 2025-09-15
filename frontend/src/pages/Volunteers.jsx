@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { Users } from "lucide-react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // For decoding the JWT token
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const Volunteers = () => {
   const [formData, setFormData] = useState({
@@ -10,12 +12,12 @@ const Volunteers = () => {
     division: "",
     district: "",
   });
-
   const [divisions, setDivisions] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const token = localStorage.getItem("token"); // Get the JWT token from local storage
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -24,23 +26,20 @@ const Volunteers = () => {
         if (!token) {
           throw new Error("No token found in localStorage");
         }
-
-        // Decode the token to get the user ID
+        
         const decodedToken = jwtDecode(token);
-        const userId = decodedToken.uid; // Assuming `uid` is the key for user_id in the token
-
+        const userId = decodedToken.uid;
+        
         if (!userId) {
           throw new Error("User ID not found in token");
         }
 
-        // Fetch user data from the API
         const response = await axios.get("http://localhost:8000/api/user", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        // Update formData with the user's data
         setFormData((prevData) => ({
           ...prevData,
           volunteerName: response.data.userName,
@@ -50,7 +49,6 @@ const Volunteers = () => {
           district: response.data.district,
         }));
 
-        // Fetch districts for the user's division
         if (response.data.division) {
           fetchDistricts(response.data.division);
         }
@@ -60,19 +58,23 @@ const Volunteers = () => {
       }
     };
 
-    fetchUserData();
+    if (token) {
+      fetchUserData();
+    }
   }, [token]);
 
   // Fetch divisions from API
   useEffect(() => {
-    axios
-      .get("https://bdapis.com/api/v1.2/divisions")
-      .then((response) => setDivisions(response.data.data))
-      .catch((error) => {
-        console.error("Error fetching divisions:", error);
-        setMessage("Failed to fetch divisions. Please try again later.");
-      });
-  }, []);
+    if (token) {
+      axios
+        .get("https://bdapis.com/api/v1.2/divisions")
+        .then((response) => setDivisions(response.data.data))
+        .catch((error) => {
+          console.error("Error fetching divisions:", error);
+          setMessage("Failed to fetch divisions. Please try again later.");
+        });
+    }
+  }, [token]);
 
   // Fetch districts from API
   const fetchDistricts = (division) => {
@@ -91,7 +93,7 @@ const Volunteers = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
+    
     if (name === "division") {
       setFormData({ ...formData, division: value, district: "" });
       fetchDistricts(value);
@@ -110,7 +112,6 @@ const Volunteers = () => {
     }
 
     try {
-      // Prepare the payload for the API request
       const payload = {
         volunteerName: formData.volunteerName,
         volunteerMail: formData.volunteerMail,
@@ -119,7 +120,6 @@ const Volunteers = () => {
         district: formData.district,
       };
 
-      // Submit the data to the backend
       const response = await axios.post(
         "http://localhost:8000/api/create-volunteer",
         payload,
@@ -149,105 +149,178 @@ const Volunteers = () => {
     setLoading(false);
   };
 
-  return (
-    <div className="py-20 relative flex size-full min-h-screen flex-col overflow-x-hidden bg-gray-100">
-      <div className="layout-container flex h-full grow flex-col items-center py-10">
-        {/* Wider Card Container */}
-        <div className="w-full md:w-[780px] max-w-[1024px] py-5 border border-amber-900 rounded-xl shadow-lg bg-white p-4 md:p-8">
-          <div className="flex flex-wrap justify-between gap-3 p-4">
-            <p className="text-2xl md:text-[32px] font-bold leading-tight text-gray-900 text-center md:text-left">
-              Join as a Volunteer
+  if (!token) {
+    return (
+      <div className="flex min-h-screen">
+        {/* Right Sidebar - Hidden on mobile */}
+        <div className="hidden lg:flex lg:w-[40%] bg-[#311B08] flex-col items-center justify-center p-8 text-white">
+          <div className="text-center space-y-6">
+            <h1 className="text-3xl font-bold mb-4">Welcome Back</h1>
+            <p className="text-lg opacity-90">
+              Join our volunteer community and make a difference
+            </p>
+            <p className="text-sm opacity-75">
+              Together we can help those in need during disasters.
             </p>
           </div>
-
-          {message && <p className="text-center text-green-500">{message}</p>}
-
-          <form onSubmit={handleSubmit} className="flex flex-col">
-            <label className="text-lg font-bold px-4 pb-2">Name</label>
-            <input
-              type="text"
-              name="volunteerName"
-              className="form-input w-full rounded-xl bg-gray-100 h-12 md:h-14 p-3 md:p-[15px] text-base"
-              placeholder="Enter your name"
-              value={formData.volunteerName}
-              onChange={handleChange}
-              required
-              readOnly // Make the field non-editable
-            />
-
-            <label className="text-lg font-bold px-4 pb-2 mt-4">Email</label>
-            <input
-              type="email"
-              name="volunteerMail"
-              className="form-input w-full rounded-xl bg-gray-100 h-12 md:h-14 p-3 md:p-[15px] text-base"
-              placeholder="Enter your email"
-              value={formData.volunteerMail}
-              onChange={handleChange}
-              required
-              readOnly // Make the field non-editable
-            />
-
-            <label className="text-lg font-bold px-4 pb-2 mt-4">Blood Group</label>
-            <input
-              type="text"
-              name="blood_group"
-              className="form-input w-full rounded-xl bg-gray-100 h-12 md:h-14 p-3 md:p-[15px] text-base"
-              placeholder="Enter your blood group"
-              value={formData.blood_group}
-              onChange={handleChange}
-              required
-              readOnly // Make the field non-editable
-            />
-
-            {/* <label className="text-lg font-bold px-4 pb-2 mt-4">Location</label>
-            <div className="flex flex-col md:flex-row gap-4">
-              <select
-                name="division"
-                className="w-full rounded-xl bg-gray-100 h-12 md:h-14 p-3 md:p-[15px] text-base"
-                value={formData.division}
-                onChange={handleChange}
-                required
-                readOnly // Make the field non-editable
+        </div>
+        {/* Left Content - Full width on mobile, 60% on desktop */}
+        <div className="w-full lg:w-[60%] flex items-center justify-center bg-gray-50 p-4 lg:p-8">
+          <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+            <p className="text-xl lg:text-2xl font-bold text-gray-900 mb-4">
+              You need to be logged in to join as a volunteer.
+            </p>
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full bg-[#311B08] text-white font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all mb-4"
+            >
+              Log In
+            </button>
+            <p className="text-gray-600">
+              Don't have an account?{" "}
+              <span
+                className="text-[#311B08] cursor-pointer hover:underline font-semibold"
+                onClick={() => navigate("/register")}
               >
-                <option value="" disabled>
-                  Select Division
-                </option>
-                {divisions.map((division, index) => (
-                  <option key={index} value={division.division}>
-                    {division.division}
-                  </option>
-                ))}
-              </select>
+                Create one
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-              <select
-                name="district"
-                className="w-full rounded-xl bg-gray-100 h-12 md:h-14 p-3 md:p-[15px] text-base disabled:bg-gray-300"
-                value={formData.district}
-                onChange={handleChange}
-                required
-                readOnly // Make the field non-editable
+  return (
+    <div className="flex h-auto">
+      {/* Left Form Section - Full width on mobile, 60% on desktop */}
+      <div className="w-full lg:w-[60%] bg-gray-50 py-20 lg:py-24">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-10 lg:py-14 w-full max-w-4xl mx-auto">
+            {/* Mobile header - only visible on small screens */}
+            <div className="lg:hidden text-center mb-8">
+              <div className="flex justify-center mb-3">
+                <Users size={50} className="text-amber-500" />
+              </div>
+              <h1 className="text-3xl font-bold text-[#311B08] mb-3">Join as a Volunteer</h1>
+              <p className="text-lg text-gray-600 px-2">
+                Make a difference in your community during disasters.
+              </p>
+            </div>
+
+            {/* Back arrow and Join volunteer header */}
+            <div className="flex items-center mb-6 lg:mb-8">
+              <button
+                onClick={() => navigate(-1)}
+                className="mr-4 p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <option value="" disabled>
-                  Select District
-                </option>
-                {districts.map((district, index) => (
-                  <option key={index} value={district}>
-                    {district}
-                  </option>
-                ))}
-              </select>
-            </div> */}
+                <svg className="mt-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </button>
+              <h2 className="text-xl lg:text-[1.7rem] font-bold text-[#311B08]">Join as a Volunteer</h2>
+            </div>
 
-            <div className="flex px-4 py-5 justify-center">
+            {message && (
+              <div className={`text-center p-3 mb-6 rounded-lg ${message.includes('successful') ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                {message}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-6">
+              {/* Name */}
+              <div>
+                <label className="block text-lg font-semibold text-gray-700 mb-2">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  name="volunteerName"
+                  className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base bg-gray-100"
+                  placeholder="Enter your name"
+                  value={formData.volunteerName}
+                  onChange={handleChange}
+                  required
+                  readOnly
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-lg font-semibold text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="volunteerMail"
+                  className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base bg-gray-100"
+                  placeholder="Enter your email"
+                  value={formData.volunteerMail}
+                  onChange={handleChange}
+                  required
+                  readOnly
+                />
+              </div>
+
+              {/* Blood Group */}
+              <div>
+                <label className="block text-lg font-semibold text-gray-700 mb-2">
+                  Blood Group
+                </label>
+                <input
+                  type="text"
+                  name="blood_group"
+                  className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base bg-gray-100"
+                  placeholder="Enter your blood group"
+                  value={formData.blood_group}
+                  onChange={handleChange}
+                  required
+                  readOnly
+                />
+              </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="text-white flex w-full md:w-[220px] h-12 md:h-14 cursor-pointer items-center justify-center rounded-xl bg-gradient-to-r from-amber-900 to-amber-600 text-lg font-bold hover:scale-105 transition-all"
+                className="w-full bg-[#311B08] text-lg font-semibold text-amber-500 hover:bg-[#EBB380] hover:text-[#311B08] p-4 rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Submitting..." : "Submit"}
+                {loading ? "Submitting..." : "Join as Volunteer"}
               </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Sidebar - Hidden on mobile and tablet, visible on large screens */}
+      <div className="hidden lg:flex lg:w-[40%] bg-[#311B08] items-center justify-center p-8 text-white py-20 lg:py-24">
+        <div className="text-center space-y-6 flex flex-col items-center justify-center">
+          {/* Icon */}
+          <div className="flex justify-center">
+            <Users size={80} className="text-gray-300" />
+          </div>
+          <h1 className="text-3xl xl:text-4xl font-bold text-amber-500">Join as a Volunteer</h1>
+          <p className="text-lg xl:text-xl opacity-90 leading-relaxed mx-8">
+            Volunteer registration enables community members to offer their time, skills, and resources to assist during disaster response and recovery efforts, creating a network of prepared and willing helpers.
+          </p>
+          <div className="space-y-4 text-left w-full max-w-md">
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-xl opacity-85">Help coordinate relief efforts in your community</p>
             </div>
-          </form>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-xl opacity-85">Provide essential support during emergencies</p>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-xl opacity-85">Connect with local disaster response teams</p>
+            </div>
+            <div className="flex items-start space-x-3">
+              <div className="w-2 h-2 bg-amber-500 rounded-full mt-2 flex-shrink-0"></div>
+              <p className="text-xl opacity-85">Make a meaningful difference when it matters most</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

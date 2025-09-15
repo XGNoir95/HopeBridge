@@ -25,7 +25,8 @@ import AllReports from "./components/AllReports";
 import UploadVlogs from "./components/UploadVlogs";
 import VlogDetails from "./pages/VlogDetails";
 import Volunteers from "./pages/Volunteers";
-import ContactUs from "./pages/ContactUs"; // Import the ContactUs component
+import ContactUs from "./pages/ContactUs"; 
+import Shelter from "./pages/Shelter";
 
 function App() {
   return (
@@ -56,7 +57,8 @@ function App() {
           <Route path="/upload-vlogs" element={<UploadVlogs />} />
           <Route path="/vlog-details/:id" element={<VlogDetails />} />
           <Route path="/volunteers" element={<Volunteers />} />
-          <Route path="/contact-us" element={<ContactUs />} /> {/* Add the ContactUs route */}
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/shelter" element={<Shelter />} />
         </Routes>
         <Footer />
       </div>

@@ -50,7 +50,7 @@ const Map = () => {
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© Adnan Shahriar',
+      attribution: '© HopeBridge, XGNoir95',
     }).addTo(map);
 
     // Prepare heatmap data
@@ -64,7 +64,7 @@ const Map = () => {
     L.heatLayer(heatmapData, {
       radius: 70,
       blur: 30,
-      maxZoom: 13,
+      maxZoom: 12,
      // minOpacity: 0.1,
     }).addTo(map);
 
@@ -87,7 +87,7 @@ const Map = () => {
       <p className="text-gray-600 mb-8 text-xl">
         Visualizing disaster data across different divisions in Bangladesh.
       </p>
-      <div id="map" style={{ height: '700px', width: '100%', maxWidth: '1200px', borderRadius: '10px', overflow: 'hidden' }}></div>
+      <div id="map" style={{ height: '700px', width: '100%', maxWidth: '1450px', borderRadius: '10px', overflow: 'hidden' }}></div>
     </div>
   );
 };
