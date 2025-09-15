@@ -10,20 +10,20 @@ function Login() {
         <h1 className="text-4xl xl:text-[2.7rem] font-bold text-amber-500 mb-4 text-center mb-2">
           Welcome To HopeBridge
         </h1>
-        
+
         {/* Description Text */}
-<p className="mt-8 text-[1.2rem] text-gray-300 opacity-90 mb-8 text-center px-8 max-w-8xl">
-  Sign in to continue your mission of helping communities during disasters and emergencies.
-  Your dedicated service connects people in crisis with the support they need most.
-</p>
-        
+        <p className="mt-8 text-[1.2rem] text-gray-300 opacity-90 mb-8 text-center px-8 max-w-8xl">
+          Sign in to continue your mission of helping communities during disasters and emergencies.
+          Your dedicated service connects people in crisis with the support they need most.
+        </p>
+
         {/* Image */}
         <img
           src="/login.png"
           alt="Disaster Relief"
           className="w-[85%] h-[65%] object-cover rounded-lg"
         />
-        
+
         <p className="mt-8 text-[1.2rem] text-gray-300 opacity-90 mb-8 text-center px-8 max-w-8xl">
           Your community needs you. Log in and continue making a difference in disaster response.
         </p>

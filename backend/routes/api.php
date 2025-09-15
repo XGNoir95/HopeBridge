@@ -91,8 +91,6 @@ Route::post('/create-volunteer',[ShelterController::class,'storeVolunteer'])->mi
 Route::delete('/volunteer/{id}',[ShelterController::class,'destroyVolunteer']);
 
 //chatbot route
-Route::middleware(['chatbot.limit'])->group(function () {
-    Route::post('/chat', [ChatbotController::class, 'handle']);
-    Route::get('/chat/messages', [ChatbotController::class, 'index']);
-    Route::get('/chat/messages/{id}', [ChatbotController::class, 'show']);
-});
+Route::post('/chat', [ChatbotController::class, 'handle']);
+Route::get('/chat/messages', [ChatbotController::class, 'index']);
+Route::get('/chat/messages/{id}', [ChatbotController::class, 'show']);

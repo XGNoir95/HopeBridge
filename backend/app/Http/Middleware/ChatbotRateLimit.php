@@ -12,22 +12,22 @@ class ChatbotRateLimit
     {
         $user = $request->user();
         $identifier = $user ? 'user:' . $user->id : 'ip:' . $request->ip();
-
-        $maxRequests = 5;
+        
+        $maxRequests = 10; // Increased for better UX
         $decayMinutes = 1;
-
+        
         $key = 'chatbot-rate-limit:' . $identifier;
-
         $requests = Cache::get($key, 0);
-
+        
         if ($requests >= $maxRequests) {
             return response()->json([
+                'success' => false,
                 'message' => 'Too many requests. Please try again later.'
             ], 429);
         }
-
+        
         Cache::put($key, $requests + 1, now()->addMinutes($decayMinutes));
-
+        
         return $next($request);
     }
 }

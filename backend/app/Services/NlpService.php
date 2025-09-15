@@ -12,7 +12,7 @@ class NlpService
             ],
         ],
         'login' => [
-            'keywords' => ['how to login', 'sign in', 'access account'],
+            'keywords' => ['how to login', 'sign in', 'access account','login'],
             'responses' => [
                 [
                     'text' => 'You can log in to your account here.',
@@ -62,7 +62,7 @@ class NlpService
             ],
         ],
         'report' => [
-            'keywords' => ['report disaster', 'file a report', 'incident report'],
+            'keywords' => ['report disaster', 'file a report', 'incident report', 'report'],
             'responses' => [
                 [
                     'text' => 'You can report an incident here.',
@@ -126,7 +126,7 @@ class NlpService
             'responses' => [
                 [
                     'text' => 'You can edit your profile details here.',
-                    'link' => '/edit-profile',
+                    'link' => '/profile',
                     'linkText' => 'Edit Profile',
                 ],
             ],
@@ -136,7 +136,7 @@ class NlpService
             'responses' => [
                 [
                     'text' => 'You can see all your submitted reports here.',
-                    'link' => '/my-reports',
+                    'link' => '/profile',
                     'linkText' => 'View My Reports',
                 ],
             ],

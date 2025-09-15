@@ -37,25 +37,30 @@ class AuthController extends Controller
     }
 
     // User Login
-    public function login(Request $request)
-    {
-        $admin = $this->AdminService->loginGo($request);
-        $user = $this->UserService->loginGo($request);
-        $role = null;
+public function login(Request $request)
+{
+    $admin = $this->AdminService->loginGo($request);
+    $user = $this->UserService->loginGo($request);
+    $role = null;
+    $userData = null; // Add this line
 
-        if ($admin) {
-            $role = 'admin';
-            $token = $this->UserService->getToken($admin->admin_id, $role);
-        } elseif ($user) {
-            $role = 'user';
-            $token = $this->UserService->getToken($user->user_id, $role);
-        } else {
-            return response()->json(['message' => 'Invalid credentials'], 401);
-        }
-
-        return response()->json([
-            'token' => $token,
-            'role' => $role,
-        ]);
+    if ($admin) {
+        $role = 'admin';
+        $token = $this->UserService->getToken($admin->admin_id, $role);
+        $userData = $admin; // Add this line
+    } elseif ($user) {
+        $role = 'user';
+        $token = $this->UserService->getToken($user->user_id, $role);
+        $userData = $user; // Add this line
+    } else {
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
+
+    return response()->json([
+        'token' => $token,
+        'role' => $role,
+        'user' => $userData, // Add this line
+    ]);
+}
+
 }

@@ -3,6 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import ChatBot from "./components/ChatBot";
+import ProtectedRoute from "./components/ProtectedRoute";
+import GuestRoute from "./components/GuestRoute";
+
+// Import all your pages
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
@@ -35,32 +40,119 @@ function App() {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <Routes>
+          {/* Public Routes - Accessible to everyone */}
           <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/relief" element={<Relief />} />
           <Route path="/safeguard" element={<Safeguard />} />
-          <Route path="/report" element={<Report />} />
           <Route path="/donate" element={<DonationPage />} />
           <Route path="/donate-money" element={<DonateMoney />} />
           <Route path="/donate-blood" element={<DonateBlood />} />
           <Route path="/donate-goods" element={<DonateGoods />} />
           <Route path="/disaster-posts/:post_id" element={<DisasterPostDetail />} />
-          <Route path="/edit-profile" element={<EditProfile />} />
-          <Route path="/my-reports" element={<MyReports />} />
-          <Route path="/profile-info" element={<ProfileInfo />} />
-          <Route path="/admin-dashboard" element={<AdminProfile />} />
-          <Route path="/admin-info" element={<AdminInfo />} />
-          <Route path="/all-reports" element={<AllReports />} />
-          <Route path="/upload-vlogs" element={<UploadVlogs />} />
           <Route path="/vlog-details/:id" element={<VlogDetails />} />
           <Route path="/volunteers" element={<Volunteers />} />
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/shelter" element={<Shelter />} />
+
+          {/* Guest Only Routes - Only for unauthenticated users */}
+          <Route 
+            path="/login" 
+            element={
+              <GuestRoute>
+                <Login />
+              </GuestRoute>
+            } 
+          />
+          <Route 
+            path="/register" 
+            element={
+              <GuestRoute>
+                <Register />
+              </GuestRoute>
+            } 
+          />
+
+          {/* USER ONLY Routes - Only for regular users */}
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute allowedRoles={['user']} fallbackPath="/admin-dashboard">
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile-info" 
+            element={
+              <ProtectedRoute allowedRoles={['user']} fallbackPath="/admin-dashboard">
+                <ProfileInfo />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/edit-profile" 
+            element={
+              <ProtectedRoute allowedRoles={['user']} fallbackPath="/admin-dashboard">
+                <EditProfile />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* SHARED Routes - Both user and admin can access */}
+          <Route 
+            path="/report" 
+            element={
+              <ProtectedRoute allowedRoles={['user', 'admin']}>
+                <Report />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/my-reports" 
+            element={
+              <ProtectedRoute allowedRoles={['user', 'admin']}>
+                <MyReports />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* ADMIN ONLY Routes - Only for admin users */}
+          <Route 
+            path="/admin-dashboard" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']} fallbackPath="/profile">
+                <AdminProfile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin-info" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']} fallbackPath="/profile">
+                <AdminInfo />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/all-reports" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']} fallbackPath="/profile">
+                <AllReports />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/upload-vlogs" 
+            element={
+              <ProtectedRoute allowedRoles={['admin']} fallbackPath="/profile">
+                <UploadVlogs />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
         <Footer />
+        <ChatBot />
       </div>
     </Router>
   );

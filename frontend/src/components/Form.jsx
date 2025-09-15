@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import axios from "axios";
 
 export default function Form() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [token, setToken] = useState(null);
-  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setToken(null);
-    setRole(null);
+    setLoading(true);
 
     try {
       const response = await axios.post("http://localhost:8000/api/login", {
@@ -22,17 +22,18 @@ export default function Form() {
         password: password,
       });
 
-      const { token: receivedToken, role: userRole } = response.data;
+      console.log('Login response:', response.data);
+
+      const { token: receivedToken, role: userRole, user } = response.data;
 
       if (receivedToken && userRole) {
-        localStorage.setItem("token", receivedToken);
-        localStorage.setItem("role", userRole);
-        setToken(receivedToken);
-        setRole(userRole);
+        // Store user_id based on role
+        const userId = userRole === 'admin' ? user.admin_id : user.user_id;
+        
+        // Use the auth hook's login method
+        login(receivedToken, userRole, userId);
 
-        // Dispatch a storage event to notify other components
-        window.dispatchEvent(new Event("storage"));
-
+        // Navigate based on role
         navigate(userRole === "admin" ? "/admin-dashboard" : "/");
       } else {
         setError("Invalid response from the server.");
@@ -40,6 +41,8 @@ export default function Form() {
     } catch (err) {
       setError("Invalid credentials. Please try again.");
       console.error("Login error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,6 +64,7 @@ export default function Form() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
@@ -74,6 +78,7 @@ export default function Form() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={loading}
           />
         </div>
 
@@ -81,9 +86,10 @@ export default function Form() {
         <div className="mt-12">
           <button
             type="submit"
-            className="w-full bg-[#311B08] text-amber-500 hover:bg-[#EBB380] hover:text-[#311B08] text-xl font-bold p-4 rounded-xl transition-all"
+            disabled={loading}
+            className="w-full bg-[#311B08] text-amber-500 hover:bg-[#EBB380] hover:text-[#311B08] text-xl font-bold p-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </div>
 
@@ -92,8 +98,8 @@ export default function Form() {
           <p className="text-gray-600">
             Don't have an account?{" "}
             <span
-              onClick={() => navigate("/register")}
-              className="text-[#311B08] cursor-pointer hover:underline font-bold"
+              onClick={() => !loading && navigate("/register")}
+              className={`text-[#311B08] cursor-pointer hover:underline font-bold ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Sign up
             </span>
@@ -104,12 +110,6 @@ export default function Form() {
       {error && (
         <div className="text-red-500 text-center mt-4 p-3 bg-red-50 rounded-lg">
           <p>{error}</p>
-        </div>
-      )}
-      {token && (
-        <div className="text-green-600 text-center mt-4 p-3 bg-green-50 rounded-lg break-all">
-          <p>Login successful!</p>
-          <p className="text-sm">Role: {role}</p>
         </div>
       )}
     </div>
