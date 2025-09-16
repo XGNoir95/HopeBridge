@@ -20,6 +20,8 @@ class CreateAvailableResourcesTable extends Migration
             $table->string('itemDescription');
             $table->integer('quantity');
             $table->string('pickUpLocation');
+            $table->date('pickUpDate');
+            $table->date('expirationDate')->nullable();
             $table->timestamps();
         });
     }
