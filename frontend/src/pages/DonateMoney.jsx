@@ -159,7 +159,7 @@ const DonateMoney = () => {
   }
 
   return (
-    <div className="flex min-h-screen lg:h-screen overflow-hidden">
+    <div className="flex min-h-screen">
       {/* Left Sidebar - Fixed width with proper constraints */}
       <div className="hidden lg:flex lg:w-[45%] bg-[#311B08] flex-col items-center justify-center p-6 text-white overflow-hidden">
         <div className="text-center flex flex-col items-center justify-center h-full max-w-full">
@@ -193,9 +193,9 @@ const DonateMoney = () => {
 
       {/* Right Form Section - Fixed width with proper constraints */}
       <div className="w-full lg:w-[55%] bg-gray-50 flex flex-col">
-        <div className="flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-6 px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-10 lg:py-15 w-full max-h-full overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 w-full">
 
               {/* Mobile header - only visible on small screens */}
               <div className="lg:hidden text-center mb-4 sm:mb-6">
@@ -235,7 +235,7 @@ const DonateMoney = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                 {/* Full Name */}
                 <div>
                   <label className="block text-lg font-semibold text-gray-700 mb-2">
@@ -318,17 +318,17 @@ const DonateMoney = () => {
                     <option value="" disabled>Select Payment Method</option>
                     <option value="bkash">Bkash</option>
                     <option value="nagad">Nagad</option>
-                    <option value="credit">Credit Card</option>
                     <option value="rocket">Rocket</option>
+                    <option value="credit">Credit Card</option>
                   </select>
                 </div>
 
                 {/* Submit Button */}
-                <div className="pt-2 sm:pt-4">
+                <div className="pt-2 sm:pt-3">
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#311B08] text-lg lg:text-xl font-semibold text-amber-500 py-4 lg:py-5 px-6 rounded-lg hover:bg-[#EBB380] hover:text-[#311B08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-[#311B08] text-lg lg:text-xl font-semibold text-amber-500 py-4 lg:py-4 px-6 rounded-lg hover:bg-[#EBB380] hover:text-[#311B08] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? "Processing..." : "Donate Now"}
                   </button>

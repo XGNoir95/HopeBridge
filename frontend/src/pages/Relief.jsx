@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { ChevronLeft, ChevronRight, Network } from "lucide-react";
+import { ChevronLeft, ChevronRight, Network, Clock, AlertTriangle, Filter, Droplet } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -46,9 +46,47 @@ const Relief = () => {
   const [selectedDivision, setSelectedDivision] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedBloodType, setSelectedBloodType] = useState("");
+  const [resourceFilter, setResourceFilter] = useState("available");
   
   const navigate = useNavigate();
   const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+
+  // Get current date in Bangladesh timezone (UTC+6)
+  const getCurrentBDTDate = () => {
+    const now = new Date();
+    const bdtOffset = 6 * 60; // 6 hours in minutes
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const bdtTime = new Date(utc + (bdtOffset * 60000));
+    return bdtTime.toISOString().split('T')[0]; // YYYY-MM-DD format
+  };
+
+  // Check if item is expired
+  const isExpired = (expirationDate) => {
+    if (!expirationDate) return false;
+    const currentDate = getCurrentBDTDate();
+    return expirationDate <= currentDate;
+  };
+
+  // Get days until expiry
+  const getDaysUntilExpiry = (expirationDate) => {
+    if (!expirationDate) return null;
+    const currentDate = new Date(getCurrentBDTDate());
+    const expiryDate = new Date(expirationDate);
+    const timeDifference = expiryDate.getTime() - currentDate.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    return daysDifference;
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return "No expiry date";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
 
   // Fetch divisions and districts
   useEffect(() => {
@@ -63,7 +101,6 @@ const Relief = () => {
             `https://bdapi.vercel.app/api/v.1/district/${division.id}`
           );
           
-          // Add division info to each district
           const districtsWithDivision = districtsResponse.data.data.map(district => ({
             ...district,
             divisionId: division.id,
@@ -183,9 +220,13 @@ const Relief = () => {
     fetchVolunteers();
   }, []);
 
-  // Filter data based on selections
-  const filteredResources = selectedDivision || selectedDistrict
-    ? resources.filter((resource) => {
+  // Filter data based on selections and expiry status
+  const getFilteredResources = () => {
+    let filtered = resources;
+
+    // Apply location filters
+    if (selectedDivision || selectedDistrict) {
+      filtered = filtered.filter((resource) => {
         const divisionMatch = selectedDivision && !selectedDistrict
           ? resource.pickUpLocation.toLowerCase().includes(selectedDivision.toLowerCase())
           : true;
@@ -193,14 +234,24 @@ const Relief = () => {
           ? resource.pickUpLocation.toLowerCase().includes(selectedDistrict.toLowerCase())
           : divisionMatch;
         return districtMatch;
-      })
-    : resources;
+      });
+    }
+
+    // Apply expiry filter
+    if (resourceFilter === "available") {
+      filtered = filtered.filter(resource => !isExpired(resource.expirationDate));
+    }
+    // For "all" filter, we don't filter anything (show both expired and non-expired)
+
+    return filtered;
+  };
+
+  const filteredResources = getFilteredResources();
 
   const filteredDonors = selectedDivision || selectedDistrict || selectedBloodType
     ? donors.filter((donor) => {
         const divisionMatch = selectedDivision && !selectedDistrict
           ? donor.district.toLowerCase().includes(selectedDivision.toLowerCase()) ||
-            // Check if donor's district belongs to selected division
             allDistricts.some(dist => 
               dist.name.toLowerCase() === donor.district.toLowerCase() && 
               divisions.some(div => div.id === dist.divisionId && div.name === selectedDivision)
@@ -220,7 +271,6 @@ const Relief = () => {
     ? volunteers.filter((volunteer) => {
         const divisionMatch = selectedDivision && !selectedDistrict
           ? volunteer.District.toLowerCase().includes(selectedDivision.toLowerCase()) ||
-            // Check if volunteer's district belongs to selected division
             allDistricts.some(dist => 
               dist.name.toLowerCase() === volunteer.District.toLowerCase() && 
               divisions.some(div => div.id === dist.divisionId && div.name === selectedDivision)
@@ -264,7 +314,57 @@ const Relief = () => {
     setSelectedDivision("");
     setSelectedDistrict("");
     setSelectedBloodType("");
+    setResourceFilter("available"); // Reset to default
   };
+
+  // Get count of expired vs available resources
+  const getResourceCounts = () => {
+    const allResources = selectedDivision || selectedDistrict
+      ? resources.filter((resource) => {
+          const divisionMatch = selectedDivision && !selectedDistrict
+            ? resource.pickUpLocation.toLowerCase().includes(selectedDivision.toLowerCase())
+            : true;
+          const districtMatch = selectedDistrict
+            ? resource.pickUpLocation.toLowerCase().includes(selectedDistrict.toLowerCase())
+            : divisionMatch;
+          return districtMatch;
+        })
+      : resources;
+
+    const availableCount = allResources.filter(resource => !isExpired(resource.expirationDate)).length;
+    const expiredCount = allResources.filter(resource => isExpired(resource.expirationDate)).length;
+    
+    return { availableCount, expiredCount, totalCount: allResources.length };
+  };
+
+  // Get donor counts by blood type
+  const getDonorCounts = () => {
+    const locationFilteredDonors = selectedDivision || selectedDistrict
+      ? donors.filter((donor) => {
+          const divisionMatch = selectedDivision && !selectedDistrict
+            ? donor.district.toLowerCase().includes(selectedDivision.toLowerCase()) ||
+              allDistricts.some(dist => 
+                dist.name.toLowerCase() === donor.district.toLowerCase() && 
+                divisions.some(div => div.id === dist.divisionId && div.name === selectedDivision)
+              )
+            : true;
+          const districtMatch = selectedDistrict
+            ? donor.district.toLowerCase().includes(selectedDistrict.toLowerCase())
+            : divisionMatch;
+          return districtMatch;
+        })
+      : donors;
+
+    const totalCount = locationFilteredDonors.length;
+    const bloodTypeCount = selectedBloodType 
+      ? locationFilteredDonors.filter(donor => donor.blood_group === selectedBloodType).length
+      : totalCount;
+
+    return { totalCount, bloodTypeCount, selectedBloodType };
+  };
+
+  const resourceCounts = getResourceCounts();
+  const donorCounts = getDonorCounts();
 
   return (
     <div className="bg-white min-h-screen">
@@ -295,7 +395,7 @@ const Relief = () => {
           </div>
         </div>
 
-        {/* Division, District and Blood Type Filters */}
+        {/* Division and District Filters */}
         <div className="mb-10">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             <select
@@ -325,24 +425,11 @@ const Relief = () => {
               ))}
             </select>
 
-            <select
-              className="border border-gray-300 p-4 rounded-xl flex-1 shadow-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
-              value={selectedBloodType}
-              onChange={(e) => setSelectedBloodType(e.target.value)}
-            >
-              <option value="">All Blood Types</option>
-              {bloodTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-
             <button
               onClick={handleReset}
               className="bg-[#311B08] text-amber-500 px-8 py-4 rounded-xl font-semibold hover:underline text-lg transition-colors duration-300 whitespace-nowrap"
             >
-              Reset Filters
+              Reset All Filters
             </button>
           </div>
         </div>
@@ -363,33 +450,160 @@ const Relief = () => {
 
         {/* Available Resources */}
         <section className="mb-10">
-          <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Resources:</h2>
+          {/* Section Header with Filter */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Resources:</h2>
+            
+            {/* Resource Filter */}
+            <div className="flex items-center gap-3 mx-6">
+              <Filter size={20} className="text-[#311B08] font-bold" />
+              <div className="bg-gray-100 p-1 rounded-lg flex">
+                <button
+                  onClick={() => setResourceFilter("available")}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-300 flex items-center gap-2 ${
+                    resourceFilter === "available"
+                      ? "bg-green-600 text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  <Clock size={16} />
+                  Available ({resourceCounts.availableCount})
+                </button>
+                <button
+                  onClick={() => setResourceFilter("all")}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-300 flex items-center gap-2 ${
+                    resourceFilter === "all"
+                      ? "bg-[#311B08] text-amber-500 shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  <Filter size={16} />
+                  All Products ({resourceCounts.totalCount})
+                </button>
+              </div>
+              
+              {/* Filter Info */}
+              <div className="text-[1.0rem] text-gray-500 hidden lg:block">
+                {resourceFilter === "available" 
+                  ? `Showing ${resourceCounts.availableCount} available items`
+                  : `Showing all ${resourceCounts.totalCount} items (${resourceCounts.expiredCount} expired)`
+                }
+              </div>
+            </div>
+          </div>
+
           {loadingResources ? (
             <p className="text-center text-gray-600">Loading resource data...</p>
           ) : errorResources ? (
             <p className="text-center text-red-500">{errorResources}</p>
           ) : filteredResources.length === 0 ? (
-            <p className="text-center text-gray-600 font-semibold text-2xl">No matching resources found.</p>
+            <div className="text-center py-8">
+              <p className="text-gray-600 font-semibold text-2xl mb-2">
+                {resourceFilter === "available" ? "No available resources found." : "No matching resources found."}
+              </p>
+              {resourceFilter === "available" && resourceCounts.expiredCount > 0 && (
+                <p className="text-gray-500 text-lg">
+                  Try viewing "All Products" to see {resourceCounts.expiredCount} expired items.
+                </p>
+              )}
+            </div>
           ) : (
             <div className="relative">
               <Slider {...getSliderSettings(filteredResources.length)}>
-                {filteredResources.map((resource, index) => (
-                  <div key={index} className="p-5">
-                    <div className="bg-gray-100 border border-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
-                      <p className="font-bold text-gray-800 text-2xl">{resource.itemDescription}</p>
-                      <p className="text-gray-600 text-lg">
-                        Quantity: <span className="font-medium text-amber-600">{resource.quantity}</span>
-                      </p>
-                      <p className="text-gray-600 text-lg font-semibold">Location: {resource.pickUpLocation}</p>
-                      <button
-                        onClick={() => navigate("/contact-us")}
-                        className="bg-[#311B08] text-amber-500 px-8 py-2 mt-4 rounded-xl text-lg font-semibold hover:underline transition-colors duration-300"
-                      >
-                        Request
-                      </button>
+                {filteredResources.map((resource, index) => {
+                  const expired = isExpired(resource.expirationDate);
+                  const daysUntilExpiry = getDaysUntilExpiry(resource.expirationDate);
+                  
+                  return (
+                    <div key={index} className="p-5">
+                      <div className={`p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center relative ${
+                        expired 
+                          ? 'bg-red-50 border-2 border-red-200' 
+                          : 'bg-gray-100 hover:scale-105 transition-all duration-300'
+                      }`}>
+                        
+                        {/* Expired Badge */}
+                        {expired && (
+                          <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                            <AlertTriangle size={14} />
+                            EXPIRED
+                          </div>
+                        )}
+
+                        {/* Expiring Soon Badge */}
+                        {!expired && daysUntilExpiry !== null && daysUntilExpiry <= 7 && daysUntilExpiry > 0 && (
+                          <div className="absolute top-2 right-2 bg-[#311B08] text-amber-500 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                            <Clock size={14} />
+                            {daysUntilExpiry}d left
+                          </div>
+                        )}
+
+                        <p className={`font-bold text-2xl mb-2 ${expired ? 'text-red-800' : 'text-gray-800'}`}>
+                          {resource.itemDescription}
+                        </p>
+                        
+                        <p className={`text-lg mb-2 ${expired ? 'text-red-800' : 'text-gray-600'}`}>
+                          Quantity: <span className={`font-medium ${expired ? 'text-red-800' : 'text-amber-600'}`}>
+                            {resource.quantity}
+                          </span>
+                        </p>
+                        
+                        <p className={`text-lg font-semibold mb-3 ${expired ? 'text-red-800' : 'text-gray-600'}`}>
+                          Location: {resource.pickUpLocation}
+                        </p>
+
+                        {/* Expiry Date Display */}
+                        <div className={`mb-4 p-3 rounded-lg ${
+                          expired 
+                            ? 'bg-red-100 border border-red-300' 
+                            : daysUntilExpiry !== null && daysUntilExpiry <= 7 
+                              ? 'bg-amber-100' 
+                              : 'bg-amber-100'
+                        }`}>
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <Clock size={16} className={
+                              expired 
+                                ? 'text-red-900' 
+                                : daysUntilExpiry !== null && daysUntilExpiry <= 7 
+                                  ? 'text-[#311B08]' 
+                                  : 'text-[#311B08]'
+                            } />
+                            <span className={`font-semibold text-lg ${
+                              expired 
+                                ? 'text-red-900' 
+                                : daysUntilExpiry !== null && daysUntilExpiry <= 7 
+                                  ? 'text-[#311B08]' 
+                                  : 'text-[#311B08]'
+                            }`}>
+                              {expired ? 'Expired on:' : 'Expires on:'}
+                            </span>
+                          </div>
+                          <p className={`font-bold ${
+                            expired 
+                              ? 'text-red-900' 
+                              : daysUntilExpiry !== null && daysUntilExpiry <= 7 
+                                ? 'text-orange-800' 
+                                : 'text-orange-800'
+                          }`}>
+                            {formatDate(resource.expirationDate)}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={() => navigate("/contact-us")}
+                          disabled={expired}
+                          className={`px-8 py-2 rounded-xl text-lg font-semibold transition-colors duration-300 ${
+                            expired
+                              ? 'bg-gray-200 text-gray-600 cursor-not-allowed'
+                              : 'bg-[#311B08] text-amber-500 hover:underline'
+                          }`}
+                        >
+                          {expired ? 'No longer available' : 'Request'}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </Slider>
             </div>
           )}
@@ -397,22 +611,88 @@ const Relief = () => {
 
         {/* Available Blood Donors */}
         <section className="mb-10">
-          <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Blood Donors:</h2>
+          {/* Section Header with Blood Type Filter */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h2 className="mx-6 text-3xl font-extrabold text-gray-800">Available Blood Donors:</h2>
+            
+            {/* Blood Type Filter */}
+            <div className="flex items-center gap-3 mx-6">
+              <Droplet size={20} className="text-red-500 font-bold" />
+              <div className="bg-gray-100 p-1 rounded-lg flex flex-wrap gap-1">
+                <button
+                  onClick={() => setSelectedBloodType("")}
+                  className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-300 ${
+                    selectedBloodType === ""
+                      ? "bg-red-500 text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                >
+                  All ({donorCounts.totalCount})
+                </button>
+                {bloodTypes.map((type) => {
+                  const typeCount = donors.filter(donor => {
+                    const locationMatch = selectedDivision || selectedDistrict
+                      ? (selectedDivision && !selectedDistrict
+                          ? donor.district.toLowerCase().includes(selectedDivision.toLowerCase()) ||
+                            allDistricts.some(dist => 
+                              dist.name.toLowerCase() === donor.district.toLowerCase() && 
+                              divisions.some(div => div.id === dist.divisionId && div.name === selectedDivision)
+                            )
+                          : true) && (selectedDistrict
+                          ? donor.district.toLowerCase().includes(selectedDistrict.toLowerCase())
+                          : true)
+                      : true;
+                    return donor.blood_group === type && locationMatch;
+                  }).length;
+
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => setSelectedBloodType(type)}
+                      className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors duration-300 ${
+                        selectedBloodType === type
+                          ? "bg-[#311B08] text-amber-500 shadow-md"
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                    >
+                      {type} ({typeCount})
+                    </button>
+                  );
+                })}
+              </div>
+              
+              {/* Filter Info */}
+              <div className="text-[1.0rem] text-gray-500 hidden xl:block">
+                {selectedBloodType 
+                  ? `Showing ${donorCounts.bloodTypeCount} ${selectedBloodType} donors`
+                  : `Showing all ${donorCounts.totalCount} donors`
+                }
+              </div>
+            </div>
+          </div>
+
           {loadingDonors ? (
             <p className="text-center text-gray-600">Loading donor data...</p>
           ) : errorDonors ? (
             <p className="text-center text-red-500">{errorDonors}</p>
           ) : filteredDonors.length === 0 ? (
-            <p className="text-center text-gray-600 font-semibold text-2xl">No matching donors found.</p>
+            <div className="text-center py-8">
+              <p className="text-gray-600 font-semibold text-2xl mb-2">No matching donors found.</p>
+              {selectedBloodType && (
+                <p className="text-gray-500 text-lg">
+                  Try selecting "All" to see {donorCounts.totalCount} available donors.
+                </p>
+              )}
+            </div>
           ) : (
             <div className="relative">
               <Slider {...getSliderSettings(filteredDonors.length)}>
                 {filteredDonors.map((donor, index) => (
                   <div key={index} className="p-5">
-                    <div className="bg-gray-100 border border-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+                    <div className="bg-gray-100 p-6 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-center">
                       <p className="font-bold text-gray-800 text-2xl mb-1">{donor.donorName}</p>
                       <p className="text-gray-600 text-lg font-bold">
-                        Blood Type: <span className="font-medium text-amber-600">{donor.blood_group}</span>
+                        Blood Type: <span className="font-medium text-red-600">{donor.blood_group}</span>
                       </p>
                       <p className="text-gray-600 text-lg">Contact: {donor.donorPhone}</p>
                       <p className="text-gray-600 text-lg font-semibold">
@@ -446,11 +726,11 @@ const Relief = () => {
               <Slider {...getSliderSettings(filteredVolunteers.length)}>
                 {filteredVolunteers.map((volunteer, index) => (
                   <div key={index} className="p-5">
-                    <div className="bg-gray-100 border border-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 text-center">
+                    <div className="bg-gray-100 p-6 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 text-center">
                       <p className="font-bold text-gray-800 text-2xl mb-1">{volunteer.volunteerName}</p>
                       <p className="text-gray-600 text-lg">Email: {volunteer.volunteerMail}</p>
                       <p className="text-gray-600 text-lg font-bold">
-                        Blood Type: <span className="font-medium text-amber-600">{volunteer.BloodGroup}</span>
+                        Blood Type: <span className="font-medium text-red-600">{volunteer.BloodGroup}</span>
                       </p>
                       <p className="text-gray-600 text-lg font-semibold">
                         Location: {volunteer.District}

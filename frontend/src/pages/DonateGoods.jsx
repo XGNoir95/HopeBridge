@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Package } from "lucide-react";
+import { Package } from "lucide-react";  
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -11,6 +11,7 @@ const DonateGoods = () => {
     itemDescription: "",
     quantity: "",
     pickUpLocation: "",
+    expirationDate: ""
   });
   const [error, setError] = useState(null);
   const [districts, setDistricts] = useState([]);
@@ -18,6 +19,15 @@ const DonateGoods = () => {
   const [selectedDivision, setSelectedDivision] = useState("");
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  // Get current date in Bangladesh timezone (UTC+6)
+  const getCurrentBDTDate = () => {
+    const now = new Date();
+    const bdtOffset = 6 * 60; // 6 hours in minutes
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const bdtTime = new Date(utc + (bdtOffset * 60000));
+    return bdtTime.toISOString().split('T')[0]; // YYYY-MM-DD format
+  };
 
   // Fetch user data and divisions on component mount
   useEffect(() => {
@@ -87,10 +97,24 @@ const DonateGoods = () => {
     e.preventDefault();
     setError(null);
 
+    // Validate expiration date is not in the past (BDT)
+    const currentBDTDate = getCurrentBDTDate();
+    
+    if (formData.expirationDate < currentBDTDate) {
+      setError("Expiration date cannot be in the past.");
+      return;
+    }
+
     try {
+      // Prepare data for backend (include pickUpDate as current date)
+      const submitData = {
+        ...formData,
+        pickUpDate: getCurrentBDTDate() // Set current BDT date as pickup date
+      };
+
       const response = await axios.post(
         "http://localhost:8000/api/create-resources",
-        formData
+        submitData
       );
       if (response.data.success) {
         setIsSubmitted(true);
@@ -145,7 +169,7 @@ const DonateGoods = () => {
   }
 
   return (
-    <div className="flex min-h-screen lg:h-screen overflow-hidden">
+    <div className="flex min-h-screen">
       {/* Left Sidebar - Fixed width with proper constraints */}
       <div className="hidden lg:flex lg:w-[45%] bg-[#311B08] flex-col items-center justify-center p-6 text-white overflow-hidden">
         <div className="text-center flex flex-col items-center justify-center h-full max-w-full">
@@ -179,9 +203,9 @@ const DonateGoods = () => {
 
       {/* Right Form Section - Fixed width with proper constraints */}
       <div className="w-full lg:w-[55%] bg-gray-50 flex flex-col">
-        <div className="flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex-1 flex items-center justify-center py-2 sm:py-4 lg:py-6 px-4 sm:px-6 lg:px-8">
           <div className="w-full max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-10 lg:py-15 w-full max-h-full overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:p-8 w-full">
 
               {/* Mobile header - only visible on small screens */}
               <div className="lg:hidden text-center mb-4 sm:mb-6">
@@ -210,7 +234,7 @@ const DonateGoods = () => {
               </div>
 
               {isSubmitted && (
-                <div className="text-center py-8 sm:py-15 mb-6 sm:mb-8 rounded-lg bg-green-100 text-green-600">
+                <div className="text-center py-8 sm:py-12 mb-6 sm:mb-8 rounded-lg bg-green-100 text-green-600">
                   <p className="text-2xl font-semibold mb-4">Thank you for donating goods!</p>
                   <Link
                     to="/donate"
@@ -228,7 +252,7 @@ const DonateGoods = () => {
               )}
 
               {!isSubmitted && (
-                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                   {/* Full Name */}
                   <div>
                     <label className="block text-base text-lg font-semibold text-gray-700 mb-2">
@@ -273,7 +297,7 @@ const DonateGoods = () => {
                         type="text"
                         name="itemDescription"
                         className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base"
-                        placeholder="Item Description"
+                        placeholder="e.g., Rice, Medicine, Clothes"
                         value={formData.itemDescription}
                         onChange={handleChange}
                         required
@@ -287,13 +311,33 @@ const DonateGoods = () => {
                       <input
                         type="number"
                         name="quantity"
+                        min="1"
                         className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base"
-                        placeholder="Quantity"
+                        placeholder="Enter quantity"
                         value={formData.quantity}
                         onChange={handleChange}
                         required
                       />
                     </div>
+                  </div>
+
+                  {/* Expiration Date - Full Width */}
+                  <div>
+                    <label className="block text-lg font-semibold text-gray-700 mb-2">
+                      Expiration Date <span className="text-red-500">*</span> <span className="text-sm text-gray-500">(BDT)</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="expirationDate"
+                      min={getCurrentBDTDate()}
+                      className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#311B08] focus:border-transparent outline-none transition-colors text-base"
+                      value={formData.expirationDate}
+                      onChange={handleChange}
+                      required
+                    />
+                    <p className="text-sm text-gray-600 mt-1">
+                      Please specify when this item will expire to help us distribute it effectively
+                    </p>
                   </div>
 
                   {/* Division and District */}
@@ -341,10 +385,10 @@ const DonateGoods = () => {
                   </div>
 
                   {/* Submit Button */}
-                  <div className="pt-2 sm:pt-4">
+                  <div className="pt-2 sm:pt-3">
                     <button
                       type="submit"
-                      className="w-full bg-[#311B08] text-lg lg:text-xl font-semibold text-amber-500 py-4 lg:py-5 px-6 rounded-lg hover:bg-[#EBB380] hover:text-[#311B08] transition-all"
+                      className="w-full bg-[#311B08] text-lg lg:text-xl font-semibold text-amber-500 py-4 lg:py-4 px-6 rounded-lg hover:bg-[#EBB380] hover:text-[#311B08] transition-all"
                     >
                       Submit Donation
                     </button>
