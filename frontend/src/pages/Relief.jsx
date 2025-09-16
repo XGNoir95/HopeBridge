@@ -383,7 +383,7 @@ const Relief = () => {
                       <p className="text-gray-600 text-lg font-semibold">Location: {resource.pickUpLocation}</p>
                       <button
                         onClick={() => navigate("/contact-us")}
-                        className="bg-[#311B08] text-[#EBB380] px-5 py-2 mt-4 rounded-xl text-lg font-semibold hover:underline transition-colors duration-300"
+                        className="bg-[#311B08] text-amber-500 px-8 py-2 mt-4 rounded-xl text-lg font-semibold hover:underline transition-colors duration-300"
                       >
                         Request
                       </button>
@@ -420,7 +420,7 @@ const Relief = () => {
                       </p>
                       <button
                         onClick={() => navigate("/contact-us")}
-                        className="bg-[#311B08] text-[#EBB380] px-5 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
+                        className="bg-[#311B08] text-amber-500 px-8 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
                       >
                         Contact
                       </button>
@@ -457,7 +457,7 @@ const Relief = () => {
                       </p>
                       <button
                         onClick={() => navigate("/contact-us")}
-                        className="bg-[#311B08] text-[#EBB380] px-5 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
+                        className="bg-[#311B08] text-amber-500 px-8 py-2 text-lg mt-4 rounded-xl font-semibold hover:underline transition-colors duration-300"
                       >
                         Contact
                       </button>

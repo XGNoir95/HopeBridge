@@ -102,13 +102,13 @@ const DonateBlood = () => {
     return (
       <div className="flex min-h-screen">
         <div className="w-full lg:w-[60%] flex items-center justify-center bg-gray-50 p-4 lg:p-8">
-          <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+          <div className="bg-white p-6 lg:p-8 rounded-lg shadow-lg max-w-xl w-full text-center">
             <p className="text-xl lg:text-2xl font-bold text-gray-900 mb-4">
               You need to be logged in to register for blood donation.
             </p>
             <button
               onClick={() => navigate("/login")}
-              className="w-full bg-[#311B08] text-white font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all mb-4"
+              className="w-full bg-[#311B08] text-amber-500 hover:underline text-lg font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition-all mb-4"
             >
               Log In
             </button>
@@ -126,11 +126,11 @@ const DonateBlood = () => {
 
         <div className="hidden lg:flex lg:w-[40%] bg-[#311B08] flex-col items-center justify-center p-8 text-white">
           <div className="text-center space-y-6">
-            <h1 className="text-3xl font-bold mb-4">Save Lives Today</h1>
-            <p className="text-lg opacity-90">
+            <h1 className="text-5xl text-amber-500 font-bold mb-4">Save Lives Today</h1>
+            <p className="text-2xl opacity-90">
               Register as a blood donor and help save lives in your community
             </p>
-            <p className="text-sm opacity-75">
+            <p className="text-xl opacity-75">
               Your donation can make the difference between life and death.
             </p>
           </div>

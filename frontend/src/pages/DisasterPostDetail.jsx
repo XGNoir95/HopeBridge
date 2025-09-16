@@ -191,7 +191,7 @@ function DisasterPostDetail() {
   return (
     <div className="bg-white min-h-screen">
       {/* Header Section */}
-      <header className="bg-[url('/details.png')] text-white py-16 text-center">
+      <header className="bg-[url('/login3.png')] text-white py-16 text-center">
         <h1 className="text-5xl font-bold mb-4 flex justify-center items-center gap-2">
           <AlertTriangle size={45} className="text-amber-500" />
           Disaster Briefings
@@ -333,8 +333,8 @@ function DisasterPostDetail() {
             // Display Post Details - Improved
             <div className="bg-white rounded-xl border border-gray-300 overflow-hidden">
               {/* Title Section */}
-              <div className="p-8 border-b border-gray-300">
-                <h1 className="text-4xl lg:text-5xl font-extrabold text-[#311B08] mb-4">
+              <div className="p-8 pb-4 border-b border-gray-300">
+                <h1 className="text-3xl lg:text-[2.5rem] font-extrabold text-[#311B08] mb-4">
                   {post.title}
                 </h1>
               </div>
@@ -346,11 +346,11 @@ function DisasterPostDetail() {
                   <div className="bg-white border border-gray-300 p-6 rounded-xl shadow-sm">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="p-3 bg-[#311B08] rounded-lg">
-                        <MapPin size={25} className="text-amber-500" />
+                        <MapPin size={22} className="text-amber-500" />
                       </div>
-                      <h3 className="text-[2.0rem] font-bold text-[#311B08]">Location</h3>
+                      <h3 className="text-[1.7rem] font-bold text-[#311B08]">Location</h3>
                     </div>
-                    <p className="text-[1.4rem] text-gray-700 mb-2">
+                    <p className="text-[1.3rem] text-gray-700 mb-2">
                       {post.district}, {post.division}
                     </p>
                   </div>
@@ -359,14 +359,14 @@ function DisasterPostDetail() {
                   <div className="bg-white border border-gray-300 p-6 rounded-xl shadow-sm">
                     <div className="flex items-center gap-3 mb-5">
                       <div className="p-3 bg-[#311B08] rounded-lg">
-                        <Calendar size={25} className="text-amber-500" />
+                        <Calendar size={22} className="text-amber-500" />
                       </div>
-                      <h3 className="text-[2.0rem] font-bold text-[#311B08]">Date & Time</h3>
+                      <h3 className="text-[1.7rem] font-bold text-[#311B08]">Date & Time</h3>
                     </div>
-                    <p className="text-[1.4rem] font-bold text-gray-700">
+                    <p className="text-[1.3rem] font-bold text-gray-700">
                       {post.event_date}
                     </p>
-                    <p className="text-xl text-gray-700 mb-2">
+                    <p className="text-lg text-gray-700 mb-2">
                       {post.event_time}
                     </p>
                   </div>
@@ -376,11 +376,11 @@ function DisasterPostDetail() {
                 <div className="bg-white border border-gray-300 p-8 rounded-xl shadow-sm">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-3 bg-[#311B08] rounded-lg">
-                      <AlertTriangle size={25} className="text-amber-500" />
+                      <AlertTriangle size={22} className="text-amber-500" />
                     </div>
-                    <h3 className="text-[2.0rem] font-bold text-[#311B08]">Description</h3>
+                    <h3 className="text-[1.7rem] font-bold text-[#311B08]">Description</h3>
                   </div>
-                  <p className="text-[1.4rem] text-gray-700 leading-relaxed text-justify">
+                  <p className="text-[1.3rem] text-gray-700 leading-relaxed text-justify">
                     {post.description}
                   </p>
                 </div>
@@ -393,14 +393,14 @@ function DisasterPostDetail() {
                   <div className="flex gap-4">
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex-1 bg-[#311B08] text-amber-500 text-xl px-10 py-3 rounded-xl font-semibold hover:underline transition-colors duration-300 flex items-center justify-center gap-2"
+                      className="flex-1 bg-[#311B08] text-amber-500 text-xl px-10 py-4 rounded-xl font-semibold hover:underline transition-colors duration-300 flex items-center justify-center gap-2"
                     >
                       <Edit2 size={20} />
                       Update
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="flex-1 bg-red-500 text-white text-xl px-10 py-3 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300 flex items-center justify-center gap-2"
+                      className="flex-1 bg-red-500 text-white text-xl px-10 py-4 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300 flex items-center justify-center gap-2"
                     >
                       <Trash2 size={20} />
                       Delete
