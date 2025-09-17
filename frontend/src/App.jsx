@@ -6,8 +6,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import ChatBot from "./components/ChatBot";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GuestRoute from "./components/GuestRoute";
-
-// Import all your pages
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";

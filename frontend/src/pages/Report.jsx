@@ -127,10 +127,10 @@ const ReportIncident = () => {
           <div className="text-center space-y-6">
             <h1 className="text-3xl font-bold mb-4">Welcome Back</h1>
             <p className="text-lg opacity-90">
-              Implement user onboarding experiences with just a few clicks
+              Welcome back! Please log in to report a disaster and help your community.
             </p>
             <p className="text-sm opacity-75">
-              Guide your customers on fantastic journey within your app.
+              Login to access your account and contribute to disaster relief efforts.
             </p>
           </div>
         </div>

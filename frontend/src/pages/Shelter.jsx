@@ -23,7 +23,6 @@ const Shelter = () => {
   const mapInitialized = useRef(false);
   const mapContainerRef = useRef(null);
   const isMounted = useRef(true);
-  
   const navigate = useNavigate();
   
   // ========== FACILITY TYPES CONFIGURATION ==========

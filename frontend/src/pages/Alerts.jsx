@@ -20,7 +20,7 @@ function Alerts() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        // Sort by newest first (created_at or updated_at)
+        // Sort by newest first
         const sortedPosts = response.data.disaster_posts.sort((a, b) => {
           const dateA = new Date(a.created_at || a.updated_at);
           const dateB = new Date(b.created_at || b.updated_at);

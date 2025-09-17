@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[#311B08] text-white p-4 shadow-lg relative">
+    <nav className="bg-[#311B08] text-white p-4 shadow-xl relative">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center space-x-2">
           <img src={logo} alt="Hope Bridge Logo" className="w-auto h-14" />
